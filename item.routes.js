@@ -1,85 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const { Item, itemValidationSchema } = require('./item.model');
-const mongoose = require('mongoose');
-
-// Middleware to validate ObjectId
-function validateObjectId(req, res, next) {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).send('Invalid ID format');
-  }
-  next();
-}
+const Item = require('./item.model');
 
 // Get all items
 router.get('/', async (req, res) => {
-  try {
-    const items = await Item.find();
-    res.send(items);
-  } catch (err) {
-    res.status(500).send('Internal Server Error');
-  }
+try {
+const items = await Item.find();
+res.json(items);
+} catch (err) {
+res.status(500).json({ message: err.message });
+}
 });
 
-// Get item by id
-router.get('/:id', validateObjectId, async (req, res) => {
-  try {
-    const item = await Item.findById(req.params.id);
-    if (!item) {
-      return res.status(404).send('Item not found');
-    }
-    res.send(item);
-  } catch (err) {
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-// Create a new item
+// Create an item
 router.post('/', async (req, res) => {
-  try {
-    const { error } = itemValidationSchema.validate(req.body);
-    if (error) {
-      return res.status(400).send(error.details[0].message);
-    }
-
-    const item = new Item(req.body);
-    await item.save();
-    res.status(201).send(item);
-  } catch (err) {
-    res.status(500).send('Internal Server Error');
-  }
+const item = new Item({
+name: req.body.name,
+description: req.body.description,
+price: req.body.price
 });
-
-// Update an item
-router.put('/:id', validateObjectId, async (req, res) => {
-  try {
-    const { error } = itemValidationSchema.validate(req.body);
-    if (error) {
-      return res.status(400).send(error.details[0].message);
-    }
-
-    const item = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!item) {
-      return res.status(404).send('Item not found');
-    }
-    res.send(item);
-  } catch (err) {
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-// Delete an item
-router.delete('/:id', validateObjectId, async (req, res) => {
-  try {
-    const item = await Item.findByIdAndDelete(req.params.id);
-    if (!item) {
-      return res.status(404).send('Item not found');
-    }
-    res.send(item);
-  } catch (err) {
-    res.status(500).send('Internal Server Error');
-  }
+try {
+    const newItem = await item.save();
+    res.status(201).json(newItem);
+} catch (err) {
+    res.status(400).json({ message: err.message });
+}
 });
 
 module.exports = router;
-
