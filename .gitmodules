@@ -1,0 +1,3 @@
+[submodule "Real-Estate-Direct"]
+	path = Real-Estate-Direct
+	url = https://github.com/YourUsername/YourSubmoduleRepository.git
