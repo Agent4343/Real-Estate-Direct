@@ -1,14 +1,14 @@
 {
-  "name": "rental-app",
-  "version": "1.0.0",
-  "description": "Real Estate Direct - A rental property management API",
+  "name": "real-estate-direct",
+  "version": "2.0.0",
+  "description": "Canadian Real Estate Buying/Selling Platform API",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
     "test": "echo \"No tests configured\" && exit 0"
   },
-  "keywords": ["rental", "real-estate", "api"],
+  "keywords": ["real-estate", "canada", "property", "buying", "selling", "api"],
   "author": "",
   "license": "ISC",
   "dependencies": {
