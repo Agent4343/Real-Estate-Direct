@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real Estate Direct - Canadian Real Estate Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <h1>🏠 Real Estate Direct</h1>
+      </div>
+      <div class="nav-links">
+        <a href="#" onclick="showSection('home')">Home</a>
+        <a href="#" onclick="showSection('search')">Buy</a>
+        <a href="#" onclick="showSection('sell')">Sell</a>
+        <a href="#" onclick="showSection('calculator')">Tax Calculator</a>
+        <a href="#" onclick="showSection('dashboard')" id="dashboardLink" style="display:none;">Dashboard</a>
+      </div>
+      <div class="auth-buttons" id="authButtons">
+        <button onclick="showModal('loginModal')" class="btn btn-outline">Login</button>
+        <button onclick="showModal('registerModal')" class="btn btn-primary">Register</button>
+      </div>
+      <div class="user-info" id="userInfo" style="display:none;">
+        <span id="userName"></span>
+        <button onclick="logout()" class="btn btn-outline">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Home Section -->
+    <section id="home" class="section active">
+      <div class="hero">
+        <h2>Buy or Sell Real Estate in Canada</h2>
+        <p>Simple, step-by-step process with all the forms you need</p>
+        <div class="hero-buttons">
+          <button onclick="showSection('search')" class="btn btn-primary btn-lg">Find Properties</button>
+          <button onclick="showSection('sell')" class="btn btn-outline btn-lg">List Your Property</button>
+        </div>
+      </div>
+
+      <div class="features">
+        <div class="feature-card">
+          <h3>📋 Province-Specific Forms</h3>
+          <p>All the legal forms you need for every Canadian province</p>
+        </div>
+        <div class="feature-card">
+          <h3>💰 Tax Calculator</h3>
+          <p>Calculate land transfer taxes for any province</p>
+        </div>
+        <div class="feature-card">
+          <h3>📝 Step-by-Step Process</h3>
+          <p>Guided workflow from offer to closing</p>
+        </div>
+        <div class="feature-card">
+          <h3>🔒 Secure Transactions</h3>
+          <p>Track conditions, documents, and deadlines</p>
+        </div>
+      </div>
+
+      <div class="provinces-section">
+        <h3>Serving All Canadian Provinces</h3>
+        <div class="province-grid" id="provinceGrid"></div>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+    <section id="search" class="section">
+      <h2>Find Your Perfect Property</h2>
+      <div class="search-container">
+        <div class="search-filters">
+          <select id="searchProvince">
+            <option value="">All Provinces</option>
+          </select>
+          <input type="text" id="searchCity" placeholder="City">
+          <select id="searchType">
+            <option value="">All Types</option>
+            <option value="detached">Detached</option>
+            <option value="semi-detached">Semi-Detached</option>
+            <option value="townhouse">Townhouse</option>
+            <option value="condo">Condo</option>
+          </select>
+          <input type="number" id="minPrice" placeholder="Min Price">
+          <input type="number" id="maxPrice" placeholder="Max Price">
+          <button onclick="searchProperties()" class="btn btn-primary">Search</button>
+        </div>
+      </div>
+      <div class="property-grid" id="propertyGrid">
+        <p class="loading">Loading properties...</p>
+      </div>
+    </section>
+
+    <!-- Sell Section -->
+    <section id="sell" class="section">
+      <h2>List Your Property</h2>
+      <div class="sell-form-container" id="sellFormContainer">
+        <p class="auth-required">Please <a href="#" onclick="showModal('loginModal')">login</a> to list your property.</p>
+      </div>
+      <div class="sell-form" id="sellForm" style="display:none;">
+        <form onsubmit="createProperty(event)">
+          <div class="form-group">
+            <label>Province</label>
+            <select id="propertyProvince" required></select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Street Address</label>
+              <input type="text" id="propertyStreet" required>
+            </div>
+            <div class="form-group">
+              <label>Unit (optional)</label>
+              <input type="text" id="propertyUnit">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>City</label>
+              <input type="text" id="propertyCity" required>
+            </div>
+            <div class="form-group">
+              <label>Postal Code</label>
+              <input type="text" id="propertyPostal" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Legal Description</label>
+            <input type="text" id="propertyLegal" required placeholder="e.g., Lot 123, Plan 456">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Property Type</label>
+              <select id="propertyType" required>
+                <option value="detached">Detached</option>
+                <option value="semi-detached">Semi-Detached</option>
+                <option value="townhouse">Townhouse</option>
+                <option value="condo">Condo</option>
+                <option value="land">Land</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Asking Price ($)</label>
+              <input type="number" id="propertyPrice" required min="1">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bedrooms</label>
+              <input type="number" id="propertyBeds" min="0" value="3">
+            </div>
+            <div class="form-group">
+              <label>Bathrooms</label>
+              <input type="number" id="propertyBaths" min="0" step="0.5" value="2">
+            </div>
+            <div class="form-group">
+              <label>Square Feet</label>
+              <input type="number" id="propertySqft" min="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="propertyDescription" rows="4"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg">Create Listing</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Tax Calculator Section -->
+    <section id="calculator" class="section">
+      <h2>Land Transfer Tax Calculator</h2>
+      <div class="calculator-container">
+        <div class="calc-form">
+          <div class="form-group">
+            <label>Province</label>
+            <select id="calcProvince" onchange="updateCalcOptions()"></select>
+          </div>
+          <div class="form-group">
+            <label>Purchase Price ($)</label>
+            <input type="number" id="calcPrice" value="500000" min="0">
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="calcFirstTime"> First-Time Home Buyer
+            </label>
+          </div>
+          <div class="form-group" id="torontoOption" style="display:none;">
+            <label>
+              <input type="checkbox" id="calcToronto"> Property in Toronto
+            </label>
+          </div>
+          <button onclick="calculateTax()" class="btn btn-primary">Calculate</button>
+        </div>
+        <div class="calc-results" id="calcResults">
+          <p>Enter details and click Calculate</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section">
+      <h2>My Dashboard</h2>
+      <div class="dashboard-tabs">
+        <button class="tab-btn active" onclick="showTab('myProperties')">My Properties</button>
+        <button class="tab-btn" onclick="showTab('myOffers')">My Offers</button>
+        <button class="tab-btn" onclick="showTab('myTransactions')">Transactions</button>
+      </div>
+      <div class="dashboard-content">
+        <div id="myProperties" class="tab-content active">
+          <h3>My Properties</h3>
+          <div id="propertiesList"></div>
+        </div>
+        <div id="myOffers" class="tab-content">
+          <h3>My Offers</h3>
+          <div id="offersList"></div>
+        </div>
+        <div id="myTransactions" class="tab-content">
+          <h3>My Transactions</h3>
+          <div id="transactionsList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('loginModal')">&times;</span>
+      <h2>Login</h2>
+      <form onsubmit="login(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+      <p class="modal-footer">Don't have an account? <a href="#" onclick="showModal('registerModal'); closeModal('loginModal');">Register</a></p>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('registerModal')">&times;</span>
+      <h2>Register</h2>
+      <form onsubmit="register(event)">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="registerName" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="registerEmail" required>
+        </div>
+        <div class="form-group">
+          <label>Password (min 8 characters)</label>
+          <input type="password" id="registerPassword" required minlength="8">
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+      </form>
+      <p class="modal-footer">Already have an account? <a href="#" onclick="showModal('loginModal'); closeModal('registerModal');">Login</a></p>
+    </div>
+  </div>
+
+  <!-- Property Detail Modal -->
+  <div id="propertyModal" class="modal">
+    <div class="modal-content modal-large">
+      <span class="close" onclick="closeModal('propertyModal')">&times;</span>
+      <div id="propertyDetail"></div>
+    </div>
+  </div>
+
+  <!-- Make Offer Modal -->
+  <div id="offerModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('offerModal')">&times;</span>
+      <h2>Make an Offer</h2>
+      <form onsubmit="submitOffer(event)">
+        <input type="hidden" id="offerListingId">
+        <div class="form-group">
+          <label>Offer Price ($)</label>
+          <input type="number" id="offerPrice" required min="1">
+        </div>
+        <div class="form-group">
+          <label>Deposit Amount ($)</label>
+          <input type="number" id="offerDeposit" required min="0">
+        </div>
+        <div class="form-group">
+          <label>Closing Date</label>
+          <input type="date" id="offerClosingDate" required>
+        </div>
+        <div class="form-group">
+          <label>Offer Expires (Irrevocable Date)</label>
+          <input type="datetime-local" id="offerIrrevocable" required>
+        </div>
+        <div class="form-group">
+          <label>Conditions</label>
+          <div class="conditions-list">
+            <label><input type="checkbox" name="conditions" value="financing"> Financing (5 days)</label>
+            <label><input type="checkbox" name="conditions" value="inspection"> Home Inspection (7 days)</label>
+            <label><input type="checkbox" name="conditions" value="lawyer_review"> Lawyer Review (3 days)</label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Offer</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Real Estate Direct. This platform provides tools for convenience only. Consult with licensed professionals.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

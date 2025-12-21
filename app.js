@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const path = require('path');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -22,9 +23,21 @@ const { getAllProvinces, calculateLandTransferTax } = require('./config/province
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Security middleware - configure for frontend
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
 app.use(cors());
+
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -127,10 +140,22 @@ app.get('/api', (req, res) => {
 });
 
 // ==========================================
+// Frontend Catch-all (for SPA routing)
+// ==========================================
+
+// Serve frontend for non-API routes
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ==========================================
 // Error Handling
 // ==========================================
 
-// 404 handler
+// 404 handler for API routes
 app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
