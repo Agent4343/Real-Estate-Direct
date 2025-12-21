@@ -2,33 +2,227 @@
  * Email Notification Service
  * Handles all email notifications for the real estate platform
  *
- * Note: This is a template service. In production, integrate with:
- * - SendGrid, Mailgun, AWS SES, or similar
+ * Supports: SendGrid, Mailgun, AWS SES, or local development mode
  */
 
 class EmailService {
   constructor() {
     this.fromEmail = process.env.EMAIL_FROM || 'noreply@realestatedirect.ca';
+    this.fromName = process.env.EMAIL_FROM_NAME || 'Real Estate Direct';
     this.appName = 'Real Estate Direct';
-    // In production, initialize your email provider here
-    // this.client = new SendGridClient(process.env.SENDGRID_API_KEY);
+    this.provider = process.env.EMAIL_PROVIDER || 'local'; // sendgrid, mailgun, ses, local
+
+    // Provider-specific configurations
+    this.sendgridApiKey = process.env.SENDGRID_API_KEY;
+    this.mailgunApiKey = process.env.MAILGUN_API_KEY;
+    this.mailgunDomain = process.env.MAILGUN_DOMAIN;
+    this.awsRegion = process.env.AWS_REGION || 'us-east-1';
   }
 
   /**
-   * Send email (template method - integrate with your email provider)
+   * Send email using configured provider
    */
   async sendEmail(to, subject, html, text) {
-    // In production, send actual email
-    console.log(`[EMAIL] To: ${to}`);
-    console.log(`[EMAIL] Subject: ${subject}`);
-    console.log(`[EMAIL] Preview: ${text?.substring(0, 100)}...`);
+    const emailData = {
+      from: { email: this.fromEmail, name: this.fromName },
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      html,
+      text: text || this.stripHtml(html)
+    };
 
-    // Simulate sending
+    try {
+      switch (this.provider) {
+        case 'sendgrid':
+          return await this.sendWithSendGrid(emailData);
+        case 'mailgun':
+          return await this.sendWithMailgun(emailData);
+        case 'ses':
+          return await this.sendWithSES(emailData);
+        default:
+          return await this.sendLocal(emailData);
+      }
+    } catch (error) {
+      console.error(`[EMAIL ERROR] ${error.message}`);
+      // Return error but don't throw - email failures shouldn't break the app
+      return {
+        success: false,
+        error: error.message,
+        to,
+        subject
+      };
+    }
+  }
+
+  /**
+   * Send email via SendGrid
+   */
+  async sendWithSendGrid(emailData) {
+    if (!this.sendgridApiKey) {
+      console.warn('[EMAIL] SendGrid API key not configured, falling back to local');
+      return this.sendLocal(emailData);
+    }
+
+    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.sendgridApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        personalizations: [{
+          to: emailData.to.map(email => ({ email }))
+        }],
+        from: emailData.from,
+        subject: emailData.subject,
+        content: [
+          { type: 'text/plain', value: emailData.text },
+          { type: 'text/html', value: emailData.html }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`SendGrid error: ${error}`);
+    }
+
+    const messageId = response.headers.get('x-message-id') || `sg_${Date.now()}`;
+
+    console.log(`[EMAIL] Sent via SendGrid: ${emailData.subject} to ${emailData.to.join(', ')}`);
+
     return {
       success: true,
-      messageId: `msg_${Date.now()}`,
-      to,
-      subject
+      provider: 'sendgrid',
+      messageId,
+      to: emailData.to,
+      subject: emailData.subject
+    };
+  }
+
+  /**
+   * Send email via Mailgun
+   */
+  async sendWithMailgun(emailData) {
+    if (!this.mailgunApiKey || !this.mailgunDomain) {
+      console.warn('[EMAIL] Mailgun not configured, falling back to local');
+      return this.sendLocal(emailData);
+    }
+
+    const formData = new URLSearchParams();
+    formData.append('from', `${emailData.from.name} <${emailData.from.email}>`);
+    emailData.to.forEach(to => formData.append('to', to));
+    formData.append('subject', emailData.subject);
+    formData.append('text', emailData.text);
+    formData.append('html', emailData.html);
+
+    const response = await fetch(
+      `https://api.mailgun.net/v3/${this.mailgunDomain}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${Buffer.from(`api:${this.mailgunApiKey}`).toString('base64')}`
+        },
+        body: formData
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Mailgun error: ${error}`);
+    }
+
+    const result = await response.json();
+
+    console.log(`[EMAIL] Sent via Mailgun: ${emailData.subject} to ${emailData.to.join(', ')}`);
+
+    return {
+      success: true,
+      provider: 'mailgun',
+      messageId: result.id,
+      to: emailData.to,
+      subject: emailData.subject
+    };
+  }
+
+  /**
+   * Send email via AWS SES
+   */
+  async sendWithSES(emailData) {
+    // AWS SES requires the AWS SDK - check if available
+    try {
+      const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
+
+      const client = new SESClient({ region: this.awsRegion });
+
+      const command = new SendEmailCommand({
+        Source: `${emailData.from.name} <${emailData.from.email}>`,
+        Destination: {
+          ToAddresses: emailData.to
+        },
+        Message: {
+          Subject: { Data: emailData.subject },
+          Body: {
+            Text: { Data: emailData.text },
+            Html: { Data: emailData.html }
+          }
+        }
+      });
+
+      const result = await client.send(command);
+
+      console.log(`[EMAIL] Sent via SES: ${emailData.subject} to ${emailData.to.join(', ')}`);
+
+      return {
+        success: true,
+        provider: 'ses',
+        messageId: result.MessageId,
+        to: emailData.to,
+        subject: emailData.subject
+      };
+    } catch (error) {
+      if (error.code === 'MODULE_NOT_FOUND') {
+        console.warn('[EMAIL] AWS SDK not installed, falling back to local');
+        return this.sendLocal(emailData);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Local development mode - logs email to console
+   */
+  async sendLocal(emailData) {
+    console.log('\n========== EMAIL (Local Mode) ==========');
+    console.log(`To: ${emailData.to.join(', ')}`);
+    console.log(`From: ${emailData.from.name} <${emailData.from.email}>`);
+    console.log(`Subject: ${emailData.subject}`);
+    console.log('-----------------------------------------');
+    console.log(`Preview: ${emailData.text?.substring(0, 200)}...`);
+    console.log('=========================================\n');
+
+    return {
+      success: true,
+      provider: 'local',
+      messageId: `local_${Date.now()}`,
+      to: emailData.to,
+      subject: emailData.subject
+    };
+  }
+
+  /**
+   * Send bulk emails (for notifications to multiple users)
+   */
+  async sendBulk(recipients) {
+    const results = await Promise.allSettled(
+      recipients.map(r => this.sendEmail(r.email, r.subject, r.html, r.text))
+    );
+
+    return {
+      total: recipients.length,
+      sent: results.filter(r => r.status === 'fulfilled' && r.value.success).length,
+      failed: results.filter(r => r.status === 'rejected' || !r.value?.success).length,
+      results
     };
   }
 

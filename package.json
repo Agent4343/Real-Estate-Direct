@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
-    "test": "echo \"No tests configured\" && exit 0"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "echo \"No linter configured\"",
+    "build": "echo \"No build step required\""
   },
   "keywords": ["real-estate", "canada", "property", "buying", "selling", "api"],
   "author": "",
@@ -21,6 +25,13 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.1",
+    "multer": "^1.4.5-lts.1",
     "pdfkit": "^0.15.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

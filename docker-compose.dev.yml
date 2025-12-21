@@ -1,0 +1,67 @@
+version: '3.8'
+
+# Development Configuration
+# Usage: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # Real Estate Direct API (Development)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: real-estate-api-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/real-estate-dev
+      - JWT_SECRET=dev-jwt-secret-change-in-production
+      - EMAIL_PROVIDER=local
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - uploads:/app/uploads
+    depends_on:
+      - mongo
+    networks:
+      - real-estate-dev
+
+  # MongoDB Database
+  mongo:
+    image: mongo:7
+    container_name: real-estate-mongo-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-dev-data:/data/db
+    networks:
+      - real-estate-dev
+
+  # Mongo Express (Database GUI)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: real-estate-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+    depends_on:
+      - mongo
+    networks:
+      - real-estate-dev
+
+volumes:
+  mongo-dev-data:
+    driver: local
+  uploads:
+    driver: local
+
+networks:
+  real-estate-dev:
+    driver: bridge

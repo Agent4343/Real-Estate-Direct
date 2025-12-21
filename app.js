@@ -13,6 +13,7 @@ const listingRoutes = require('./routes/listing.routes');
 const offerRoutes = require('./routes/offer.routes');
 const transactionRoutes = require('./routes/transaction.routes');
 const documentRoutes = require('./routes/document.routes');
+const imageRoutes = require('./routes/image.routes');
 
 // Legacy routes (from rental app)
 const itemRoutes = require('./item.routes');
@@ -38,6 +39,7 @@ app.use(cors());
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -64,6 +66,7 @@ app.use('/api/listings', listingRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/images', imageRoutes);
 
 // Legacy routes (keeping for backward compatibility)
 app.use('/auth', authRoutes);
