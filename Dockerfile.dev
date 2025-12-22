@@ -1,0 +1,30 @@
+# Real Estate Direct - Development Dockerfile
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install nodemon for development
+RUN npm install -g nodemon
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including devDependencies)
+RUN npm install
+
+# Copy application files
+COPY . .
+
+# Create uploads directory
+RUN mkdir -p uploads/properties uploads/documents
+
+# Set environment
+ENV NODE_ENV=development
+ENV PORT=3000
+
+# Expose port
+EXPOSE 3000
+
+# Start with nodemon for hot reload
+CMD ["nodemon", "--legacy-watch", "app.js"]
