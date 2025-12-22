@@ -16,6 +16,7 @@ const documentRoutes = require('./routes/document.routes');
 const imageRoutes = require('./routes/image.routes');
 const userRoutes = require('./routes/user.routes');
 const adminRoutes = require('./routes/admin.routes');
+const paymentRoutes = require('./routes/payment.routes');
 
 // Legacy routes (from rental app)
 const itemRoutes = require('./item.routes');
@@ -44,6 +45,9 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Stripe webhook endpoint (needs raw body, must be before express.json())
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -64,6 +68,7 @@ app.use('/api/documents', documentRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Legacy routes (keeping for backward compatibility)
 app.use('/auth', authRoutes);
@@ -132,6 +137,8 @@ app.get('/api', (req, res) => {
       offers: '/api/offers - Offer submission and negotiation',
       transactions: '/api/transactions - Transaction workflow',
       documents: '/api/documents - Document generation and signing',
+      payments: '/api/payments - Stripe payment processing',
+      admin: '/api/admin - Admin dashboard and earnings',
       provinces: '/api/provinces - Province information',
       calculateTax: '/api/calculate-tax - Land transfer tax calculator'
     },
