@@ -6,6 +6,28 @@ const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  // Checklist progress - stores which items are completed
+  checklistProgress: {
+    type: Map,
+    of: Boolean,
+    default: new Map()
+  },
+  // Saved/favorite properties
+  favoriteProperties: [{
+    propertyId: { type: Schema.Types.ObjectId, ref: 'Property' },
+    address: {
+      street: String,
+      city: String,
+      province: String
+    },
+    askingPrice: Number,
+    bedrooms: Number,
+    bathrooms: Number,
+    squareFeet: Number,
+    propertyType: String,
+    image: String,
+    savedAt: { type: Date, default: Date.now }
+  }]
 });
 
 userSchema.pre('save', async function(next) {

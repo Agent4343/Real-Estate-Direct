@@ -8,17 +8,56 @@ let selectedImages = [];
 const MAX_IMAGES = 20;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-// Favorites storage
-let favorites = JSON.parse(localStorage.getItem('favoriteProperties') || '[]');
+// User preferences (loaded from API when logged in)
+let favorites = [];
+let checklistProgress = {};
 
 // Initialize app
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   loadProvinces();
   updateAuthUI();
   searchProperties();
   initImageUpload();
+
+  // Load user preferences from API if logged in
+  if (authToken) {
+    await loadUserPreferences();
+  }
+
   initChecklists();
 });
+
+// ==========================================
+// User Preferences API
+// ==========================================
+
+async function loadUserPreferences() {
+  if (!authToken) return;
+
+  try {
+    const response = await fetch(`${API_BASE}/user/preferences`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      checklistProgress = data.checklistProgress || {};
+      favorites = (data.favoriteProperties || []).map(f => ({
+        id: f.propertyId,
+        address: f.address,
+        askingPrice: f.askingPrice,
+        bedrooms: f.bedrooms,
+        bathrooms: f.bathrooms,
+        squareFeet: f.squareFeet,
+        propertyType: f.propertyType,
+        image: f.image,
+        savedAt: f.savedAt
+      }));
+    }
+  } catch (error) {
+    console.error('Failed to load user preferences:', error);
+  }
+}
 
 // ==========================================
 // Favorites / Saved Properties
@@ -27,20 +66,21 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleFavorite(propertyId, event) {
   event.stopPropagation(); // Prevent triggering property view
 
+  if (!authToken) {
+    showToast('Please login to save properties', 'warning');
+    showModal('loginModal');
+    return;
+  }
+
   const index = favorites.findIndex(f => f.id === propertyId);
 
   if (index > -1) {
     // Remove from favorites
-    favorites.splice(index, 1);
-    showToast('Removed from saved properties', 'info');
+    removeFavoriteFromAPI(propertyId);
   } else {
-    // Add to favorites - fetch property data first
+    // Add to favorites
     addToFavorites(propertyId);
-    return; // addToFavorites will handle the toast
   }
-
-  saveFavorites();
-  updateFavoriteButtons();
 }
 
 async function addToFavorites(propertyId) {
@@ -48,28 +88,60 @@ async function addToFavorites(propertyId) {
     const response = await fetch(`${API_BASE}/properties/${propertyId}`);
     const property = await response.json();
 
-    favorites.push({
-      id: propertyId,
+    const favoriteData = {
+      propertyId: propertyId,
       address: property.address,
       askingPrice: property.askingPrice,
       bedrooms: property.bedrooms,
       bathrooms: property.bathrooms,
       squareFeet: property.squareFeet,
       propertyType: property.propertyType,
-      image: property.images && property.images.length > 0 ? property.images[0].url : null,
-      savedAt: new Date().toISOString()
+      image: property.images && property.images.length > 0 ? property.images[0].url : null
+    };
+
+    // Save to API
+    const saveResponse = await fetch(`${API_BASE}/user/favorites`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify(favoriteData)
     });
 
-    saveFavorites();
-    updateFavoriteButtons();
-    showToast('Property saved to favorites!', 'success');
+    if (saveResponse.ok) {
+      favorites.push({
+        id: propertyId,
+        ...favoriteData,
+        savedAt: new Date().toISOString()
+      });
+      updateFavoriteButtons();
+      showToast('Property saved to favorites!', 'success');
+    } else {
+      const error = await saveResponse.json();
+      showToast(error.error || 'Failed to save property', 'error');
+    }
   } catch (error) {
     showToast('Failed to save property', 'error');
   }
 }
 
-function saveFavorites() {
-  localStorage.setItem('favoriteProperties', JSON.stringify(favorites));
+async function removeFavoriteFromAPI(propertyId) {
+  try {
+    const response = await fetch(`${API_BASE}/user/favorites/${propertyId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    if (response.ok) {
+      favorites = favorites.filter(f => f.id !== propertyId);
+      updateFavoriteButtons();
+      loadSavedProperties();
+      showToast('Removed from saved properties', 'info');
+    }
+  } catch (error) {
+    showToast('Failed to remove property', 'error');
+  }
 }
 
 function isFavorite(propertyId) {
@@ -92,11 +164,9 @@ function updateFavoriteButtons() {
 }
 
 function removeFavorite(propertyId) {
-  favorites = favorites.filter(f => f.id !== propertyId);
-  saveFavorites();
-  loadSavedProperties();
-  updateFavoriteButtons();
-  showToast('Removed from saved properties', 'info');
+  if (authToken) {
+    removeFavoriteFromAPI(propertyId);
+  }
 }
 
 function loadSavedProperties() {
@@ -272,8 +342,7 @@ const sellerChecklistItems = {
   ]
 };
 
-// Load checklist progress from localStorage
-let checklistProgress = JSON.parse(localStorage.getItem('checklistProgress') || '{}');
+// checklistProgress is loaded from API in loadUserPreferences()
 
 function initChecklists() {
   renderBuyerChecklist();
@@ -384,9 +453,22 @@ function toggleChecklistSection(sectionKey) {
   }
 }
 
-function toggleChecklistItem(itemId, checked) {
-  checklistProgress[itemId] = checked;
-  localStorage.setItem('checklistProgress', JSON.stringify(checklistProgress));
+async function toggleChecklistItem(itemId, checked) {
+  if (!authToken) {
+    showToast('Please login to track your progress', 'warning');
+    showModal('loginModal');
+    // Revert the checkbox
+    const checkbox = document.querySelector(`input[onchange*="${itemId}"]`);
+    if (checkbox) checkbox.checked = !checked;
+    return;
+  }
+
+  // Optimistically update UI
+  if (checked) {
+    checklistProgress[itemId] = true;
+  } else {
+    delete checklistProgress[itemId];
+  }
 
   // Update the item's visual state
   const checkbox = document.querySelector(`input[onchange*="${itemId}"]`);
@@ -399,8 +481,29 @@ function toggleChecklistItem(itemId, checked) {
 
   updateAllProgress();
 
-  if (checked) {
-    showToast('Task completed!', 'success');
+  // Save to API
+  try {
+    const response = await fetch(`${API_BASE}/user/checklist/${itemId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ completed: checked })
+    });
+
+    if (response.ok && checked) {
+      showToast('Task completed!', 'success');
+    }
+  } catch (error) {
+    console.error('Failed to save checklist item:', error);
+    // Revert on error
+    if (checked) {
+      delete checklistProgress[itemId];
+    } else {
+      checklistProgress[itemId] = true;
+    }
+    updateAllProgress();
   }
 }
 
@@ -447,27 +550,57 @@ function updateSellerProgress() {
   renderSellerChecklist();
 }
 
-function resetBuyerChecklist() {
+async function resetBuyerChecklist() {
+  if (!authToken) {
+    showToast('Please login to reset your checklist', 'warning');
+    return;
+  }
+
   if (confirm('Are you sure you want to reset your buyer checklist progress? This cannot be undone.')) {
-    Object.values(buyerChecklistItems).flat().forEach(item => {
-      delete checklistProgress[item.id];
-    });
-    localStorage.setItem('checklistProgress', JSON.stringify(checklistProgress));
-    renderBuyerChecklist();
-    updateBuyerProgress();
-    showToast('Buyer checklist reset', 'info');
+    try {
+      const response = await fetch(`${API_BASE}/user/checklist/buyer`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+
+      if (response.ok) {
+        Object.values(buyerChecklistItems).flat().forEach(item => {
+          delete checklistProgress[item.id];
+        });
+        renderBuyerChecklist();
+        updateBuyerProgress();
+        showToast('Buyer checklist reset', 'info');
+      }
+    } catch (error) {
+      showToast('Failed to reset checklist', 'error');
+    }
   }
 }
 
-function resetSellerChecklist() {
+async function resetSellerChecklist() {
+  if (!authToken) {
+    showToast('Please login to reset your checklist', 'warning');
+    return;
+  }
+
   if (confirm('Are you sure you want to reset your seller checklist progress? This cannot be undone.')) {
-    Object.values(sellerChecklistItems).flat().forEach(item => {
-      delete checklistProgress[item.id];
-    });
-    localStorage.setItem('checklistProgress', JSON.stringify(checklistProgress));
-    renderSellerChecklist();
-    updateSellerProgress();
-    showToast('Seller checklist reset', 'info');
+    try {
+      const response = await fetch(`${API_BASE}/user/checklist/seller`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+
+      if (response.ok) {
+        Object.values(sellerChecklistItems).flat().forEach(item => {
+          delete checklistProgress[item.id];
+        });
+        renderSellerChecklist();
+        updateSellerProgress();
+        showToast('Seller checklist reset', 'info');
+      }
+    } catch (error) {
+      showToast('Failed to reset checklist', 'error');
+    }
   }
 }
 
@@ -680,6 +813,11 @@ async function login(event) {
       currentUser = { id: payload.userId, email };
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
+      // Load user preferences (checklist progress and favorites)
+      await loadUserPreferences();
+      initChecklists();
+      searchProperties(); // Refresh to show favorite buttons correctly
+
       updateAuthUI();
       closeModal('loginModal');
       showSection('dashboard');
@@ -724,6 +862,13 @@ function logout() {
   currentUser = null;
   localStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
+
+  // Clear user preferences
+  favorites = [];
+  checklistProgress = {};
+  initChecklists();
+  searchProperties(); // Refresh property cards
+
   updateAuthUI();
   showSection('home');
 }
