@@ -24,17 +24,9 @@ const { getAllProvinces, calculateLandTransferTax } = require('./config/province
 
 const app = express();
 
-// Security middleware - configure for frontend
+// Security middleware - disable CSP for frontend compatibility
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    },
-  },
+  contentSecurityPolicy: false
 }));
 app.use(cors());
 
