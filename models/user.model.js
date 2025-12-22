@@ -14,6 +14,14 @@ const userSchema = new Schema({
     of: Boolean,
     default: new Map()
   },
+  // Notification preferences
+  notificationSettings: {
+    emailOffers: { type: Boolean, default: true },
+    emailMessages: { type: Boolean, default: true },
+    emailTransactions: { type: Boolean, default: true },
+    emailDocuments: { type: Boolean, default: true },
+    emailMarketing: { type: Boolean, default: false }
+  },
   // Saved/favorite properties
   favoriteProperties: [{
     propertyId: { type: Schema.Types.ObjectId, ref: 'Property' },

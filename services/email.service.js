@@ -505,6 +505,122 @@ class EmailService {
   }
 
   // ==========================================
+  // Messaging Notifications
+  // ==========================================
+
+  async sendNewMessage(recipientEmail, data) {
+    const subject = `New Message from ${data.senderName}`;
+    const html = `
+      <h2>You Have a New Message</h2>
+      <p>Hi ${data.recipientName},</p>
+      <p><strong>${data.senderName}</strong> has sent you a message${data.propertyAddress ? ` regarding ${data.propertyAddress}` : ''}.</p>
+
+      <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <p style="margin: 0; font-style: italic;">"${data.messagePreview}..."</p>
+      </div>
+
+      <p><a href="${data.messageUrl}">View Full Conversation</a></p>
+    `;
+
+    return this.sendEmail(recipientEmail, subject, html, this.stripHtml(html));
+  }
+
+  // ==========================================
+  // Commission/Payment Notifications
+  // ==========================================
+
+  async sendCommissionInvoice(sellerEmail, data) {
+    const subject = `Platform Commission Invoice - ${data.propertyAddress}`;
+    const html = `
+      <h2>Platform Commission Invoice</h2>
+      <p>Hi ${data.sellerName},</p>
+      <p>Congratulations on your successful sale! Here is your platform commission invoice.</p>
+
+      <h3>Invoice Details:</h3>
+      <ul>
+        <li><strong>Property:</strong> ${data.propertyAddress}</li>
+        <li><strong>Sale Price:</strong> $${data.salePrice.toLocaleString()}</li>
+        <li><strong>Commission Rate:</strong> ${(data.commissionRate * 100).toFixed(1)}%</li>
+        <li><strong>Amount Due:</strong> $${data.commissionAmount.toLocaleString()}</li>
+        <li><strong>Due Date:</strong> ${this.formatDate(data.dueDate)}</li>
+      </ul>
+
+      <p><a href="${data.paymentUrl}">Pay Now</a></p>
+
+      <p>Thank you for using Real Estate Direct. You saved approximately $${data.savingsAmount.toLocaleString()} compared to traditional real estate commissions!</p>
+    `;
+
+    return this.sendEmail(sellerEmail, subject, html, this.stripHtml(html));
+  }
+
+  async sendPaymentConfirmation(sellerEmail, data) {
+    const subject = `Payment Confirmed - Commission for ${data.propertyAddress}`;
+    const html = `
+      <h2>Payment Confirmed</h2>
+      <p>Hi ${data.sellerName},</p>
+      <p>Thank you! Your commission payment has been received.</p>
+
+      <h3>Payment Details:</h3>
+      <ul>
+        <li><strong>Property:</strong> ${data.propertyAddress}</li>
+        <li><strong>Amount Paid:</strong> $${data.amountPaid.toLocaleString()}</li>
+        <li><strong>Payment Date:</strong> ${this.formatDate(data.paymentDate)}</li>
+        <li><strong>Reference:</strong> ${data.paymentReference}</li>
+      </ul>
+
+      <p>Thank you for using Real Estate Direct!</p>
+    `;
+
+    return this.sendEmail(sellerEmail, subject, html, this.stripHtml(html));
+  }
+
+  async sendPaymentReminder(sellerEmail, data) {
+    const subject = `Payment Reminder - Commission Due for ${data.propertyAddress}`;
+    const html = `
+      <h2>Payment Reminder</h2>
+      <p>Hi ${data.sellerName},</p>
+      <p>This is a friendly reminder that your platform commission payment is due.</p>
+
+      <h3>Invoice Details:</h3>
+      <ul>
+        <li><strong>Property:</strong> ${data.propertyAddress}</li>
+        <li><strong>Amount Due:</strong> $${data.amountDue.toLocaleString()}</li>
+        <li><strong>Due Date:</strong> ${this.formatDate(data.dueDate)}</li>
+        <li><strong>Days Overdue:</strong> ${data.daysOverdue || 0}</li>
+      </ul>
+
+      <p><a href="${data.paymentUrl}">Pay Now</a></p>
+
+      <p>If you have any questions, please contact us.</p>
+    `;
+
+    return this.sendEmail(sellerEmail, subject, html, this.stripHtml(html));
+  }
+
+  // ==========================================
+  // Password Reset
+  // ==========================================
+
+  async sendPasswordReset(userEmail, data) {
+    const subject = `Password Reset Request - Real Estate Direct`;
+    const html = `
+      <h2>Password Reset Request</h2>
+      <p>Hi ${data.name},</p>
+      <p>We received a request to reset your password. Click the button below to create a new password:</p>
+
+      <p style="text-align: center;">
+        <a href="${data.resetUrl}" style="display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Reset Password</a>
+      </p>
+
+      <p>This link will expire in ${data.expiresInHours || 1} hour(s).</p>
+
+      <p>If you didn't request this reset, you can safely ignore this email. Your password will remain unchanged.</p>
+    `;
+
+    return this.sendEmail(userEmail, subject, html, this.stripHtml(html));
+  }
+
+  // ==========================================
   // Helper Methods
   // ==========================================
 

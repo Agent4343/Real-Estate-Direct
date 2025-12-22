@@ -18,6 +18,7 @@ const userRoutes = require('./routes/user.routes');
 const adminRoutes = require('./routes/admin.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const messageRoutes = require('./routes/message.routes');
+const notificationRoutes = require('./routes/notification.routes');
 
 // Legacy routes (from rental app)
 const itemRoutes = require('./item.routes');
@@ -71,6 +72,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Legacy routes (keeping for backward compatibility)
 app.use('/auth', authRoutes);
@@ -141,6 +143,7 @@ app.get('/api', (req, res) => {
       documents: '/api/documents - Document generation and signing',
       payments: '/api/payments - Stripe payment processing',
       messages: '/api/messages - Messaging between users',
+      notifications: '/api/notifications - Email notification management',
       admin: '/api/admin - Admin dashboard and earnings',
       provinces: '/api/provinces - Province information',
       calculateTax: '/api/calculate-tax - Land transfer tax calculator'
