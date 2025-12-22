@@ -3,12 +3,303 @@ const API_BASE = '/api';
 let authToken = localStorage.getItem('authToken');
 let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
+// Image upload state
+let selectedImages = [];
+const MAX_IMAGES = 20;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+// Favorites storage
+let favorites = JSON.parse(localStorage.getItem('favoriteProperties') || '[]');
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
   loadProvinces();
   updateAuthUI();
   searchProperties();
+  initImageUpload();
 });
+
+// ==========================================
+// Favorites / Saved Properties
+// ==========================================
+
+function toggleFavorite(propertyId, event) {
+  event.stopPropagation(); // Prevent triggering property view
+
+  const index = favorites.findIndex(f => f.id === propertyId);
+
+  if (index > -1) {
+    // Remove from favorites
+    favorites.splice(index, 1);
+    showToast('Removed from saved properties', 'info');
+  } else {
+    // Add to favorites - fetch property data first
+    addToFavorites(propertyId);
+    return; // addToFavorites will handle the toast
+  }
+
+  saveFavorites();
+  updateFavoriteButtons();
+}
+
+async function addToFavorites(propertyId) {
+  try {
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`);
+    const property = await response.json();
+
+    favorites.push({
+      id: propertyId,
+      address: property.address,
+      askingPrice: property.askingPrice,
+      bedrooms: property.bedrooms,
+      bathrooms: property.bathrooms,
+      squareFeet: property.squareFeet,
+      propertyType: property.propertyType,
+      image: property.images && property.images.length > 0 ? property.images[0].url : null,
+      savedAt: new Date().toISOString()
+    });
+
+    saveFavorites();
+    updateFavoriteButtons();
+    showToast('Property saved to favorites!', 'success');
+  } catch (error) {
+    showToast('Failed to save property', 'error');
+  }
+}
+
+function saveFavorites() {
+  localStorage.setItem('favoriteProperties', JSON.stringify(favorites));
+}
+
+function isFavorite(propertyId) {
+  return favorites.some(f => f.id === propertyId);
+}
+
+function updateFavoriteButtons() {
+  document.querySelectorAll('.favorite-btn').forEach(btn => {
+    const propertyId = btn.dataset.propertyId;
+    if (isFavorite(propertyId)) {
+      btn.classList.add('favorited');
+      btn.innerHTML = '❤️';
+      btn.title = 'Remove from saved';
+    } else {
+      btn.classList.remove('favorited');
+      btn.innerHTML = '🤍';
+      btn.title = 'Save property';
+    }
+  });
+}
+
+function removeFavorite(propertyId) {
+  favorites = favorites.filter(f => f.id !== propertyId);
+  saveFavorites();
+  loadSavedProperties();
+  updateFavoriteButtons();
+  showToast('Removed from saved properties', 'info');
+}
+
+function loadSavedProperties() {
+  const list = document.getElementById('savedPropertiesList');
+  if (!list) return;
+
+  if (favorites.length > 0) {
+    list.innerHTML = favorites.map(p => `
+      <div class="saved-property-card">
+        <div class="saved-property-image">
+          ${p.image
+            ? `<img src="${p.image}" alt="${p.address?.street}">`
+            : '<div class="property-image-placeholder">🏠</div>'
+          }
+        </div>
+        <div class="saved-property-info">
+          <div class="saved-property-price">$${p.askingPrice?.toLocaleString() || 'N/A'}</div>
+          <div class="saved-property-address">${p.address?.street || ''}, ${p.address?.city || ''}</div>
+          <div class="saved-property-details">
+            <span>${p.bedrooms || 0} beds</span>
+            <span>${p.bathrooms || 0} baths</span>
+            <span>${p.squareFeet || 'N/A'} sqft</span>
+          </div>
+          <div class="saved-property-meta">
+            <span class="property-type-badge">${p.propertyType || 'Property'}</span>
+            <span class="saved-date">Saved ${formatSavedDate(p.savedAt)}</span>
+          </div>
+        </div>
+        <div class="saved-property-actions">
+          <button class="btn btn-primary btn-sm" onclick="viewProperty('${p.id}')">View</button>
+          <button class="btn btn-outline btn-sm" onclick="removeFavorite('${p.id}')">Remove</button>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    list.innerHTML = `
+      <div class="empty-saved-state">
+        <div class="empty-icon">🤍</div>
+        <h3>No Saved Properties</h3>
+        <p>Click the heart icon on any property to save it for later.</p>
+        <button onclick="showSection('search')" class="btn btn-primary">Browse Properties</button>
+      </div>
+    `;
+  }
+}
+
+function formatSavedDate(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'today';
+  if (diffDays === 1) return 'yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  return date.toLocaleDateString();
+}
+
+function updateSavedCount() {
+  const countEl = document.getElementById('savedCount');
+  if (countEl) {
+    countEl.textContent = favorites.length > 0 ? `(${favorites.length})` : '';
+  }
+}
+
+// ==========================================
+// Toast Notifications
+// ==========================================
+
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+
+  const icons = {
+    success: '✓',
+    error: '✕',
+    info: 'ℹ',
+    warning: '⚠'
+  };
+
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type] || icons.info}</span>
+    <span class="toast-message">${message}</span>
+  `;
+
+  container.appendChild(toast);
+
+  // Trigger animation
+  setTimeout(() => toast.classList.add('show'), 10);
+
+  // Auto remove after 4 seconds
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// ==========================================
+// Image Upload Handling
+// ==========================================
+
+function initImageUpload() {
+  const uploadArea = document.getElementById('imageUploadArea');
+  if (!uploadArea) return;
+
+  // Drag and drop handlers
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+
+  uploadArea.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+  });
+
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    addImages(files);
+  });
+}
+
+function handleImagePreview(event) {
+  const files = Array.from(event.target.files);
+  addImages(files);
+  event.target.value = ''; // Reset input so same file can be selected again
+}
+
+function addImages(files) {
+  const validFiles = files.filter(file => {
+    if (!file.type.startsWith('image/')) {
+      showToast(`${file.name} is not an image file`, 'error');
+      return false;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      showToast(`${file.name} exceeds 10MB limit`, 'error');
+      return false;
+    }
+    return true;
+  });
+
+  if (selectedImages.length + validFiles.length > MAX_IMAGES) {
+    showToast(`Maximum ${MAX_IMAGES} images allowed`, 'warning');
+    validFiles.splice(MAX_IMAGES - selectedImages.length);
+  }
+
+  validFiles.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedImages.push({
+        file: file,
+        preview: e.target.result,
+        id: Date.now() + Math.random()
+      });
+      renderImagePreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  if (validFiles.length > 0) {
+    showToast(`${validFiles.length} image(s) added`, 'success');
+  }
+}
+
+function renderImagePreviews() {
+  const grid = document.getElementById('imagePreviewGrid');
+  if (!grid) return;
+
+  grid.innerHTML = selectedImages.map((img, index) => `
+    <div class="image-preview-item" data-id="${img.id}">
+      <img src="${img.preview}" alt="Preview ${index + 1}">
+      <button type="button" class="remove-image-btn" onclick="removeImage(${img.id})">×</button>
+      ${index === 0 ? '<span class="main-image-badge">Main</span>' : ''}
+    </div>
+  `).join('');
+
+  // Update upload area text
+  const uploadArea = document.getElementById('imageUploadArea');
+  if (uploadArea) {
+    const placeholder = uploadArea.querySelector('.upload-placeholder p');
+    if (placeholder) {
+      placeholder.textContent = selectedImages.length > 0
+        ? `${selectedImages.length}/${MAX_IMAGES} photos selected - Click to add more`
+        : 'Click to upload photos';
+    }
+  }
+}
+
+function removeImage(imageId) {
+  selectedImages = selectedImages.filter(img => img.id !== imageId);
+  renderImagePreviews();
+  showToast('Image removed', 'info');
+}
+
+function clearAllImages() {
+  selectedImages = [];
+  renderImagePreviews();
+}
 
 // ==========================================
 // Navigation
@@ -211,20 +502,38 @@ async function searchProperties() {
     const grid = document.getElementById('propertyGrid');
 
     if (data.properties && data.properties.length > 0) {
-      grid.innerHTML = data.properties.map(p => `
-        <div class="property-card" onclick="viewProperty('${p._id}')">
-          <div class="property-image">🏠</div>
-          <div class="property-info">
-            <div class="property-price">$${p.askingPrice?.toLocaleString() || 'N/A'}</div>
-            <div class="property-address">${p.address?.street || ''}, ${p.address?.city || ''}</div>
-            <div class="property-details">
-              <span>${p.bedrooms || 0} beds</span>
-              <span>${p.bathrooms || 0} baths</span>
-              <span>${p.squareFeet || 'N/A'} sqft</span>
+      grid.innerHTML = data.properties.map(p => {
+        const mainImage = p.images && p.images.length > 0
+          ? `<img src="${p.images[0].url}" alt="${p.address?.street}" style="width:100%;height:100%;object-fit:cover;">`
+          : '<div class="property-image-placeholder">🏠</div>';
+
+        const isFav = isFavorite(p._id);
+
+        return `
+          <div class="property-card" onclick="viewProperty('${p._id}')">
+            <div class="property-image">
+              ${mainImage}
+              <button class="favorite-btn ${isFav ? 'favorited' : ''}"
+                      data-property-id="${p._id}"
+                      onclick="toggleFavorite('${p._id}', event)"
+                      title="${isFav ? 'Remove from saved' : 'Save property'}">
+                ${isFav ? '❤️' : '🤍'}
+              </button>
+            </div>
+            ${p.images && p.images.length > 1 ? `<span class="image-count">📷 ${p.images.length}</span>` : ''}
+            <div class="property-info">
+              <div class="property-price">$${p.askingPrice?.toLocaleString() || 'N/A'}</div>
+              <div class="property-address">${p.address?.street || ''}, ${p.address?.city || ''}</div>
+              <div class="property-details">
+                <span>${p.bedrooms || 0} beds</span>
+                <span>${p.bathrooms || 0} baths</span>
+                <span>${p.squareFeet || 'N/A'} sqft</span>
+              </div>
+              <div class="property-type-badge">${p.propertyType || 'Property'}</div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } else {
       grid.innerHTML = '<p class="loading">No properties found. Try adjusting your search.</p>';
     }
@@ -239,30 +548,95 @@ async function viewProperty(propertyId) {
     const response = await fetch(`${API_BASE}/properties/${propertyId}`);
     const property = await response.json();
 
+    // Build image gallery HTML
+    let galleryHtml = '';
+    if (property.images && property.images.length > 0) {
+      galleryHtml = `
+        <div class="property-gallery">
+          <div class="gallery-main">
+            <img id="galleryMainImage" src="${property.images[0].url}" alt="${property.address?.street}">
+            <div class="gallery-nav">
+              <button class="gallery-nav-btn" onclick="prevGalleryImage()">‹</button>
+              <span class="gallery-counter"><span id="galleryIndex">1</span> / ${property.images.length}</span>
+              <button class="gallery-nav-btn" onclick="nextGalleryImage()">›</button>
+            </div>
+          </div>
+          ${property.images.length > 1 ? `
+            <div class="gallery-thumbnails">
+              ${property.images.map((img, i) => `
+                <img src="${img.url}" alt="Photo ${i + 1}"
+                     class="gallery-thumb ${i === 0 ? 'active' : ''}"
+                     onclick="selectGalleryImage(${i})"
+                     data-index="${i}">
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+      // Store images for gallery navigation
+      window.currentGalleryImages = property.images;
+      window.currentGalleryIndex = 0;
+    } else {
+      galleryHtml = '<div class="property-image-placeholder" style="height:300px;font-size:5rem;display:flex;align-items:center;justify-content:center;background:#f3f4f6;border-radius:12px;">🏠</div>';
+    }
+
     const detail = document.getElementById('propertyDetail');
     detail.innerHTML = `
-      <div class="property-image" style="height:300px;font-size:5rem;">🏠</div>
-      <h2>$${property.askingPrice?.toLocaleString()}</h2>
-      <p><strong>${property.address?.street}${property.address?.unit ? ', ' + property.address.unit : ''}</strong></p>
-      <p>${property.address?.city}, ${property.address?.province} ${property.address?.postalCode}</p>
+      ${galleryHtml}
 
-      <div class="property-details" style="margin:1rem 0;">
-        <span><strong>${property.bedrooms || 0}</strong> beds</span>
-        <span><strong>${property.bathrooms || 0}</strong> baths</span>
-        <span><strong>${property.squareFeet || 'N/A'}</strong> sqft</span>
-        <span><strong>${property.propertyType}</strong></span>
+      <div class="property-detail-header">
+        <h2 class="property-detail-price">$${property.askingPrice?.toLocaleString()}</h2>
+        <span class="property-status-badge status-${property.status}">${property.status}</span>
       </div>
 
-      <p>${property.description || 'No description provided.'}</p>
+      <p class="property-detail-address">
+        <strong>${property.address?.street}${property.address?.unit ? ', Unit ' + property.address.unit : ''}</strong>
+      </p>
+      <p class="property-detail-location">${property.address?.city}, ${property.address?.province} ${property.address?.postalCode}</p>
 
-      <h3 style="margin-top:1.5rem;">Property Details</h3>
-      <ul>
-        <li>Year Built: ${property.yearBuilt || 'N/A'}</li>
-        <li>Lot Size: ${property.lotSize || 'N/A'} ${property.lotSizeUnit || ''}</li>
-        <li>Parking: ${property.parkingSpaces || 0} spaces (${property.parkingType || 'N/A'})</li>
-        <li>Heating: ${property.heatingType || 'N/A'}</li>
-        <li>Cooling: ${property.coolingType || 'N/A'}</li>
-      </ul>
+      <div class="property-stats">
+        <div class="stat-item">
+          <span class="stat-value">${property.bedrooms || 0}</span>
+          <span class="stat-label">Bedrooms</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">${property.bathrooms || 0}</span>
+          <span class="stat-label">Bathrooms</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">${property.squareFeet?.toLocaleString() || 'N/A'}</span>
+          <span class="stat-label">Sq Ft</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">${property.yearBuilt || 'N/A'}</span>
+          <span class="stat-label">Year Built</span>
+        </div>
+      </div>
+
+      <div class="property-description">
+        <h3>Description</h3>
+        <p>${property.description || 'No description provided.'}</p>
+      </div>
+
+      <div class="property-features">
+        <h3>Property Details</h3>
+        <div class="features-grid">
+          <div class="feature-item"><span class="feature-label">Type:</span> ${property.propertyType || 'N/A'}</div>
+          <div class="feature-item"><span class="feature-label">Lot Size:</span> ${property.lotSize || 'N/A'} ${property.lotSizeUnit || 'sqft'}</div>
+          <div class="feature-item"><span class="feature-label">Parking:</span> ${property.parkingSpaces || 0} spaces</div>
+          <div class="feature-item"><span class="feature-label">Heating:</span> ${property.heatingType || 'N/A'}</div>
+          <div class="feature-item"><span class="feature-label">Cooling:</span> ${property.coolingType || 'N/A'}</div>
+        </div>
+      </div>
+
+      ${property.features && property.features.length > 0 ? `
+        <div class="property-amenities">
+          <h3>Features & Amenities</h3>
+          <div class="amenities-list">
+            ${property.features.map(f => `<span class="amenity-tag">✓ ${f}</span>`).join('')}
+          </div>
+        </div>
+      ` : ''}
 
       ${authToken && property.status === 'active' ? `
         <button onclick="prepareOffer('${property._id}')" class="btn btn-primary btn-lg" style="margin-top:1.5rem;width:100%;">
@@ -273,8 +647,43 @@ async function viewProperty(propertyId) {
 
     showModal('propertyModal');
   } catch (error) {
-    alert('Failed to load property details');
+    showToast('Failed to load property details', 'error');
   }
+}
+
+// Gallery navigation functions
+function selectGalleryImage(index) {
+  if (!window.currentGalleryImages) return;
+
+  window.currentGalleryIndex = index;
+  const mainImg = document.getElementById('galleryMainImage');
+  const indexSpan = document.getElementById('galleryIndex');
+
+  if (mainImg) {
+    mainImg.src = window.currentGalleryImages[index].url;
+  }
+  if (indexSpan) {
+    indexSpan.textContent = index + 1;
+  }
+
+  // Update thumbnail active state
+  document.querySelectorAll('.gallery-thumb').forEach((thumb, i) => {
+    thumb.classList.toggle('active', i === index);
+  });
+}
+
+function nextGalleryImage() {
+  if (!window.currentGalleryImages) return;
+  const nextIndex = (window.currentGalleryIndex + 1) % window.currentGalleryImages.length;
+  selectGalleryImage(nextIndex);
+}
+
+function prevGalleryImage() {
+  if (!window.currentGalleryImages) return;
+  const prevIndex = window.currentGalleryIndex === 0
+    ? window.currentGalleryImages.length - 1
+    : window.currentGalleryIndex - 1;
+  selectGalleryImage(prevIndex);
 }
 
 async function createProperty(event) {
@@ -284,6 +693,18 @@ async function createProperty(event) {
     showModal('loginModal');
     return;
   }
+
+  // Show loading state
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Creating Listing...';
+
+  // Gather property features
+  const features = [];
+  document.querySelectorAll('input[name="features"]:checked').forEach(cb => {
+    features.push(cb.value);
+  });
 
   const property = {
     province: document.getElementById('propertyProvince').value,
@@ -300,10 +721,15 @@ async function createProperty(event) {
     bedrooms: parseInt(document.getElementById('propertyBeds').value) || 0,
     bathrooms: parseFloat(document.getElementById('propertyBaths').value) || 0,
     squareFeet: parseInt(document.getElementById('propertySqft').value) || 0,
-    description: document.getElementById('propertyDescription').value
+    yearBuilt: parseInt(document.getElementById('propertyYear')?.value) || null,
+    lotSize: parseFloat(document.getElementById('propertyLotSize')?.value) || null,
+    parkingSpaces: parseInt(document.getElementById('propertyParking')?.value) || 0,
+    description: document.getElementById('propertyDescription').value,
+    features: features
   };
 
   try {
+    // First, create the property
     const response = await fetch(`${API_BASE}/properties`, {
       method: 'POST',
       headers: {
@@ -316,14 +742,64 @@ async function createProperty(event) {
     const data = await response.json();
 
     if (response.ok) {
-      alert('Property created! Now activate it as a listing.');
-      showSection('dashboard');
-      loadDashboard();
+      const propertyId = data.property._id || data._id;
+
+      // If there are images, upload them
+      if (selectedImages.length > 0) {
+        showToast('Uploading images...', 'info');
+        await uploadPropertyImages(propertyId);
+      }
+
+      showToast('Property created successfully!', 'success');
+
+      // Clear the form and images
+      event.target.reset();
+      clearAllImages();
+
+      // Navigate to dashboard
+      setTimeout(() => {
+        showSection('dashboard');
+        loadDashboard();
+      }, 1000);
     } else {
-      alert(data.error || 'Failed to create property');
+      showToast(data.error || 'Failed to create property', 'error');
     }
   } catch (error) {
-    alert('Failed to create property: ' + error.message);
+    showToast('Failed to create property: ' + error.message, 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+}
+
+async function uploadPropertyImages(propertyId) {
+  const formData = new FormData();
+
+  selectedImages.forEach((img, index) => {
+    formData.append('images', img.file);
+  });
+
+  try {
+    const response = await fetch(`${API_BASE}/images/property/${propertyId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      showToast(`${selectedImages.length} image(s) uploaded successfully!`, 'success');
+      return data;
+    } else {
+      showToast('Some images failed to upload', 'warning');
+      return null;
+    }
+  } catch (error) {
+    showToast('Image upload failed: ' + error.message, 'error');
+    return null;
   }
 }
 
@@ -491,6 +967,10 @@ async function calculateTax() {
 // ==========================================
 
 async function loadDashboard() {
+  // Load saved properties (works without auth)
+  loadSavedProperties();
+  updateSavedCount();
+
   if (!authToken) return;
 
   // Load properties
