@@ -15,6 +15,7 @@ const transactionRoutes = require('./routes/transaction.routes');
 const documentRoutes = require('./routes/document.routes');
 const imageRoutes = require('./routes/image.routes');
 const userRoutes = require('./routes/user.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 // Legacy routes (from rental app)
 const itemRoutes = require('./item.routes');
@@ -62,6 +63,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Legacy routes (keeping for backward compatibility)
 app.use('/auth', authRoutes);

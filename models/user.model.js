@@ -6,6 +6,8 @@ const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  // Admin access
+  isAdmin: { type: Boolean, default: false },
   // Checklist progress - stores which items are completed
   checklistProgress: {
     type: Map,
