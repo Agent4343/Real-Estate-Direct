@@ -441,6 +441,24 @@
           </div>
         </div>
 
+        <!-- Interactive Buyer Checklist -->
+        <div class="interactive-checklist-container">
+          <div class="checklist-header">
+            <div class="checklist-title">
+              <span class="checklist-icon">📋</span>
+              <div>
+                <h2>Your Home Buying Checklist</h2>
+                <p>Track your progress through every step of the buying process</p>
+              </div>
+            </div>
+            <div class="checklist-actions">
+              <div id="buyerOverallProgress" class="overall-progress"></div>
+              <button onclick="resetBuyerChecklist()" class="btn btn-outline btn-sm">Reset Progress</button>
+            </div>
+          </div>
+          <div id="buyerChecklist" class="interactive-checklist"></div>
+        </div>
+
         <div class="guide-steps">
           <!-- Step 1 -->
           <div class="guide-step">
@@ -735,6 +753,24 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Interactive Seller Checklist -->
+        <div class="interactive-checklist-container">
+          <div class="checklist-header">
+            <div class="checklist-title">
+              <span class="checklist-icon">📋</span>
+              <div>
+                <h2>Your Home Selling Checklist</h2>
+                <p>Track your progress through every step of the selling process</p>
+              </div>
+            </div>
+            <div class="checklist-actions">
+              <div id="sellerOverallProgress" class="overall-progress"></div>
+              <button onclick="resetSellerChecklist()" class="btn btn-outline btn-sm">Reset Progress</button>
+            </div>
+          </div>
+          <div id="sellerChecklist" class="interactive-checklist"></div>
         </div>
 
         <div class="guide-steps">

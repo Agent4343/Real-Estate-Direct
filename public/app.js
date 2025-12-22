@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateAuthUI();
   searchProperties();
   initImageUpload();
+  initChecklists();
 });
 
 // ==========================================
@@ -159,6 +160,314 @@ function updateSavedCount() {
   const countEl = document.getElementById('savedCount');
   if (countEl) {
     countEl.textContent = favorites.length > 0 ? `(${favorites.length})` : '';
+  }
+}
+
+// ==========================================
+// Interactive Checklists
+// ==========================================
+
+// Buyer checklist items
+const buyerChecklistItems = {
+  preApproval: [
+    { id: 'buyer-1-1', text: 'Check your credit score', tip: 'Aim for 680+ for best rates' },
+    { id: 'buyer-1-2', text: 'Gather income documentation (T4s, pay stubs, NOA)', tip: 'Last 2 years' },
+    { id: 'buyer-1-3', text: 'Get employment verification letter', tip: 'Include salary and tenure' },
+    { id: 'buyer-1-4', text: 'Calculate how much you can afford', tip: 'Max 32% of income on housing' },
+    { id: 'buyer-1-5', text: 'Save for down payment', tip: 'Min 5% for homes under $500K' },
+    { id: 'buyer-1-6', text: 'Get pre-approved by a lender', tip: 'Valid for 90-120 days' }
+  ],
+  searching: [
+    { id: 'buyer-2-1', text: 'Define your must-haves vs nice-to-haves', tip: 'Be realistic' },
+    { id: 'buyer-2-2', text: 'Research neighbourhoods', tip: 'Visit at different times of day' },
+    { id: 'buyer-2-3', text: 'Set up property alerts', tip: 'Be first to know about new listings' },
+    { id: 'buyer-2-4', text: 'View properties in person', tip: 'Take photos and notes' },
+    { id: 'buyer-2-5', text: 'Compare properties objectively', tip: 'Use a scoring system' },
+    { id: 'buyer-2-6', text: 'Research comparable sales (comps)', tip: 'Know the market value' }
+  ],
+  offer: [
+    { id: 'buyer-3-1', text: 'Determine your offer price strategy', tip: 'Based on comps and market' },
+    { id: 'buyer-3-2', text: 'Decide on deposit amount', tip: 'Usually 3-5% of price' },
+    { id: 'buyer-3-3', text: 'Choose your conditions (financing, inspection)', tip: 'Protect yourself' },
+    { id: 'buyer-3-4', text: 'Set closing date', tip: '30-90 days is typical' },
+    { id: 'buyer-3-5', text: 'Submit formal offer through platform', tip: 'All legal forms included' },
+    { id: 'buyer-3-6', text: 'Negotiate if counter-offer received', tip: 'Stay within budget' },
+    { id: 'buyer-3-7', text: 'Sign accepted offer', tip: 'Now legally binding' }
+  ],
+  conditions: [
+    { id: 'buyer-4-1', text: 'Submit mortgage application to lender', tip: 'Do immediately' },
+    { id: 'buyer-4-2', text: 'Book home inspection', tip: 'Use certified inspector' },
+    { id: 'buyer-4-3', text: 'Attend home inspection', tip: 'Ask questions' },
+    { id: 'buyer-4-4', text: 'Review inspection report', tip: 'Note major issues' },
+    { id: 'buyer-4-5', text: 'Negotiate repairs if needed', tip: 'Or price reduction' },
+    { id: 'buyer-4-6', text: 'Hire a real estate lawyer', tip: 'Essential for closing' },
+    { id: 'buyer-4-7', text: 'Have lawyer review all documents', tip: 'Before waiving' },
+    { id: 'buyer-4-8', text: 'Receive mortgage approval', tip: 'Get it in writing' },
+    { id: 'buyer-4-9', text: 'Arrange home insurance', tip: 'Required by lender' },
+    { id: 'buyer-4-10', text: 'Sign waiver of conditions', tip: 'Before deadline!' }
+  ],
+  closing: [
+    { id: 'buyer-5-1', text: 'Sign mortgage documents', tip: 'Review all terms' },
+    { id: 'buyer-5-2', text: 'Transfer down payment to lawyer', tip: 'Wire or bank draft' },
+    { id: 'buyer-5-3', text: 'Transfer closing costs to lawyer', tip: 'Include all fees' },
+    { id: 'buyer-5-4', text: 'Do final walkthrough of property', tip: 'Day before closing' },
+    { id: 'buyer-5-5', text: 'Set up utilities in your name', tip: 'Hydro, gas, water, internet' },
+    { id: 'buyer-5-6', text: 'Arrange movers', tip: 'Book early for month-end' },
+    { id: 'buyer-5-7', text: 'Get certified cheque for any balance', tip: 'If needed' },
+    { id: 'buyer-5-8', text: 'Receive keys from lawyer', tip: 'Usually after 5pm on closing day' },
+    { id: 'buyer-5-9', text: 'Change locks on new home', tip: 'For security' },
+    { id: 'buyer-5-10', text: 'Update your address everywhere', tip: 'CRA, bank, license, etc.' }
+  ]
+};
+
+// Seller checklist items
+const sellerChecklistItems = {
+  preparation: [
+    { id: 'seller-1-1', text: 'Research current market conditions', tip: 'Know if buyer or seller market' },
+    { id: 'seller-1-2', text: 'Get a pre-listing home inspection', tip: 'Optional but recommended' },
+    { id: 'seller-1-3', text: 'Make necessary repairs', tip: 'Focus on high-impact fixes' },
+    { id: 'seller-1-4', text: 'Declutter and depersonalize', tip: 'Buyers need to envision themselves' },
+    { id: 'seller-1-5', text: 'Deep clean entire home', tip: 'Consider professional cleaning' },
+    { id: 'seller-1-6', text: 'Stage key rooms', tip: 'Living room, kitchen, master bedroom' },
+    { id: 'seller-1-7', text: 'Boost curb appeal', tip: 'First impressions matter' },
+    { id: 'seller-1-8', text: 'Gather all documents (title, surveys, etc.)', tip: 'Be prepared' }
+  ],
+  pricing: [
+    { id: 'seller-2-1', text: 'Research comparable sales in area', tip: 'Last 3-6 months' },
+    { id: 'seller-2-2', text: 'Consider getting an appraisal', tip: 'Professional valuation' },
+    { id: 'seller-2-3', text: 'Factor in unique features', tip: 'Upgrades, location, lot size' },
+    { id: 'seller-2-4', text: 'Decide on pricing strategy', tip: 'Market price, under, or over' },
+    { id: 'seller-2-5', text: 'Set your bottom line price', tip: 'Lowest you will accept' },
+    { id: 'seller-2-6', text: 'Calculate your net proceeds', tip: 'After all costs' }
+  ],
+  listing: [
+    { id: 'seller-3-1', text: 'Take professional quality photos', tip: 'Natural light, wide angles' },
+    { id: 'seller-3-2', text: 'Write compelling property description', tip: 'Highlight best features' },
+    { id: 'seller-3-3', text: 'Complete property details form', tip: 'Be accurate and thorough' },
+    { id: 'seller-3-4', text: 'Disclose known defects', tip: 'Legally required' },
+    { id: 'seller-3-5', text: 'Create listing on Real Estate Direct', tip: 'All provinces supported' },
+    { id: 'seller-3-6', text: 'Share listing on social media', tip: 'Increase exposure' },
+    { id: 'seller-3-7', text: 'Prepare for showings', tip: 'Keep home show-ready' }
+  ],
+  offers: [
+    { id: 'seller-4-1', text: 'Review all offers carefully', tip: 'Price isn\'t everything' },
+    { id: 'seller-4-2', text: 'Check buyer\'s financing status', tip: 'Pre-approved is better' },
+    { id: 'seller-4-3', text: 'Evaluate conditions and timeline', tip: 'Fewer conditions = less risk' },
+    { id: 'seller-4-4', text: 'Consider deposit amount', tip: 'Higher = more committed buyer' },
+    { id: 'seller-4-5', text: 'Counter-offer if needed', tip: 'Negotiate strategically' },
+    { id: 'seller-4-6', text: 'Accept the best offer', tip: 'Sign all documents' },
+    { id: 'seller-4-7', text: 'Hire a real estate lawyer', tip: 'To handle closing' }
+  ],
+  closing: [
+    { id: 'seller-5-1', text: 'Cooperate with buyer\'s inspection', tip: 'Be available' },
+    { id: 'seller-5-2', text: 'Negotiate any inspection issues', tip: 'Be reasonable' },
+    { id: 'seller-5-3', text: 'Provide documents to lawyer', tip: 'Title, surveys, etc.' },
+    { id: 'seller-5-4', text: 'Sign transfer documents', tip: 'At lawyer\'s office' },
+    { id: 'seller-5-5', text: 'Cancel home insurance (after closing)', tip: 'Get prorated refund' },
+    { id: 'seller-5-6', text: 'Cancel/transfer utilities', tip: 'For closing date' },
+    { id: 'seller-5-7', text: 'Complete final cleaning', tip: 'Leave it broom-clean' },
+    { id: 'seller-5-8', text: 'Remove all belongings', tip: 'Unless included in sale' },
+    { id: 'seller-5-9', text: 'Leave all keys, remotes, manuals', tip: 'On kitchen counter' },
+    { id: 'seller-5-10', text: 'Receive proceeds from lawyer', tip: 'After closing completes' }
+  ]
+};
+
+// Load checklist progress from localStorage
+let checklistProgress = JSON.parse(localStorage.getItem('checklistProgress') || '{}');
+
+function initChecklists() {
+  renderBuyerChecklist();
+  renderSellerChecklist();
+  updateAllProgress();
+}
+
+function renderBuyerChecklist() {
+  const container = document.getElementById('buyerChecklist');
+  if (!container) return;
+
+  const sections = [
+    { key: 'preApproval', title: 'Step 1: Get Pre-Approved', icon: '💰' },
+    { key: 'searching', title: 'Step 2: Search & Find', icon: '🔍' },
+    { key: 'offer', title: 'Step 3: Make an Offer', icon: '📝' },
+    { key: 'conditions', title: 'Step 4: Conditions Period', icon: '✅' },
+    { key: 'closing', title: 'Step 5: Close the Deal', icon: '🔑' }
+  ];
+
+  container.innerHTML = sections.map(section => {
+    const items = buyerChecklistItems[section.key];
+    const completed = items.filter(item => checklistProgress[item.id]).length;
+    const percentage = Math.round((completed / items.length) * 100);
+
+    return `
+      <div class="checklist-section" data-section="buyer-${section.key}">
+        <div class="checklist-section-header" onclick="toggleChecklistSection('buyer-${section.key}')">
+          <div class="section-title">
+            <span class="section-icon">${section.icon}</span>
+            <h4>${section.title}</h4>
+          </div>
+          <div class="section-progress">
+            <span class="progress-text">${completed}/${items.length}</span>
+            <div class="progress-bar-mini">
+              <div class="progress-fill" style="width: ${percentage}%"></div>
+            </div>
+            <span class="expand-icon">▼</span>
+          </div>
+        </div>
+        <div class="checklist-section-content">
+          ${items.map(item => `
+            <label class="checklist-item-interactive ${checklistProgress[item.id] ? 'completed' : ''}">
+              <input type="checkbox" ${checklistProgress[item.id] ? 'checked' : ''}
+                     onchange="toggleChecklistItem('${item.id}', this.checked)">
+              <span class="checkmark"></span>
+              <span class="item-text">${item.text}</span>
+              <span class="item-tip">${item.tip}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderSellerChecklist() {
+  const container = document.getElementById('sellerChecklist');
+  if (!container) return;
+
+  const sections = [
+    { key: 'preparation', title: 'Step 1: Prepare Your Home', icon: '🏠' },
+    { key: 'pricing', title: 'Step 2: Price It Right', icon: '💵' },
+    { key: 'listing', title: 'Step 3: Create Your Listing', icon: '📸' },
+    { key: 'offers', title: 'Step 4: Review Offers', icon: '📋' },
+    { key: 'closing', title: 'Step 5: Close the Sale', icon: '🎉' }
+  ];
+
+  container.innerHTML = sections.map(section => {
+    const items = sellerChecklistItems[section.key];
+    const completed = items.filter(item => checklistProgress[item.id]).length;
+    const percentage = Math.round((completed / items.length) * 100);
+
+    return `
+      <div class="checklist-section" data-section="seller-${section.key}">
+        <div class="checklist-section-header" onclick="toggleChecklistSection('seller-${section.key}')">
+          <div class="section-title">
+            <span class="section-icon">${section.icon}</span>
+            <h4>${section.title}</h4>
+          </div>
+          <div class="section-progress">
+            <span class="progress-text">${completed}/${items.length}</span>
+            <div class="progress-bar-mini">
+              <div class="progress-fill" style="width: ${percentage}%"></div>
+            </div>
+            <span class="expand-icon">▼</span>
+          </div>
+        </div>
+        <div class="checklist-section-content">
+          ${items.map(item => `
+            <label class="checklist-item-interactive ${checklistProgress[item.id] ? 'completed' : ''}">
+              <input type="checkbox" ${checklistProgress[item.id] ? 'checked' : ''}
+                     onchange="toggleChecklistItem('${item.id}', this.checked)">
+              <span class="checkmark"></span>
+              <span class="item-text">${item.text}</span>
+              <span class="item-tip">${item.tip}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleChecklistSection(sectionKey) {
+  const section = document.querySelector(`[data-section="${sectionKey}"]`);
+  if (section) {
+    section.classList.toggle('expanded');
+  }
+}
+
+function toggleChecklistItem(itemId, checked) {
+  checklistProgress[itemId] = checked;
+  localStorage.setItem('checklistProgress', JSON.stringify(checklistProgress));
+
+  // Update the item's visual state
+  const checkbox = document.querySelector(`input[onchange*="${itemId}"]`);
+  if (checkbox) {
+    const label = checkbox.closest('.checklist-item-interactive');
+    if (label) {
+      label.classList.toggle('completed', checked);
+    }
+  }
+
+  updateAllProgress();
+
+  if (checked) {
+    showToast('Task completed!', 'success');
+  }
+}
+
+function updateAllProgress() {
+  updateBuyerProgress();
+  updateSellerProgress();
+}
+
+function updateBuyerProgress() {
+  const allItems = Object.values(buyerChecklistItems).flat();
+  const completed = allItems.filter(item => checklistProgress[item.id]).length;
+  const percentage = Math.round((completed / allItems.length) * 100);
+
+  const progressEl = document.getElementById('buyerOverallProgress');
+  if (progressEl) {
+    progressEl.innerHTML = `
+      <div class="overall-progress-bar">
+        <div class="progress-fill" style="width: ${percentage}%"></div>
+      </div>
+      <span class="overall-progress-text">${completed} of ${allItems.length} tasks complete (${percentage}%)</span>
+    `;
+  }
+
+  // Re-render to update section progress bars
+  renderBuyerChecklist();
+}
+
+function updateSellerProgress() {
+  const allItems = Object.values(sellerChecklistItems).flat();
+  const completed = allItems.filter(item => checklistProgress[item.id]).length;
+  const percentage = Math.round((completed / allItems.length) * 100);
+
+  const progressEl = document.getElementById('sellerOverallProgress');
+  if (progressEl) {
+    progressEl.innerHTML = `
+      <div class="overall-progress-bar">
+        <div class="progress-fill" style="width: ${percentage}%"></div>
+      </div>
+      <span class="overall-progress-text">${completed} of ${allItems.length} tasks complete (${percentage}%)</span>
+    `;
+  }
+
+  // Re-render to update section progress bars
+  renderSellerChecklist();
+}
+
+function resetBuyerChecklist() {
+  if (confirm('Are you sure you want to reset your buyer checklist progress? This cannot be undone.')) {
+    Object.values(buyerChecklistItems).flat().forEach(item => {
+      delete checklistProgress[item.id];
+    });
+    localStorage.setItem('checklistProgress', JSON.stringify(checklistProgress));
+    renderBuyerChecklist();
+    updateBuyerProgress();
+    showToast('Buyer checklist reset', 'info');
+  }
+}
+
+function resetSellerChecklist() {
+  if (confirm('Are you sure you want to reset your seller checklist progress? This cannot be undone.')) {
+    Object.values(sellerChecklistItems).flat().forEach(item => {
+      delete checklistProgress[item.id];
+    });
+    localStorage.setItem('checklistProgress', JSON.stringify(checklistProgress));
+    renderSellerChecklist();
+    updateSellerProgress();
+    showToast('Seller checklist reset', 'info');
   }
 }
 
