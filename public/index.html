@@ -351,6 +351,9 @@
         <button class="tab-btn active" onclick="showTab('myProperties')">
           <span class="tab-icon">🏠</span> My Properties
         </button>
+        <button class="tab-btn" onclick="showTab('savedProperties')">
+          <span class="tab-icon">❤️</span> Saved
+        </button>
         <button class="tab-btn" onclick="showTab('myOffers')">
           <span class="tab-icon">📝</span> My Offers
         </button>
@@ -365,6 +368,13 @@
             <button onclick="showSection('sell')" class="btn btn-primary btn-sm">+ Add Property</button>
           </div>
           <div id="propertiesList" class="properties-list"></div>
+        </div>
+        <div id="savedProperties" class="tab-content">
+          <div class="tab-header">
+            <h3>Saved Properties</h3>
+            <span class="saved-count" id="savedCount"></span>
+          </div>
+          <div id="savedPropertiesList" class="saved-properties-list"></div>
         </div>
         <div id="myOffers" class="tab-content">
           <h3>My Offers</h3>

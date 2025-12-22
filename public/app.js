@@ -8,6 +8,9 @@ let selectedImages = [];
 const MAX_IMAGES = 20;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+// Favorites storage
+let favorites = JSON.parse(localStorage.getItem('favoriteProperties') || '[]');
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
   loadProvinces();
@@ -15,6 +18,149 @@ document.addEventListener('DOMContentLoaded', () => {
   searchProperties();
   initImageUpload();
 });
+
+// ==========================================
+// Favorites / Saved Properties
+// ==========================================
+
+function toggleFavorite(propertyId, event) {
+  event.stopPropagation(); // Prevent triggering property view
+
+  const index = favorites.findIndex(f => f.id === propertyId);
+
+  if (index > -1) {
+    // Remove from favorites
+    favorites.splice(index, 1);
+    showToast('Removed from saved properties', 'info');
+  } else {
+    // Add to favorites - fetch property data first
+    addToFavorites(propertyId);
+    return; // addToFavorites will handle the toast
+  }
+
+  saveFavorites();
+  updateFavoriteButtons();
+}
+
+async function addToFavorites(propertyId) {
+  try {
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`);
+    const property = await response.json();
+
+    favorites.push({
+      id: propertyId,
+      address: property.address,
+      askingPrice: property.askingPrice,
+      bedrooms: property.bedrooms,
+      bathrooms: property.bathrooms,
+      squareFeet: property.squareFeet,
+      propertyType: property.propertyType,
+      image: property.images && property.images.length > 0 ? property.images[0].url : null,
+      savedAt: new Date().toISOString()
+    });
+
+    saveFavorites();
+    updateFavoriteButtons();
+    showToast('Property saved to favorites!', 'success');
+  } catch (error) {
+    showToast('Failed to save property', 'error');
+  }
+}
+
+function saveFavorites() {
+  localStorage.setItem('favoriteProperties', JSON.stringify(favorites));
+}
+
+function isFavorite(propertyId) {
+  return favorites.some(f => f.id === propertyId);
+}
+
+function updateFavoriteButtons() {
+  document.querySelectorAll('.favorite-btn').forEach(btn => {
+    const propertyId = btn.dataset.propertyId;
+    if (isFavorite(propertyId)) {
+      btn.classList.add('favorited');
+      btn.innerHTML = '❤️';
+      btn.title = 'Remove from saved';
+    } else {
+      btn.classList.remove('favorited');
+      btn.innerHTML = '🤍';
+      btn.title = 'Save property';
+    }
+  });
+}
+
+function removeFavorite(propertyId) {
+  favorites = favorites.filter(f => f.id !== propertyId);
+  saveFavorites();
+  loadSavedProperties();
+  updateFavoriteButtons();
+  showToast('Removed from saved properties', 'info');
+}
+
+function loadSavedProperties() {
+  const list = document.getElementById('savedPropertiesList');
+  if (!list) return;
+
+  if (favorites.length > 0) {
+    list.innerHTML = favorites.map(p => `
+      <div class="saved-property-card">
+        <div class="saved-property-image">
+          ${p.image
+            ? `<img src="${p.image}" alt="${p.address?.street}">`
+            : '<div class="property-image-placeholder">🏠</div>'
+          }
+        </div>
+        <div class="saved-property-info">
+          <div class="saved-property-price">$${p.askingPrice?.toLocaleString() || 'N/A'}</div>
+          <div class="saved-property-address">${p.address?.street || ''}, ${p.address?.city || ''}</div>
+          <div class="saved-property-details">
+            <span>${p.bedrooms || 0} beds</span>
+            <span>${p.bathrooms || 0} baths</span>
+            <span>${p.squareFeet || 'N/A'} sqft</span>
+          </div>
+          <div class="saved-property-meta">
+            <span class="property-type-badge">${p.propertyType || 'Property'}</span>
+            <span class="saved-date">Saved ${formatSavedDate(p.savedAt)}</span>
+          </div>
+        </div>
+        <div class="saved-property-actions">
+          <button class="btn btn-primary btn-sm" onclick="viewProperty('${p.id}')">View</button>
+          <button class="btn btn-outline btn-sm" onclick="removeFavorite('${p.id}')">Remove</button>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    list.innerHTML = `
+      <div class="empty-saved-state">
+        <div class="empty-icon">🤍</div>
+        <h3>No Saved Properties</h3>
+        <p>Click the heart icon on any property to save it for later.</p>
+        <button onclick="showSection('search')" class="btn btn-primary">Browse Properties</button>
+      </div>
+    `;
+  }
+}
+
+function formatSavedDate(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'today';
+  if (diffDays === 1) return 'yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  return date.toLocaleDateString();
+}
+
+function updateSavedCount() {
+  const countEl = document.getElementById('savedCount');
+  if (countEl) {
+    countEl.textContent = favorites.length > 0 ? `(${favorites.length})` : '';
+  }
+}
 
 // ==========================================
 // Toast Notifications
@@ -361,9 +507,19 @@ async function searchProperties() {
           ? `<img src="${p.images[0].url}" alt="${p.address?.street}" style="width:100%;height:100%;object-fit:cover;">`
           : '<div class="property-image-placeholder">🏠</div>';
 
+        const isFav = isFavorite(p._id);
+
         return `
           <div class="property-card" onclick="viewProperty('${p._id}')">
-            <div class="property-image">${mainImage}</div>
+            <div class="property-image">
+              ${mainImage}
+              <button class="favorite-btn ${isFav ? 'favorited' : ''}"
+                      data-property-id="${p._id}"
+                      onclick="toggleFavorite('${p._id}', event)"
+                      title="${isFav ? 'Remove from saved' : 'Save property'}">
+                ${isFav ? '❤️' : '🤍'}
+              </button>
+            </div>
             ${p.images && p.images.length > 1 ? `<span class="image-count">📷 ${p.images.length}</span>` : ''}
             <div class="property-info">
               <div class="property-price">$${p.askingPrice?.toLocaleString() || 'N/A'}</div>
@@ -811,6 +967,10 @@ async function calculateTax() {
 // ==========================================
 
 async function loadDashboard() {
+  // Load saved properties (works without auth)
+  loadSavedProperties();
+  updateSavedCount();
+
   if (!authToken) return;
 
   // Load properties
