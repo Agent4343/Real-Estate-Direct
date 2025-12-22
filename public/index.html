@@ -20,7 +20,9 @@
         <a href="#" onclick="showSection('home')">Home</a>
         <a href="#" onclick="showSection('search')">Buy</a>
         <a href="#" onclick="showSection('sell')">Sell</a>
-        <a href="#" onclick="showSection('calculator')">Tax Calculator</a>
+        <a href="#" onclick="showSection('how-to-buy')">How to Buy</a>
+        <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
+        <a href="#" onclick="showSection('calculator')">Calculator</a>
         <a href="#" onclick="showSection('dashboard')" id="dashboardLink" style="display:none;">Dashboard</a>
       </div>
       <div class="auth-buttons" id="authButtons">
@@ -374,7 +376,618 @@
         </div>
       </div>
     </section>
+
+    <!-- How to Buy Section -->
+    <section id="how-to-buy" class="section">
+      <div class="guide-container">
+        <div class="guide-header">
+          <span class="guide-icon">🏡</span>
+          <h1>Complete Guide to Buying Real Estate in Canada</h1>
+          <p class="guide-subtitle">Everything you need to know about purchasing property, from searching to closing</p>
+        </div>
+
+        <div class="guide-overview">
+          <h2>The Buying Process at a Glance</h2>
+          <div class="process-timeline">
+            <div class="timeline-item">
+              <div class="timeline-number">1</div>
+              <div class="timeline-content">
+                <h4>Get Pre-Approved</h4>
+                <p>Secure financing</p>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-item">
+              <div class="timeline-number">2</div>
+              <div class="timeline-content">
+                <h4>Search Properties</h4>
+                <p>Find your home</p>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-item">
+              <div class="timeline-number">3</div>
+              <div class="timeline-content">
+                <h4>Make an Offer</h4>
+                <p>Submit & negotiate</p>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-item">
+              <div class="timeline-number">4</div>
+              <div class="timeline-content">
+                <h4>Conditions Period</h4>
+                <p>Inspections & financing</p>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-item">
+              <div class="timeline-number">5</div>
+              <div class="timeline-content">
+                <h4>Close the Deal</h4>
+                <p>Sign & get keys</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-steps">
+          <!-- Step 1 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 1</span>
+              <h3>Get Pre-Approved for a Mortgage</h3>
+            </div>
+            <div class="step-content">
+              <p>Before you start looking at properties, get pre-approved for a mortgage. This tells you exactly how much you can afford and shows sellers you're a serious buyer.</p>
+
+              <div class="info-box">
+                <h4>What You'll Need for Pre-Approval:</h4>
+                <ul>
+                  <li><strong>Proof of income:</strong> Pay stubs, T4s, or Notice of Assessment</li>
+                  <li><strong>Employment verification:</strong> Letter from employer</li>
+                  <li><strong>Credit check:</strong> Lender will pull your credit score</li>
+                  <li><strong>Down payment proof:</strong> Bank statements showing savings</li>
+                  <li><strong>ID:</strong> Government-issued identification</li>
+                </ul>
+              </div>
+
+              <div class="highlight-box">
+                <h4>Down Payment Requirements in Canada</h4>
+                <div class="comparison-table">
+                  <div class="table-row">
+                    <span>Purchase Price under $500,000</span>
+                    <span><strong>5% minimum</strong></span>
+                  </div>
+                  <div class="table-row">
+                    <span>$500,000 - $999,999</span>
+                    <span><strong>5% on first $500K, 10% on remainder</strong></span>
+                  </div>
+                  <div class="table-row">
+                    <span>$1,000,000 and above</span>
+                    <span><strong>20% minimum</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tip-box">
+                <span class="tip-icon">💡</span>
+                <p><strong>Pro Tip:</strong> If your down payment is less than 20%, you'll need CMHC mortgage insurance, which adds to your costs.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 2</span>
+              <h3>Search for Properties</h3>
+            </div>
+            <div class="step-content">
+              <p>Now the fun part! Use Real Estate Direct to search for properties that match your criteria across Canada.</p>
+
+              <div class="info-box">
+                <h4>Consider These Factors:</h4>
+                <ul>
+                  <li><strong>Location:</strong> Proximity to work, schools, transit, amenities</li>
+                  <li><strong>Property type:</strong> Detached, semi, townhouse, condo</li>
+                  <li><strong>Size:</strong> Bedrooms, bathrooms, square footage</li>
+                  <li><strong>Age & condition:</strong> New build vs. resale, renovation needs</li>
+                  <li><strong>Future potential:</strong> Neighbourhood development, resale value</li>
+                </ul>
+              </div>
+
+              <div class="action-box">
+                <h4>Ready to Start Searching?</h4>
+                <p>Browse available properties in your desired area.</p>
+                <button onclick="showSection('search')" class="btn btn-primary">Search Properties</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 3</span>
+              <h3>Make an Offer</h3>
+            </div>
+            <div class="step-content">
+              <p>Found a property you love? It's time to submit a formal offer. Real Estate Direct generates all the legally required forms for your province.</p>
+
+              <div class="info-box">
+                <h4>Your Offer Will Include:</h4>
+                <ul>
+                  <li><strong>Offer price:</strong> What you're willing to pay</li>
+                  <li><strong>Deposit amount:</strong> Usually 3-5% of purchase price</li>
+                  <li><strong>Closing date:</strong> When you'll take possession</li>
+                  <li><strong>Irrevocable date:</strong> How long seller has to respond</li>
+                  <li><strong>Conditions:</strong> Financing, inspection, lawyer review, etc.</li>
+                  <li><strong>Chattels & fixtures:</strong> What's included in the sale</li>
+                </ul>
+              </div>
+
+              <div class="warning-box">
+                <span class="warning-icon">⚠️</span>
+                <p><strong>Important:</strong> An offer is a legally binding contract. Once accepted, you're committed to the purchase (subject to your conditions).</p>
+              </div>
+
+              <h4>Understanding Conditions</h4>
+              <p>Conditions protect you as a buyer. Common conditions include:</p>
+
+              <div class="conditions-grid">
+                <div class="condition-card">
+                  <span class="condition-icon">💰</span>
+                  <h5>Financing Condition</h5>
+                  <p>Usually 5 business days. Allows you to secure final mortgage approval.</p>
+                </div>
+                <div class="condition-card">
+                  <span class="condition-icon">🔍</span>
+                  <h5>Home Inspection</h5>
+                  <p>Usually 7 days. Professional inspection reveals hidden issues.</p>
+                </div>
+                <div class="condition-card">
+                  <span class="condition-icon">⚖️</span>
+                  <h5>Lawyer Review</h5>
+                  <p>Usually 3 business days. Your lawyer reviews the contract.</p>
+                </div>
+                <div class="condition-card">
+                  <span class="condition-icon">🏠</span>
+                  <h5>Sale of Property</h5>
+                  <p>If you need to sell your current home first.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 4</span>
+              <h3>Fulfil Your Conditions</h3>
+            </div>
+            <div class="step-content">
+              <p>Once your offer is accepted, you enter the "conditions period." This is your chance to complete due diligence before the sale becomes firm.</p>
+
+              <div class="checklist-box">
+                <h4>Conditions Period Checklist:</h4>
+                <div class="checklist">
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Finalize mortgage with your lender</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Schedule and complete home inspection</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Have lawyer review all documents</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Arrange home insurance (required by lender)</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Sign waiver of conditions before deadline</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tip-box">
+                <span class="tip-icon">💡</span>
+                <p><strong>Pro Tip:</strong> If the home inspection reveals major issues, you can negotiate repairs, a price reduction, or walk away from the deal.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 5</span>
+              <h3>Close the Deal</h3>
+            </div>
+            <div class="step-content">
+              <p>Closing day is when ownership officially transfers to you. Your lawyer handles most of the heavy lifting.</p>
+
+              <div class="info-box">
+                <h4>Before Closing Day:</h4>
+                <ul>
+                  <li>Provide remaining down payment to lawyer's trust account</li>
+                  <li>Sign mortgage documents with your lender</li>
+                  <li>Do a final walkthrough of the property</li>
+                  <li>Set up utilities in your name</li>
+                  <li>Arrange for moving day</li>
+                </ul>
+              </div>
+
+              <div class="highlight-box">
+                <h4>Closing Costs to Budget For</h4>
+                <div class="comparison-table">
+                  <div class="table-row">
+                    <span>Land Transfer Tax</span>
+                    <span>Varies by province</span>
+                  </div>
+                  <div class="table-row">
+                    <span>Legal Fees</span>
+                    <span>$1,000 - $2,500</span>
+                  </div>
+                  <div class="table-row">
+                    <span>Title Insurance</span>
+                    <span>$300 - $500</span>
+                  </div>
+                  <div class="table-row">
+                    <span>Home Inspection</span>
+                    <span>$400 - $700</span>
+                  </div>
+                  <div class="table-row">
+                    <span>Adjustments</span>
+                    <span>Property tax, utilities, etc.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-box">
+                <h4>Calculate Your Land Transfer Tax</h4>
+                <p>Use our calculator to estimate your province-specific closing costs.</p>
+                <button onclick="showSection('calculator')" class="btn btn-primary">Tax Calculator</button>
+              </div>
+
+              <div class="success-box">
+                <span class="success-icon">🎉</span>
+                <h4>Congratulations!</h4>
+                <p>Once your lawyer confirms all funds have been transferred and documents registered, you'll receive the keys to your new home!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-cta">
+          <h2>Ready to Buy Your Home?</h2>
+          <p>Create an account to start searching for properties and making offers.</p>
+          <div class="cta-buttons">
+            <button onclick="showSection('search')" class="btn btn-primary btn-lg">Browse Properties</button>
+            <button onclick="showModal('registerModal')" class="btn btn-secondary btn-lg">Create Account</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Sell Section -->
+    <section id="how-to-sell" class="section">
+      <div class="guide-container">
+        <div class="guide-header">
+          <span class="guide-icon">🏷️</span>
+          <h1>Complete Guide to Selling Real Estate in Canada</h1>
+          <p class="guide-subtitle">Maximize your sale price and navigate the process with confidence</p>
+        </div>
+
+        <div class="guide-overview">
+          <h2>The Selling Process at a Glance</h2>
+          <div class="process-timeline">
+            <div class="timeline-item">
+              <div class="timeline-number">1</div>
+              <div class="timeline-content">
+                <h4>Prepare Your Home</h4>
+                <p>Clean & stage</p>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-item">
+              <div class="timeline-number">2</div>
+              <div class="timeline-content">
+                <h4>Price It Right</h4>
+                <p>Market analysis</p>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-item">
+              <div class="timeline-number">3</div>
+              <div class="timeline-content">
+                <h4>List & Market</h4>
+                <p>Photos & listing</p>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-item">
+              <div class="timeline-number">4</div>
+              <div class="timeline-content">
+                <h4>Receive Offers</h4>
+                <p>Review & negotiate</p>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-item">
+              <div class="timeline-number">5</div>
+              <div class="timeline-content">
+                <h4>Close the Sale</h4>
+                <p>Transfer & payout</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-steps">
+          <!-- Step 1 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 1</span>
+              <h3>Prepare Your Home for Sale</h3>
+            </div>
+            <div class="step-content">
+              <p>First impressions matter! A well-prepared home sells faster and often for a higher price.</p>
+
+              <div class="info-box">
+                <h4>Pre-Listing Checklist:</h4>
+                <ul>
+                  <li><strong>Declutter:</strong> Remove personal items and excess furniture</li>
+                  <li><strong>Deep clean:</strong> Every room, including windows and carpets</li>
+                  <li><strong>Minor repairs:</strong> Fix leaky faucets, squeaky doors, chipped paint</li>
+                  <li><strong>Curb appeal:</strong> Landscaping, front door, mailbox</li>
+                  <li><strong>Neutralize:</strong> Fresh paint in neutral colours</li>
+                  <li><strong>Stage key rooms:</strong> Living room, kitchen, master bedroom</li>
+                </ul>
+              </div>
+
+              <div class="tip-box">
+                <span class="tip-icon">💡</span>
+                <p><strong>Pro Tip:</strong> Consider getting a pre-listing home inspection. It helps you identify and fix issues before buyers discover them.</p>
+              </div>
+
+              <div class="highlight-box">
+                <h4>Repairs with Best ROI</h4>
+                <div class="comparison-table">
+                  <div class="table-row">
+                    <span>Fresh paint (interior)</span>
+                    <span><strong>100-150% ROI</strong></span>
+                  </div>
+                  <div class="table-row">
+                    <span>Kitchen updates</span>
+                    <span><strong>75-100% ROI</strong></span>
+                  </div>
+                  <div class="table-row">
+                    <span>Bathroom refresh</span>
+                    <span><strong>70-90% ROI</strong></span>
+                  </div>
+                  <div class="table-row">
+                    <span>Flooring update</span>
+                    <span><strong>70-80% ROI</strong></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 2</span>
+              <h3>Price Your Property Right</h3>
+            </div>
+            <div class="step-content">
+              <p>Pricing correctly from the start is crucial. Overpricing leads to stale listings; underpricing leaves money on the table.</p>
+
+              <div class="info-box">
+                <h4>How to Determine Fair Market Value:</h4>
+                <ul>
+                  <li><strong>Comparable sales:</strong> What have similar homes sold for recently?</li>
+                  <li><strong>Active listings:</strong> What's your competition priced at?</li>
+                  <li><strong>Market conditions:</strong> Is it a buyer's or seller's market?</li>
+                  <li><strong>Unique features:</strong> Upgrades, location, lot size</li>
+                  <li><strong>Time on market:</strong> Price for how quickly you need to sell</li>
+                </ul>
+              </div>
+
+              <div class="warning-box">
+                <span class="warning-icon">⚠️</span>
+                <p><strong>Warning:</strong> Homes that sit on the market too long (30+ days) often sell for less than asking price. Price it right from day one.</p>
+              </div>
+
+              <div class="info-box">
+                <h4>Pricing Strategies:</h4>
+                <ul>
+                  <li><strong>At market value:</strong> Fair price, steady interest, normal negotiation</li>
+                  <li><strong>Slightly below market:</strong> Creates urgency, potential multiple offers</li>
+                  <li><strong>Offer date strategy:</strong> Set a date to review offers, often drives competition</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 3</span>
+              <h3>Create Your Listing</h3>
+            </div>
+            <div class="step-content">
+              <p>A great listing attracts more buyers. High-quality photos and a compelling description are essential.</p>
+
+              <div class="info-box">
+                <h4>Essential Listing Elements:</h4>
+                <ul>
+                  <li><strong>Professional photos:</strong> At least 15-20 high-quality images</li>
+                  <li><strong>Detailed description:</strong> Highlight key features and upgrades</li>
+                  <li><strong>Accurate measurements:</strong> Room sizes, lot dimensions</li>
+                  <li><strong>Property history:</strong> Year built, renovations, new systems</li>
+                  <li><strong>Neighbourhood info:</strong> Schools, transit, amenities</li>
+                </ul>
+              </div>
+
+              <div class="tip-box">
+                <span class="tip-icon">📸</span>
+                <p><strong>Photo Tips:</strong> Shoot on a bright day, use wide-angle lens, stage each room, capture curb appeal, and highlight special features like fireplaces or views.</p>
+              </div>
+
+              <div class="action-box">
+                <h4>Ready to List Your Property?</h4>
+                <p>Create your listing with photos, description, and all the details buyers need.</p>
+                <button onclick="showSection('sell')" class="btn btn-primary">Create Listing</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 4</span>
+              <h3>Review & Negotiate Offers</h3>
+            </div>
+            <div class="step-content">
+              <p>When offers come in, review each carefully. Price isn't everything – terms and conditions matter too.</p>
+
+              <div class="info-box">
+                <h4>Evaluating an Offer:</h4>
+                <ul>
+                  <li><strong>Offer price:</strong> How does it compare to asking price?</li>
+                  <li><strong>Deposit amount:</strong> Larger deposits show serious intent</li>
+                  <li><strong>Conditions:</strong> Fewer conditions = less risk of deal falling through</li>
+                  <li><strong>Closing date:</strong> Does it work with your timeline?</li>
+                  <li><strong>Financing:</strong> Is the buyer pre-approved?</li>
+                  <li><strong>Chattels included:</strong> What are they asking you to leave?</li>
+                </ul>
+              </div>
+
+              <div class="highlight-box">
+                <h4>Your Response Options</h4>
+                <div class="comparison-table">
+                  <div class="table-row">
+                    <span><strong>Accept</strong></span>
+                    <span>Agree to all terms as presented</span>
+                  </div>
+                  <div class="table-row">
+                    <span><strong>Counter</strong></span>
+                    <span>Propose different terms (price, date, conditions)</span>
+                  </div>
+                  <div class="table-row">
+                    <span><strong>Reject</strong></span>
+                    <span>Decline the offer entirely</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tip-box">
+                <span class="tip-icon">💡</span>
+                <p><strong>Multiple Offers?</strong> You can ask all buyers to submit their "best and final" offer, then choose the strongest one.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="guide-step">
+            <div class="step-header">
+              <span class="step-number">Step 5</span>
+              <h3>Close the Sale</h3>
+            </div>
+            <div class="step-content">
+              <p>Once an offer is accepted and conditions are waived, you're on your way to closing. Here's what happens next.</p>
+
+              <div class="checklist-box">
+                <h4>Seller's Closing Checklist:</h4>
+                <div class="checklist">
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Hire a real estate lawyer (if you haven't already)</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Gather all property documents (deed, survey, permits)</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Pay off your existing mortgage</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Cancel home insurance after closing</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Notify utilities of final meter readings</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Complete final cleaning and move out</span>
+                  </div>
+                  <div class="checklist-item">
+                    <span class="checkbox">☐</span>
+                    <span>Leave all keys, remotes, and documents for buyer</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-box">
+                <h4>Seller's Closing Costs:</h4>
+                <ul>
+                  <li><strong>Legal fees:</strong> $800 - $1,500</li>
+                  <li><strong>Mortgage discharge:</strong> $200 - $400</li>
+                  <li><strong>Status certificate (condos):</strong> $100 - $200</li>
+                  <li><strong>Capital gains tax:</strong> If not principal residence</li>
+                  <li><strong>Moving expenses:</strong> Variable</li>
+                </ul>
+              </div>
+
+              <div class="success-box">
+                <span class="success-icon">💰</span>
+                <h4>Getting Paid</h4>
+                <p>On closing day, your lawyer will pay off your mortgage, deduct closing costs, and transfer the remaining funds to your bank account. This typically happens the same day or next business day.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-extra">
+          <h2>Important Tax Considerations</h2>
+          <div class="tax-info-grid">
+            <div class="tax-info-card">
+              <h4>Principal Residence Exemption</h4>
+              <p>If the property was your principal residence for every year you owned it, you won't pay capital gains tax on the profit.</p>
+            </div>
+            <div class="tax-info-card">
+              <h4>Capital Gains Tax</h4>
+              <p>For investment properties, 50% of your profit is added to your income and taxed at your marginal rate.</p>
+            </div>
+            <div class="tax-info-card">
+              <h4>Non-Resident Sellers</h4>
+              <p>If you're not a Canadian resident, a portion of the sale proceeds may be withheld for taxes.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-cta">
+          <h2>Ready to Sell Your Property?</h2>
+          <p>List your property on Real Estate Direct and reach buyers across Canada.</p>
+          <div class="cta-buttons">
+            <button onclick="showSection('sell')" class="btn btn-primary btn-lg">List Your Property</button>
+            <button onclick="showSection('calculator')" class="btn btn-secondary btn-lg">Calculate Costs</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
 
   <!-- Login Modal -->
   <div id="loginModal" class="modal">
@@ -496,10 +1109,11 @@
         <span>Real Estate Direct</span>
       </div>
       <div class="footer-links">
-        <a href="#">About</a>
+        <a href="#" onclick="showSection('how-to-buy')">How to Buy</a>
+        <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
+        <a href="#" onclick="showSection('calculator')">Tax Calculator</a>
         <a href="#">Privacy</a>
         <a href="#">Terms</a>
-        <a href="#">Contact</a>
       </div>
       <p class="footer-disclaimer">© 2024 Real Estate Direct. This platform provides tools for convenience only. Consult with licensed real estate professionals and lawyers for legal advice.</p>
     </div>
