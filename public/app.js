@@ -1535,3 +1535,42 @@ async function activateListing(propertyId) {
     alert('Failed to activate listing: ' + error.message);
   }
 }
+
+// ==========================================
+// FAQ Page Functions
+// ==========================================
+
+function showFaqCategory(category) {
+  // Hide all categories
+  const categories = document.querySelectorAll('.faq-category');
+  categories.forEach(cat => cat.classList.remove('active'));
+  
+  // Show selected category
+  const selectedCategory = document.getElementById(`faq-${category}`);
+  if (selectedCategory) {
+    selectedCategory.classList.add('active');
+  }
+  
+  // Update tab buttons
+  const tabs = document.querySelectorAll('.faq-tab');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function toggleFaq(element) {
+  const faqItem = element.closest('.faq-item');
+  
+  // Close other open FAQs in the same category
+  const category = faqItem.closest('.faq-category');
+  if (category) {
+    const openItems = category.querySelectorAll('.faq-item.open');
+    openItems.forEach(item => {
+      if (item !== faqItem) {
+        item.classList.remove('open');
+      }
+    });
+  }
+  
+  // Toggle current item
+  faqItem.classList.toggle('open');
+}
