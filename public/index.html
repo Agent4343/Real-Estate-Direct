@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Leaflet Maps CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 </head>
 <body>
   <header>
@@ -24,14 +26,39 @@
         <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
         <a href="#" onclick="showSection('calculator')">Calculator</a>
         <a href="#" onclick="showSection('dashboard')" id="dashboardLink" style="display:none;">Dashboard</a>
+        <a href="#" onclick="showSection('messages')" id="messagesLink" style="display:none;">Messages</a>
+        <a href="#" onclick="showSection('transactions')" id="transactionsLink" style="display:none;">Transactions</a>
+        <a href="#" onclick="showSection('documents')" id="documentsLink" style="display:none;">Documents</a>
+        <a href="#" onclick="showSection('notifications')" id="notificationsLink" style="display:none;">Notifications</a>
+        <a href="#" onclick="showSection('analytics')" id="analyticsLink" style="display:none;">Analytics</a>
+        <a href="#" onclick="showSection('profile')" id="profileLink" style="display:none;">Profile</a>
+        <a href="#" onclick="showSection('admin')" id="adminLink" style="display:none;">Admin</a>
       </div>
       <div class="auth-buttons" id="authButtons">
         <button onclick="showModal('loginModal')" class="btn btn-outline">Login</button>
         <button onclick="showModal('registerModal')" class="btn btn-primary">Get Started</button>
       </div>
       <div class="user-info" id="userInfo" style="display:none;">
+        <div class="notification-bell" id="notificationBell" onclick="toggleNotifications()">
+          <span class="bell-icon">🔔</span>
+          <span class="notification-count" id="notificationCount" style="display:none;">0</span>
+        </div>
         <span id="userName" class="user-name"></span>
         <button onclick="logout()" class="btn btn-outline">Logout</button>
+      </div>
+
+      <!-- Notification Panel -->
+      <div id="notificationPanel" class="notification-panel" style="display:none;">
+        <div class="notification-header">
+          <h3>Notifications</h3>
+          <button onclick="markAllNotificationsRead()" class="btn btn-sm btn-outline">Mark all read</button>
+        </div>
+        <div class="notification-list" id="notificationList">
+          <div class="empty-state">No notifications</div>
+        </div>
+        <div class="notification-footer">
+          <a href="#" onclick="showSection('notifications'); closeNotificationPanel();">View all notifications</a>
+        </div>
       </div>
     </nav>
   </header>
@@ -154,16 +181,50 @@
             <label>Max Price</label>
             <input type="number" id="maxPrice" placeholder="No max">
           </div>
+          <div class="filter-group">
+            <label>Bedrooms</label>
+            <select id="filterBedrooms">
+              <option value="">Any</option>
+              <option value="1">1+</option>
+              <option value="2">2+</option>
+              <option value="3">3+</option>
+              <option value="4">4+</option>
+              <option value="5">5+</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Bathrooms</label>
+            <select id="filterBathrooms">
+              <option value="">Any</option>
+              <option value="1">1+</option>
+              <option value="2">2+</option>
+              <option value="3">3+</option>
+            </select>
+          </div>
           <button onclick="searchProperties()" class="btn btn-primary">
             <span class="btn-icon">🔍</span> Search
           </button>
+          <button onclick="clearFilters()" class="btn btn-outline">Clear</button>
         </div>
       </div>
-      <div class="property-grid" id="propertyGrid">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading properties...</p>
+      <div class="view-toggle">
+        <button class="view-btn active" id="gridViewBtn" onclick="setSearchView('grid')">
+          <span>📋</span> Grid
+        </button>
+        <button class="view-btn" id="mapViewBtn" onclick="setSearchView('map')">
+          <span>🗺️</span> Map
+        </button>
+      </div>
+      <div id="searchGridView">
+        <div class="property-grid" id="propertyGrid">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading properties...</p>
+          </div>
         </div>
+      </div>
+      <div id="searchMapView" style="display:none;">
+        <div id="propertyMap" class="property-map"></div>
       </div>
     </section>
 
@@ -439,6 +500,24 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Interactive Buyer Checklist -->
+        <div class="interactive-checklist-container">
+          <div class="checklist-header">
+            <div class="checklist-title">
+              <span class="checklist-icon">📋</span>
+              <div>
+                <h2>Your Home Buying Checklist</h2>
+                <p>Track your progress through every step of the buying process</p>
+              </div>
+            </div>
+            <div class="checklist-actions">
+              <div id="buyerOverallProgress" class="overall-progress"></div>
+              <button onclick="resetBuyerChecklist()" class="btn btn-outline btn-sm">Reset Progress</button>
+            </div>
+          </div>
+          <div id="buyerChecklist" class="interactive-checklist"></div>
         </div>
 
         <div class="guide-steps">
@@ -737,6 +816,24 @@
           </div>
         </div>
 
+        <!-- Interactive Seller Checklist -->
+        <div class="interactive-checklist-container">
+          <div class="checklist-header">
+            <div class="checklist-title">
+              <span class="checklist-icon">📋</span>
+              <div>
+                <h2>Your Home Selling Checklist</h2>
+                <p>Track your progress through every step of the selling process</p>
+              </div>
+            </div>
+            <div class="checklist-actions">
+              <div id="sellerOverallProgress" class="overall-progress"></div>
+              <button onclick="resetSellerChecklist()" class="btn btn-outline btn-sm">Reset Progress</button>
+            </div>
+          </div>
+          <div id="sellerChecklist" class="interactive-checklist"></div>
+        </div>
+
         <div class="guide-steps">
           <!-- Step 1 -->
           <div class="guide-step">
@@ -1018,7 +1115,29 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Sign In</button>
       </form>
+      <p class="modal-footer">
+        <a href="#" onclick="showModal('forgotPasswordModal'); closeModal('loginModal');">Forgot password?</a>
+      </p>
       <p class="modal-footer">Don't have an account? <a href="#" onclick="showModal('registerModal'); closeModal('loginModal');">Create one</a></p>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotPasswordModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('forgotPasswordModal')">&times;</span>
+      <div class="modal-header">
+        <h2>Reset Password</h2>
+        <p>Enter your email to receive a password reset link</p>
+      </div>
+      <form onsubmit="requestPasswordReset(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="resetEmail" required placeholder="you@example.com">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
+      </form>
+      <p class="modal-footer"><a href="#" onclick="showModal('loginModal'); closeModal('forgotPasswordModal');">Back to Login</a></p>
     </div>
   </div>
 
@@ -1109,6 +1228,1038 @@
     </div>
   </div>
 
+  <!-- Terms of Service Section -->
+  <section id="terms" class="section">
+    <div class="legal-container">
+      <h1>Terms of Service</h1>
+      <p class="legal-date">Last Updated: December 2024</p>
+
+      <div class="legal-content">
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing or using Real Estate Direct ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our Platform.</p>
+
+        <h2>2. Platform Description</h2>
+        <p>Real Estate Direct is an online platform that facilitates the buying and selling of real estate properties in Canada. The Platform provides tools for property listings, offer management, document generation, and transaction coordination.</p>
+
+        <h2>3. User Accounts</h2>
+        <p>To use certain features of the Platform, you must register for an account. You agree to:</p>
+        <ul>
+          <li>Provide accurate and complete information</li>
+          <li>Maintain the security of your account credentials</li>
+          <li>Accept responsibility for all activities under your account</li>
+          <li>Notify us immediately of any unauthorized use</li>
+        </ul>
+
+        <h2>4. Platform Fees and Commission</h2>
+        <p>Real Estate Direct charges a platform commission of 1% of the final sale price, payable by the seller upon successful completion of a transaction. This fee is significantly lower than traditional real estate agent commissions.</p>
+        <ul>
+          <li>Commission is invoiced upon transaction completion</li>
+          <li>Payment is due within 30 days of closing</li>
+          <li>Accepted payment methods include credit card and bank transfer</li>
+        </ul>
+
+        <h2>5. Property Listings</h2>
+        <p>By listing a property on the Platform, you represent and warrant that:</p>
+        <ul>
+          <li>You are the legal owner or authorized agent of the property</li>
+          <li>All information provided is accurate and complete</li>
+          <li>You have the legal right to sell the property</li>
+          <li>The listing does not violate any applicable laws</li>
+        </ul>
+
+        <h2>6. Offers and Transactions</h2>
+        <p>The Platform facilitates offer submission and acceptance but does not guarantee any transaction. Users are responsible for:</p>
+        <ul>
+          <li>Conducting their own due diligence</li>
+          <li>Engaging qualified legal professionals</li>
+          <li>Meeting all legal requirements for real estate transactions in their province</li>
+          <li>Fulfilling all conditions of their agreements</li>
+        </ul>
+
+        <h2>7. Legal Documents</h2>
+        <p>Documents generated by the Platform are provided as templates and tools for convenience. They do not constitute legal advice. Users should:</p>
+        <ul>
+          <li>Have all documents reviewed by a qualified lawyer</li>
+          <li>Ensure documents meet local legal requirements</li>
+          <li>Not rely solely on auto-generated documents</li>
+        </ul>
+
+        <h2>8. Limitation of Liability</h2>
+        <p>Real Estate Direct is not a real estate brokerage, law firm, or financial institution. We do not provide legal, financial, or real estate advice. The Platform is provided "as is" without warranties of any kind.</p>
+        <p>To the maximum extent permitted by law, Real Estate Direct shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Platform.</p>
+
+        <h2>9. Prohibited Activities</h2>
+        <p>Users may not:</p>
+        <ul>
+          <li>Use the Platform for fraudulent purposes</li>
+          <li>Post false or misleading information</li>
+          <li>Violate any applicable laws or regulations</li>
+          <li>Harass other users</li>
+          <li>Attempt to gain unauthorized access to the Platform</li>
+        </ul>
+
+        <h2>10. Termination</h2>
+        <p>We reserve the right to terminate or suspend your account at any time for violations of these Terms. Upon termination, you remain responsible for any outstanding fees or obligations.</p>
+
+        <h2>11. Governing Law</h2>
+        <p>These Terms are governed by the laws of Canada and the province of Ontario. Any disputes shall be resolved in the courts of Ontario.</p>
+
+        <h2>12. Changes to Terms</h2>
+        <p>We may update these Terms from time to time. Continued use of the Platform after changes constitutes acceptance of the new Terms.</p>
+
+        <h2>13. Contact</h2>
+        <p>For questions about these Terms, please contact us at legal@realestatedirect.ca</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacy Policy Section -->
+  <section id="privacy" class="section">
+    <div class="legal-container">
+      <h1>Privacy Policy</h1>
+      <p class="legal-date">Last Updated: December 2024</p>
+
+      <div class="legal-content">
+        <h2>1. Introduction</h2>
+        <p>Real Estate Direct ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Platform.</p>
+
+        <h2>2. Information We Collect</h2>
+        <h3>Information You Provide</h3>
+        <ul>
+          <li><strong>Account Information:</strong> Name, email address, password, phone number</li>
+          <li><strong>Property Information:</strong> Property details, photos, addresses, prices</li>
+          <li><strong>Transaction Information:</strong> Offers, agreements, closing details</li>
+          <li><strong>Financial Information:</strong> Payment card details (processed securely via Stripe)</li>
+          <li><strong>Communications:</strong> Messages with other users, support inquiries</li>
+        </ul>
+
+        <h3>Information Collected Automatically</h3>
+        <ul>
+          <li>IP address and device information</li>
+          <li>Browser type and settings</li>
+          <li>Usage data and analytics</li>
+          <li>Cookies and similar technologies</li>
+        </ul>
+
+        <h2>3. How We Use Your Information</h2>
+        <p>We use your information to:</p>
+        <ul>
+          <li>Provide and maintain the Platform</li>
+          <li>Process transactions and payments</li>
+          <li>Send notifications about your transactions</li>
+          <li>Facilitate communication between buyers and sellers</li>
+          <li>Generate legal documents and forms</li>
+          <li>Improve our services and user experience</li>
+          <li>Comply with legal obligations</li>
+        </ul>
+
+        <h2>4. Information Sharing</h2>
+        <p>We may share your information with:</p>
+        <ul>
+          <li><strong>Other Users:</strong> Buyers/sellers you interact with see relevant property and contact information</li>
+          <li><strong>Service Providers:</strong> Payment processors (Stripe), email services, hosting providers</li>
+          <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
+          <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+        </ul>
+
+        <h2>5. Data Security</h2>
+        <p>We implement industry-standard security measures including:</p>
+        <ul>
+          <li>Encryption of data in transit (SSL/TLS)</li>
+          <li>Secure password hashing</li>
+          <li>Regular security audits</li>
+          <li>Access controls and authentication</li>
+        </ul>
+
+        <h2>6. Your Rights</h2>
+        <p>Under Canadian privacy law (PIPEDA) and provincial legislation, you have the right to:</p>
+        <ul>
+          <li>Access your personal information</li>
+          <li>Correct inaccurate information</li>
+          <li>Request deletion of your information</li>
+          <li>Opt-out of marketing communications</li>
+          <li>Withdraw consent (where applicable)</li>
+        </ul>
+
+        <h2>7. Cookies</h2>
+        <p>We use cookies to:</p>
+        <ul>
+          <li>Remember your login status</li>
+          <li>Store your preferences</li>
+          <li>Analyze Platform usage</li>
+          <li>Improve user experience</li>
+        </ul>
+        <p>You can control cookies through your browser settings.</p>
+
+        <h2>8. Data Retention</h2>
+        <p>We retain your information for as long as your account is active or as needed to provide services. Transaction records are retained for 7 years for legal and tax purposes.</p>
+
+        <h2>9. Children's Privacy</h2>
+        <p>The Platform is not intended for users under 18 years of age. We do not knowingly collect information from children.</p>
+
+        <h2>10. International Data Transfers</h2>
+        <p>Your information may be processed in Canada and other countries where our service providers operate. We ensure appropriate safeguards are in place for international transfers.</p>
+
+        <h2>11. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. We will notify you of significant changes via email or Platform notification.</p>
+
+        <h2>12. Contact Us</h2>
+        <p>For privacy-related inquiries, contact our Privacy Officer at:</p>
+        <p>Email: privacy@realestatedirect.ca</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Admin Dashboard Section -->
+  <section id="admin" class="section">
+    <div class="admin-container">
+      <h1>Admin Dashboard</h1>
+      <p class="admin-subtitle">Platform earnings and management</p>
+
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-value" id="adminTotalEarnings">$0</span>
+            <span class="stat-label">Total Earnings</span>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-info">
+            <span class="stat-value" id="adminPendingCommissions">$0</span>
+            <span class="stat-label">Pending Commissions</span>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">🏠</div>
+          <div class="stat-info">
+            <span class="stat-value" id="adminTotalTransactions">0</span>
+            <span class="stat-label">Total Transactions</span>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value" id="adminTotalUsers">0</span>
+            <span class="stat-label">Registered Users</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="showAdminTab('pending')">Pending Payments</button>
+        <button class="admin-tab" onclick="showAdminTab('paid')">Paid Commissions</button>
+      </div>
+
+      <div id="admin-pending" class="admin-tab-content active">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Seller</th>
+              <th>Sale Price</th>
+              <th>Commission</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pendingCommissionsTable">
+            <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="admin-paid" class="admin-tab-content">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Seller</th>
+              <th>Sale Price</th>
+              <th>Commission</th>
+              <th>Paid Date</th>
+            </tr>
+          </thead>
+          <tbody id="paidCommissionsTable">
+            <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Messages Section -->
+  <section id="messages" class="section">
+    <div class="messages-container">
+      <div class="messages-sidebar">
+        <div class="messages-header">
+          <h2>Messages</h2>
+          <span class="unread-badge" id="totalUnreadBadge" style="display:none;">0</span>
+        </div>
+        <div class="conversations-list" id="conversationsList">
+          <div class="empty-state">No conversations yet</div>
+        </div>
+      </div>
+      <div class="messages-main">
+        <div id="noConversationSelected" class="no-conversation">
+          <div class="no-conversation-icon">💬</div>
+          <h3>Select a conversation</h3>
+          <p>Choose a conversation from the sidebar to view messages</p>
+        </div>
+        <div id="conversationView" class="conversation-view" style="display:none;">
+          <div class="conversation-header">
+            <h3 id="conversationName">User Name</h3>
+            <p id="conversationProperty">Property Address</p>
+          </div>
+          <div class="messages-list" id="messagesList"></div>
+          <div class="message-input-container">
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleMessageKeypress(event)">
+            <button onclick="sendMessage()" class="btn btn-primary">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Profile Section -->
+  <section id="profile" class="section">
+    <div class="profile-container">
+      <h1>My Profile</h1>
+      <div class="profile-grid">
+        <div class="profile-card">
+          <h3>Personal Information</h3>
+          <form id="profileForm" onsubmit="updateProfile(event)">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="profileName" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="profileEmail" disabled>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="profilePhone" placeholder="(555) 555-5555">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+
+        <div class="profile-card">
+          <h3>Change Password</h3>
+          <form id="passwordForm" onsubmit="changePassword(event)">
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" id="currentPassword" required>
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="newPassword" required minlength="8">
+            </div>
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" id="confirmPassword" required minlength="8">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Password</button>
+          </form>
+        </div>
+
+        <div class="profile-card">
+          <h3>Notification Preferences</h3>
+          <form id="notificationForm" onsubmit="updateNotifications(event)">
+            <label class="checkbox-label">
+              <input type="checkbox" id="notifyOffers" checked>
+              <span>Email me about new offers</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="notifyMessages" checked>
+              <span>Email me about new messages</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="notifyTransactions" checked>
+              <span>Email me about transaction updates</span>
+            </label>
+            <button type="submit" class="btn btn-primary">Save Preferences</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transaction Tracking Section -->
+  <section id="transactions" class="section">
+    <div class="transactions-container">
+      <h1>My Transactions</h1>
+      <p class="transactions-subtitle">Track your active and completed real estate transactions</p>
+      <div class="transactions-filter">
+        <button class="filter-btn active" onclick="filterTransactions('all')">All</button>
+        <button class="filter-btn" onclick="filterTransactions('active')">Active</button>
+        <button class="filter-btn" onclick="filterTransactions('completed')">Completed</button>
+      </div>
+      <div id="transactionsList" class="transactions-list">
+        <div class="empty-state">No transactions yet</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Property Comparison Section -->
+  <section id="compare" class="section">
+    <div class="compare-container">
+      <h1>Compare Properties</h1>
+      <p class="compare-subtitle">Compare up to 3 properties side by side</p>
+      <div id="compareGrid" class="compare-grid">
+        <div class="compare-slot empty" onclick="openPropertySelector(0)">
+          <div class="add-property-icon">+</div>
+          <p>Add Property</p>
+        </div>
+        <div class="compare-slot empty" onclick="openPropertySelector(1)">
+          <div class="add-property-icon">+</div>
+          <p>Add Property</p>
+        </div>
+        <div class="compare-slot empty" onclick="openPropertySelector(2)">
+          <div class="add-property-icon">+</div>
+          <p>Add Property</p>
+        </div>
+      </div>
+      <div id="comparisonTable" class="comparison-table" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- Saved Searches Section -->
+  <section id="saved-searches" class="section">
+    <div class="saved-searches-container">
+      <h1>Saved Searches</h1>
+      <p class="saved-searches-subtitle">Get notified when new properties match your criteria</p>
+      <div class="create-search-form">
+        <h3>Create New Saved Search</h3>
+        <form id="savedSearchForm" onsubmit="createSavedSearch(event)">
+          <div class="search-form-grid">
+            <div class="form-group">
+              <label>Search Name</label>
+              <input type="text" id="searchName" placeholder="e.g., Toronto Condos" required>
+            </div>
+            <div class="form-group">
+              <label>Province</label>
+              <select id="searchProvince">
+                <option value="">Any Province</option>
+                <option value="ON">Ontario</option>
+                <option value="BC">British Columbia</option>
+                <option value="AB">Alberta</option>
+                <option value="QC">Quebec</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Min Price</label>
+              <input type="number" id="searchMinPrice" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label>Max Price</label>
+              <input type="number" id="searchMaxPrice" placeholder="No max">
+            </div>
+            <div class="form-group">
+              <label>Property Type</label>
+              <select id="searchPropertyType">
+                <option value="">Any Type</option>
+                <option value="house">House</option>
+                <option value="condo">Condo</option>
+                <option value="townhouse">Townhouse</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Min Bedrooms</label>
+              <select id="searchMinBeds">
+                <option value="">Any</option>
+                <option value="1">1+</option>
+                <option value="2">2+</option>
+                <option value="3">3+</option>
+                <option value="4">4+</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Search</button>
+        </form>
+      </div>
+      <div class="saved-searches-list">
+        <h3>Your Saved Searches</h3>
+        <div id="savedSearchesList">
+          <div class="empty-state">No saved searches yet</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Document Management Section -->
+  <section id="documents" class="section">
+    <div class="documents-container">
+      <h1>My Documents</h1>
+      <p class="documents-subtitle">Manage your real estate documents, forms, and e-signatures</p>
+
+      <div class="documents-tabs">
+        <button class="doc-tab active" onclick="showDocTab('all')">All Documents</button>
+        <button class="doc-tab" onclick="showDocTab('pending')">Pending Signatures</button>
+        <button class="doc-tab" onclick="showDocTab('signed')">Completed</button>
+        <button class="doc-tab" onclick="showDocTab('generate')">Generate New</button>
+      </div>
+
+      <div id="doc-all" class="doc-tab-content active">
+        <div class="documents-list" id="allDocumentsList">
+          <div class="empty-state">Loading documents...</div>
+        </div>
+      </div>
+
+      <div id="doc-pending" class="doc-tab-content">
+        <div class="documents-list" id="pendingDocumentsList">
+          <div class="empty-state">No documents pending signature</div>
+        </div>
+      </div>
+
+      <div id="doc-signed" class="doc-tab-content">
+        <div class="documents-list" id="signedDocumentsList">
+          <div class="empty-state">No completed documents</div>
+        </div>
+      </div>
+
+      <div id="doc-generate" class="doc-tab-content">
+        <div class="generate-document-form">
+          <h3>Generate a New Document</h3>
+          <form id="generateDocForm" onsubmit="generateDocument(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="docProvince" required onchange="loadProvinceForms()">
+                  <option value="">Select Province</option>
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                  <option value="PE">Prince Edward Island</option>
+                  <option value="NL">Newfoundland and Labrador</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Document Type</label>
+                <select id="docType" required>
+                  <option value="">Select Document Type</option>
+                  <option value="agreement_purchase_sale">Agreement of Purchase and Sale</option>
+                  <option value="listing_agreement">Listing Agreement</option>
+                  <option value="property_disclosure">Property Disclosure Statement</option>
+                  <option value="buyer_representation">Buyer Representation Agreement</option>
+                  <option value="condition_waiver">Condition Waiver</option>
+                  <option value="amendment">Amendment to Agreement</option>
+                  <option value="counter_offer">Counter Offer</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Related Transaction (optional)</label>
+              <select id="docTransaction">
+                <option value="">None - Standalone Document</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Document Title</label>
+              <input type="text" id="docTitle" placeholder="Enter document title" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Document</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Document Viewer Modal -->
+  <div id="documentViewerModal" class="modal">
+    <div class="modal-content modal-large">
+      <span class="close" onclick="closeModal('documentViewerModal')">&times;</span>
+      <div id="documentViewerContent">
+        <div class="document-viewer-header">
+          <h2 id="docViewerTitle">Document Title</h2>
+          <div class="document-meta">
+            <span id="docViewerType" class="doc-type-badge">Type</span>
+            <span id="docViewerStatus" class="doc-status-badge">Status</span>
+          </div>
+        </div>
+        <div class="document-details">
+          <div class="doc-info-grid">
+            <div class="doc-info-item">
+              <label>Province</label>
+              <span id="docViewerProvince">-</span>
+            </div>
+            <div class="doc-info-item">
+              <label>Form Number</label>
+              <span id="docViewerFormNumber">-</span>
+            </div>
+            <div class="doc-info-item">
+              <label>Created</label>
+              <span id="docViewerCreated">-</span>
+            </div>
+          </div>
+        </div>
+        <div class="signatures-section">
+          <h3>Signatures</h3>
+          <div id="signaturesContainer"></div>
+        </div>
+        <div class="document-actions">
+          <button onclick="downloadDocument()" class="btn btn-outline">Download PDF</button>
+          <button onclick="openSignatureModal()" class="btn btn-primary" id="signDocBtn" style="display:none;">Sign Document</button>
+          <button onclick="sendForSignature()" class="btn btn-secondary" id="sendForSigBtn" style="display:none;">Send for Signature</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications Section -->
+  <section id="notifications" class="section">
+    <div class="notifications-container">
+      <div class="notifications-header">
+        <h1>Notifications</h1>
+        <div class="notifications-actions">
+          <button onclick="markAllNotificationsRead()" class="btn btn-outline">Mark all as read</button>
+          <button onclick="clearAllNotifications()" class="btn btn-outline">Clear all</button>
+        </div>
+      </div>
+
+      <div class="notifications-filters">
+        <button class="notif-filter active" onclick="filterNotifications('all')">All</button>
+        <button class="notif-filter" onclick="filterNotifications('offers')">Offers</button>
+        <button class="notif-filter" onclick="filterNotifications('messages')">Messages</button>
+        <button class="notif-filter" onclick="filterNotifications('transactions')">Transactions</button>
+        <button class="notif-filter" onclick="filterNotifications('documents')">Documents</button>
+      </div>
+
+      <div class="notifications-full-list" id="notificationsFullList">
+        <div class="empty-state">No notifications</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Analytics Dashboard Section -->
+  <section id="analytics" class="section">
+    <div class="analytics-container">
+      <div class="analytics-header">
+        <h1>Analytics Dashboard</h1>
+        <div class="date-range-picker">
+          <select id="analyticsDateRange" onchange="updateAnalytics()">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="analytics-summary">
+        <div class="analytics-stat-card">
+          <div class="stat-icon views">👁️</div>
+          <div class="stat-data">
+            <span class="stat-value" id="totalViews">0</span>
+            <span class="stat-label">Total Views</span>
+            <span class="stat-change positive" id="viewsChange">+0%</span>
+          </div>
+        </div>
+        <div class="analytics-stat-card">
+          <div class="stat-icon inquiries">📧</div>
+          <div class="stat-data">
+            <span class="stat-value" id="totalInquiries">0</span>
+            <span class="stat-label">Inquiries</span>
+            <span class="stat-change positive" id="inquiriesChange">+0%</span>
+          </div>
+        </div>
+        <div class="analytics-stat-card">
+          <div class="stat-icon offers">💰</div>
+          <div class="stat-data">
+            <span class="stat-value" id="totalOffers">0</span>
+            <span class="stat-label">Offers Received</span>
+            <span class="stat-change positive" id="offersChange">+0%</span>
+          </div>
+        </div>
+        <div class="analytics-stat-card">
+          <div class="stat-icon favorites">❤️</div>
+          <div class="stat-data">
+            <span class="stat-value" id="totalFavorites">0</span>
+            <span class="stat-label">Saved by Buyers</span>
+            <span class="stat-change positive" id="favoritesChange">+0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="analytics-card chart-card">
+          <h3>Views Over Time</h3>
+          <div class="chart-container" id="viewsChart">
+            <div class="chart-placeholder">
+              <div class="chart-bars">
+                <div class="chart-bar" style="height: 40%"></div>
+                <div class="chart-bar" style="height: 60%"></div>
+                <div class="chart-bar" style="height: 45%"></div>
+                <div class="chart-bar" style="height: 80%"></div>
+                <div class="chart-bar" style="height: 65%"></div>
+                <div class="chart-bar" style="height: 90%"></div>
+                <div class="chart-bar" style="height: 75%"></div>
+              </div>
+              <div class="chart-labels">
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
+                <span>Sun</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>Top Performing Properties</h3>
+          <div class="top-properties-list" id="topPropertiesList">
+            <div class="empty-state">No property data available</div>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>Traffic Sources</h3>
+          <div class="traffic-sources" id="trafficSources">
+            <div class="source-item">
+              <span class="source-name">Direct Search</span>
+              <div class="source-bar-container">
+                <div class="source-bar" style="width: 45%"></div>
+              </div>
+              <span class="source-percent">45%</span>
+            </div>
+            <div class="source-item">
+              <span class="source-name">Saved Searches</span>
+              <div class="source-bar-container">
+                <div class="source-bar" style="width: 25%"></div>
+              </div>
+              <span class="source-percent">25%</span>
+            </div>
+            <div class="source-item">
+              <span class="source-name">External Links</span>
+              <div class="source-bar-container">
+                <div class="source-bar" style="width: 18%"></div>
+              </div>
+              <span class="source-percent">18%</span>
+            </div>
+            <div class="source-item">
+              <span class="source-name">Map View</span>
+              <div class="source-bar-container">
+                <div class="source-bar" style="width: 12%"></div>
+              </div>
+              <span class="source-percent">12%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>Recent Activity</h3>
+          <div class="activity-timeline" id="activityTimeline">
+            <div class="empty-state">No recent activity</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-tips">
+        <h3>Tips to Improve Performance</h3>
+        <div class="tips-grid" id="analyticsTips">
+          <div class="tip-card">
+            <span class="tip-icon">📸</span>
+            <h4>Add More Photos</h4>
+            <p>Properties with 10+ photos get 3x more views</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">💵</span>
+            <h4>Competitive Pricing</h4>
+            <p>Review comparable listings to optimize your asking price</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">📝</span>
+            <h4>Detailed Description</h4>
+            <p>Include key features and recent upgrades</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Signature Modal -->
+  <div id="signatureModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('signatureModal')">&times;</span>
+      <div class="modal-header">
+        <h2>Sign Document</h2>
+        <p>Add your electronic signature</p>
+      </div>
+      <form onsubmit="submitSignature(event)">
+        <div class="form-group">
+          <label>Your Role</label>
+          <select id="signatureRole" required>
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+            <option value="witness">Witness</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Full Legal Name</label>
+          <input type="text" id="signatureName" required placeholder="As it should appear on the document">
+        </div>
+        <div class="form-group">
+          <label>Signature</label>
+          <div class="signature-pad-container">
+            <canvas id="signaturePad" width="400" height="150"></canvas>
+            <button type="button" class="btn btn-outline btn-sm" onclick="clearSignaturePad()">Clear</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="signatureAgreement" required>
+            <span>I agree that my electronic signature is legally binding</span>
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Apply Signature</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FAQ and Help Section -->
+  <section id="faq" class="section">
+    <div class="faq-container">
+      <h1>Frequently Asked Questions</h1>
+      <p class="faq-subtitle">Find answers to common questions about buying and selling real estate with Real Estate Direct</p>
+
+      <div class="faq-categories">
+        <button class="faq-tab active" onclick="showFaqCategory('general')">General</button>
+        <button class="faq-tab" onclick="showFaqCategory('buying')">Buying</button>
+        <button class="faq-tab" onclick="showFaqCategory('selling')">Selling</button>
+        <button class="faq-tab" onclick="showFaqCategory('fees')">Fees & Payments</button>
+        <button class="faq-tab" onclick="showFaqCategory('legal')">Legal & Documents</button>
+      </div>
+
+      <div id="faq-general" class="faq-category active">
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What is Real Estate Direct?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Real Estate Direct is a platform that enables Canadians to buy and sell real estate directly, without traditional real estate agents. We provide all the tools, forms, and guidance needed to complete transactions legally and efficiently.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            Is this service available across Canada?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Yes! Real Estate Direct is available in all 13 provinces and territories. We provide province-specific legal forms and tax calculations for each jurisdiction.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            Do I need a real estate agent?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>No, you don't need a real estate agent to use our platform. Our tools guide you through the entire process. However, we strongly recommend engaging a real estate lawyer to review all documents and handle the closing.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="faq-buying" class="faq-category">
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            How do I make an offer on a property?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Once you find a property you like, click "Make Offer" to submit your offer. You'll need to specify your offer price, deposit amount, closing date, and any conditions. The seller will be notified immediately.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What conditions can I include in my offer?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Common conditions include:</p>
+            <ul>
+              <li>Financing condition (typically 5 business days)</li>
+              <li>Home inspection (typically 7 days)</li>
+              <li>Lawyer review (typically 3 business days)</li>
+              <li>Sale of your current property</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What is a deposit and when do I pay it?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>A deposit shows good faith and is typically 1-5% of the purchase price. You pay it after your offer is accepted, usually within 24-48 hours. It's held in trust by a lawyer until closing.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What are the closing costs I should expect?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Buyer's closing costs typically include:</p>
+            <ul>
+              <li>Land transfer tax (varies by province)</li>
+              <li>Legal fees ($1,500 - $3,000)</li>
+              <li>Title insurance ($300 - $500)</li>
+              <li>Home inspection ($400 - $600)</li>
+              <li>Appraisal (if required by lender)</li>
+            </ul>
+            <p>Use our calculator tool for accurate estimates based on your province.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="faq-selling" class="faq-category">
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            How do I list my property?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Create an account, then click "List Your Property." You'll enter property details, upload photos, and set your asking price. Your listing goes live immediately and is visible to all buyers on the platform.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            How much can I save compared to using an agent?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Traditional real estate commissions are typically 5-6% of the sale price, split between buyer's and seller's agents. Our platform fee is only 1%, meaning you could save 4-5% on a sale. On a $500,000 home, that's a savings of $20,000-$25,000!</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            How do I respond to offers?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>When you receive an offer, you'll be notified by email. You can accept, reject, or counter the offer directly through your dashboard. For counter-offers, you can adjust the price or terms.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What documents do I need to sell my property?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>You'll need:</p>
+            <ul>
+              <li>Property title/deed</li>
+              <li>Recent property tax statement</li>
+              <li>Survey (if available)</li>
+              <li>Condo documents (if applicable)</li>
+              <li>Disclosure statement</li>
+            </ul>
+            <p>Our platform generates the required legal forms for your province.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="faq-fees" class="faq-category">
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What are the platform fees?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Our platform charges a 1% commission on the final sale price, payable by the seller upon successful closing. There are no upfront fees for listing your property.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            When do I pay the platform fee?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>The platform fee is invoiced after your transaction successfully closes. Payment is due within 30 days and can be made via credit card or bank transfer through our secure payment system.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            Are there any hidden fees?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>No hidden fees. The 1% platform commission is the only fee we charge. You may have other standard closing costs (legal fees, title insurance, etc.) but these are not charged by us.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="faq-legal" class="faq-category">
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            Do I need a lawyer?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Yes, we strongly recommend (and in some provinces it's required) that both buyers and sellers engage a real estate lawyer. The lawyer handles title searches, mortgage registration, and the actual transfer of funds and property.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            Are the documents generated by the platform legally binding?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Our platform generates province-specific legal forms based on standard templates. However, we always recommend having a lawyer review all documents before signing. The forms become legally binding once properly signed by all parties.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            How does the e-signature process work?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Our platform integrates with secure e-signature services. When a document is ready for signing, you'll receive an email notification. You can review and sign documents electronically, which is legally valid in Canada.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What happens if there's a dispute?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Most disputes can be resolved between the parties with the help of their lawyers. For issues related to the platform itself, please contact our support team. We encourage all parties to maintain written communication through the platform for documentation purposes.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-contact">
+        <h2>Still Have Questions?</h2>
+        <p>Our support team is here to help you navigate the real estate process.</p>
+        <p>Email: support@realestatedirect.ca</p>
+      </div>
+    </div>
+  </section>
+
   <!-- Success/Error Toast -->
   <div id="toast" class="toast"></div>
 
@@ -1122,13 +2273,17 @@
         <a href="#" onclick="showSection('how-to-buy')">How to Buy</a>
         <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
         <a href="#" onclick="showSection('calculator')">Tax Calculator</a>
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
+        <a href="#" onclick="showSection('faq')">FAQ</a>
+        <a href="#" onclick="showSection('privacy')">Privacy</a>
+        <a href="#" onclick="showSection('terms')">Terms</a>
       </div>
       <p class="footer-disclaimer">© 2024 Real Estate Direct. This platform provides tools for convenience only. Consult with licensed real estate professionals and lawyers for legal advice.</p>
     </div>
   </footer>
 
+  <!-- Leaflet Maps JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="app.js"></script>
+  <script src="app-features.js"></script>
 </body>
 </html>

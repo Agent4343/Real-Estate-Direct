@@ -147,6 +147,22 @@ const transactionSchema = new mongoose.Schema({
     address: { type: String }
   },
 
+  // Platform Commission (1% of sale price, paid by seller)
+  platformFee: {
+    rate: { type: Number, default: 0.01 }, // 1% commission
+    amount: { type: Number }, // Calculated: purchasePrice * rate
+    status: {
+      type: String,
+      enum: ['pending', 'invoiced', 'paid', 'waived'],
+      default: 'pending'
+    },
+    invoicedAt: { type: Date },
+    paidAt: { type: Date },
+    paymentMethod: { type: String },
+    paymentReference: { type: String },
+    notes: { type: String }
+  },
+
   // Financial Summary
   financials: {
     purchasePrice: { type: Number },
@@ -160,6 +176,9 @@ const transactionSchema = new mongoose.Schema({
     titleInsurance: { type: Number },
     homeInspectionFee: { type: Number },
     appraisalFee: { type: Number },
+
+    // Platform Fee (included in seller's costs)
+    platformFee: { type: Number },
 
     // Adjustments
     propertyTaxAdjustment: { type: Number },
@@ -248,6 +267,16 @@ transactionSchema.index({ seller: 1, status: 1 });
 transactionSchema.index({ property: 1 });
 transactionSchema.index({ status: 1, closingDate: 1 });
 transactionSchema.index({ currentStep: 1 });
+
+// Calculate platform fee on save
+transactionSchema.pre('save', function(next) {
+  if (this.purchasePrice && !this.platformFee.amount) {
+    const rate = this.platformFee.rate || 0.01; // Default 1%
+    this.platformFee.amount = Math.round(this.purchasePrice * rate * 100) / 100;
+    this.financials.platformFee = this.platformFee.amount;
+  }
+  next();
+});
 
 // Calculate days until closing
 transactionSchema.methods.getDaysUntilClosing = function() {
