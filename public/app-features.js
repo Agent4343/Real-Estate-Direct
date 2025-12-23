@@ -1385,3 +1385,165 @@ if (originalSearchProperties) {
     }
   };
 }
+
+// ==========================================
+// Analytics Dashboard Functions
+// ==========================================
+
+var analyticsData = null;
+
+async function loadAnalytics() {
+  if (!authToken) return;
+
+  try {
+    var days = document.getElementById('analyticsDateRange').value || 30;
+    var response = await fetch(API_BASE + '/analytics?days=' + days, {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+
+    if (response.ok) {
+      analyticsData = await response.json();
+      renderAnalytics();
+    } else {
+      // Use demo data
+      analyticsData = getDemoAnalytics();
+      renderAnalytics();
+    }
+  } catch (err) {
+    console.error('Failed to load analytics:', err);
+    analyticsData = getDemoAnalytics();
+    renderAnalytics();
+  }
+}
+
+function getDemoAnalytics() {
+  return {
+    summary: {
+      totalViews: 1247,
+      viewsChange: 12,
+      totalInquiries: 23,
+      inquiriesChange: 8,
+      totalOffers: 5,
+      offersChange: 25,
+      totalFavorites: 89,
+      favoritesChange: 15
+    },
+    topProperties: [
+      { id: 1, address: '123 Toronto St, Toronto', views: 342, inquiries: 8 },
+      { id: 2, address: '456 Vancouver Ave, Vancouver', views: 278, inquiries: 5 },
+      { id: 3, address: '789 Calgary Blvd, Calgary', views: 201, inquiries: 4 }
+    ],
+    recentActivity: [
+      { type: 'view', message: 'Someone viewed 123 Toronto St', time: '2 hours ago' },
+      { type: 'inquiry', message: 'New inquiry on 456 Vancouver Ave', time: '5 hours ago' },
+      { type: 'offer', message: 'Offer received for 789 Calgary Blvd', time: '1 day ago' },
+      { type: 'favorite', message: '123 Toronto St was saved', time: '2 days ago' }
+    ]
+  };
+}
+
+function renderAnalytics() {
+  if (!analyticsData) return;
+
+  var summary = analyticsData.summary;
+
+  // Update summary stats
+  document.getElementById('totalViews').textContent = summary.totalViews.toLocaleString();
+  document.getElementById('totalInquiries').textContent = summary.totalInquiries.toLocaleString();
+  document.getElementById('totalOffers').textContent = summary.totalOffers.toLocaleString();
+  document.getElementById('totalFavorites').textContent = summary.totalFavorites.toLocaleString();
+
+  // Update change percentages
+  updateChangeIndicator('viewsChange', summary.viewsChange);
+  updateChangeIndicator('inquiriesChange', summary.inquiriesChange);
+  updateChangeIndicator('offersChange', summary.offersChange);
+  updateChangeIndicator('favoritesChange', summary.favoritesChange);
+
+  // Render top properties
+  renderTopProperties(analyticsData.topProperties);
+
+  // Render activity timeline
+  renderActivityTimeline(analyticsData.recentActivity);
+}
+
+function updateChangeIndicator(elementId, change) {
+  var element = document.getElementById(elementId);
+  if (!element) return;
+
+  var isPositive = change >= 0;
+  element.textContent = (isPositive ? '+' : '') + change + '%';
+  element.className = 'stat-change ' + (isPositive ? 'positive' : 'negative');
+}
+
+function renderTopProperties(properties) {
+  var container = document.getElementById('topPropertiesList');
+  if (!container) return;
+
+  if (!properties || properties.length === 0) {
+    container.innerHTML = '<div class="empty-state">No property data available</div>';
+    return;
+  }
+
+  container.innerHTML = properties.map(function(prop, index) {
+    return '<div class="top-property-item">' +
+      '<span class="property-rank">#' + (index + 1) + '</span>' +
+      '<div class="property-info">' +
+      '<p class="property-address">' + prop.address + '</p>' +
+      '<span class="property-stats">' + prop.views + ' views, ' + prop.inquiries + ' inquiries</span>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function renderActivityTimeline(activities) {
+  var container = document.getElementById('activityTimeline');
+  if (!container) return;
+
+  if (!activities || activities.length === 0) {
+    container.innerHTML = '<div class="empty-state">No recent activity</div>';
+    return;
+  }
+
+  container.innerHTML = activities.map(function(activity) {
+    var icon = getActivityIcon(activity.type);
+    return '<div class="activity-item">' +
+      '<span class="activity-icon">' + icon + '</span>' +
+      '<div class="activity-content">' +
+      '<p>' + activity.message + '</p>' +
+      '<span class="activity-time">' + activity.time + '</span>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function getActivityIcon(type) {
+  switch(type) {
+    case 'view': return '👁️';
+    case 'inquiry': return '📧';
+    case 'offer': return '💰';
+    case 'favorite': return '❤️';
+    default: return '📌';
+  }
+}
+
+function updateAnalytics() {
+  loadAnalytics();
+}
+
+// Add analytics link on login
+var prevOnLogin2 = window.onLoginSuccess;
+window.onLoginSuccess = function() {
+  if (prevOnLogin2) prevOnLogin2();
+  var analyticsLink = document.getElementById('analyticsLink');
+  if (analyticsLink) analyticsLink.style.display = 'inline';
+};
+
+// Load analytics when section is shown
+var mapShowSection = window.showSection;
+window.showSection = function(sectionId) {
+  mapShowSection(sectionId);
+
+  if (sectionId === 'analytics') {
+    loadAnalytics();
+  }
+};

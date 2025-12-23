@@ -30,6 +30,7 @@
         <a href="#" onclick="showSection('transactions')" id="transactionsLink" style="display:none;">Transactions</a>
         <a href="#" onclick="showSection('documents')" id="documentsLink" style="display:none;">Documents</a>
         <a href="#" onclick="showSection('notifications')" id="notificationsLink" style="display:none;">Notifications</a>
+        <a href="#" onclick="showSection('analytics')" id="analyticsLink" style="display:none;">Analytics</a>
         <a href="#" onclick="showSection('profile')" id="profileLink" style="display:none;">Profile</a>
         <a href="#" onclick="showSection('admin')" id="adminLink" style="display:none;">Admin</a>
       </div>
@@ -1833,6 +1834,155 @@
 
       <div class="notifications-full-list" id="notificationsFullList">
         <div class="empty-state">No notifications</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Analytics Dashboard Section -->
+  <section id="analytics" class="section">
+    <div class="analytics-container">
+      <div class="analytics-header">
+        <h1>Analytics Dashboard</h1>
+        <div class="date-range-picker">
+          <select id="analyticsDateRange" onchange="updateAnalytics()">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="analytics-summary">
+        <div class="analytics-stat-card">
+          <div class="stat-icon views">👁️</div>
+          <div class="stat-data">
+            <span class="stat-value" id="totalViews">0</span>
+            <span class="stat-label">Total Views</span>
+            <span class="stat-change positive" id="viewsChange">+0%</span>
+          </div>
+        </div>
+        <div class="analytics-stat-card">
+          <div class="stat-icon inquiries">📧</div>
+          <div class="stat-data">
+            <span class="stat-value" id="totalInquiries">0</span>
+            <span class="stat-label">Inquiries</span>
+            <span class="stat-change positive" id="inquiriesChange">+0%</span>
+          </div>
+        </div>
+        <div class="analytics-stat-card">
+          <div class="stat-icon offers">💰</div>
+          <div class="stat-data">
+            <span class="stat-value" id="totalOffers">0</span>
+            <span class="stat-label">Offers Received</span>
+            <span class="stat-change positive" id="offersChange">+0%</span>
+          </div>
+        </div>
+        <div class="analytics-stat-card">
+          <div class="stat-icon favorites">❤️</div>
+          <div class="stat-data">
+            <span class="stat-value" id="totalFavorites">0</span>
+            <span class="stat-label">Saved by Buyers</span>
+            <span class="stat-change positive" id="favoritesChange">+0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="analytics-card chart-card">
+          <h3>Views Over Time</h3>
+          <div class="chart-container" id="viewsChart">
+            <div class="chart-placeholder">
+              <div class="chart-bars">
+                <div class="chart-bar" style="height: 40%"></div>
+                <div class="chart-bar" style="height: 60%"></div>
+                <div class="chart-bar" style="height: 45%"></div>
+                <div class="chart-bar" style="height: 80%"></div>
+                <div class="chart-bar" style="height: 65%"></div>
+                <div class="chart-bar" style="height: 90%"></div>
+                <div class="chart-bar" style="height: 75%"></div>
+              </div>
+              <div class="chart-labels">
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
+                <span>Sun</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>Top Performing Properties</h3>
+          <div class="top-properties-list" id="topPropertiesList">
+            <div class="empty-state">No property data available</div>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>Traffic Sources</h3>
+          <div class="traffic-sources" id="trafficSources">
+            <div class="source-item">
+              <span class="source-name">Direct Search</span>
+              <div class="source-bar-container">
+                <div class="source-bar" style="width: 45%"></div>
+              </div>
+              <span class="source-percent">45%</span>
+            </div>
+            <div class="source-item">
+              <span class="source-name">Saved Searches</span>
+              <div class="source-bar-container">
+                <div class="source-bar" style="width: 25%"></div>
+              </div>
+              <span class="source-percent">25%</span>
+            </div>
+            <div class="source-item">
+              <span class="source-name">External Links</span>
+              <div class="source-bar-container">
+                <div class="source-bar" style="width: 18%"></div>
+              </div>
+              <span class="source-percent">18%</span>
+            </div>
+            <div class="source-item">
+              <span class="source-name">Map View</span>
+              <div class="source-bar-container">
+                <div class="source-bar" style="width: 12%"></div>
+              </div>
+              <span class="source-percent">12%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>Recent Activity</h3>
+          <div class="activity-timeline" id="activityTimeline">
+            <div class="empty-state">No recent activity</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-tips">
+        <h3>Tips to Improve Performance</h3>
+        <div class="tips-grid" id="analyticsTips">
+          <div class="tip-card">
+            <span class="tip-icon">📸</span>
+            <h4>Add More Photos</h4>
+            <p>Properties with 10+ photos get 3x more views</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">💵</span>
+            <h4>Competitive Pricing</h4>
+            <p>Review comparable listings to optimize your asking price</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">📝</span>
+            <h4>Detailed Description</h4>
+            <p>Include key features and recent upgrades</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
