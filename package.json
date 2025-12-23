@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
+    "migrate": "echo \"No migrations required for MongoDB\"",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
