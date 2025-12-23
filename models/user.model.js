@@ -41,7 +41,16 @@ const userSchema = new Schema({
     propertyType: String,
     image: String,
     savedAt: { type: Date, default: Date.now }
-  }]
+  }],
+  // AI Tools usage tracking
+  aiToolsUsage: {
+    count: { type: Number, default: 0 },
+    lastResetMonth: { type: Number, default: null },
+    lastResetYear: { type: Number, default: null }
+  },
+  // Premium subscription (for unlimited AI usage)
+  isPremium: { type: Boolean, default: false },
+  premiumExpiresAt: { type: Date, default: null }
 });
 
 userSchema.pre('save', async function(next) {

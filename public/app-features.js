@@ -1556,72 +1556,149 @@ window.showSection = function(sectionId) {
 // AI Tools - Mortgage & Lawyer Finder
 // ==========================================
 
-var AI_USAGE_KEY = 'ai_tools_usage';
-var AI_MONTHLY_LIMIT = 5; // Free tier limit
+var AI_MONTHLY_LIMIT = 5; // Free tier limit (synced with server)
+var aiUsageCache = { count: 0, limit: AI_MONTHLY_LIMIT, canUse: true, isPremium: false };
 
-function getAIUsage() {
-  var usage = localStorage.getItem(AI_USAGE_KEY);
-  if (!usage) {
-    return { count: 0, month: new Date().getMonth(), year: new Date().getFullYear() };
-  }
-  usage = JSON.parse(usage);
+// Check if user is logged in for AI tools
+function isLoggedInForAI() {
+  return !!authToken;
+}
 
-  // Reset if new month
-  var now = new Date();
-  if (usage.month !== now.getMonth() || usage.year !== now.getFullYear()) {
-    usage = { count: 0, month: now.getMonth(), year: now.getFullYear() };
-    localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage));
+// Fetch AI usage from server
+async function fetchAIUsage() {
+  if (!isLoggedInForAI()) {
+    return { count: 0, limit: AI_MONTHLY_LIMIT, canUse: false, isPremium: false };
   }
 
-  return usage;
+  try {
+    var response = await fetch(API_BASE + '/ai/usage', {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+
+    if (response.ok) {
+      var data = await response.json();
+      aiUsageCache = data;
+      return data;
+    }
+  } catch (err) {
+    console.error('Failed to fetch AI usage:', err);
+  }
+
+  return aiUsageCache;
 }
 
-function incrementAIUsage() {
-  var usage = getAIUsage();
-  usage.count++;
-  localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage));
-  updateAIUsageDisplay();
-  return usage.count;
+// Increment AI usage on server
+async function incrementAIUsageOnServer() {
+  if (!isLoggedInForAI()) {
+    return { success: false, error: 'Not logged in' };
+  }
+
+  try {
+    var response = await fetch(API_BASE + '/ai/use', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + authToken,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    var data = await response.json();
+
+    if (response.ok) {
+      aiUsageCache = data;
+      updateAIUsageDisplay(data);
+      return { success: true, data: data };
+    } else {
+      return { success: false, error: data.error };
+    }
+  } catch (err) {
+    console.error('Failed to increment AI usage:', err);
+    return { success: false, error: 'Network error' };
+  }
 }
 
-function canUseAITools() {
-  var usage = getAIUsage();
-  return usage.count < AI_MONTHLY_LIMIT;
+// Check if user can use AI tools (server check)
+async function canUseAITools() {
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    return false;
+  }
+
+  var usage = await fetchAIUsage();
+  return usage.canUse;
 }
 
-function loadAIToolsUsage() {
-  updateAIUsageDisplay();
+// Load AI tools usage from server
+async function loadAIToolsUsage() {
+  if (!isLoggedInForAI()) {
+    // Show login required message
+    var container = document.querySelector('.ai-tools-container');
+    if (container) {
+      var loginBanner = document.createElement('div');
+      loginBanner.className = 'ai-login-required';
+      loginBanner.innerHTML = '<h3>Account Required</h3><p>Please <a href="#" onclick="showModal(\'loginModal\'); return false;">log in</a> or <a href="#" onclick="showModal(\'registerModal\'); return false;">create an account</a> to use AI-powered tools.</p>';
+      container.insertBefore(loginBanner, container.firstChild);
+    }
+    return;
+  }
+
+  var usage = await fetchAIUsage();
+  updateAIUsageDisplay(usage);
 }
 
-function updateAIUsageDisplay() {
-  var usage = getAIUsage();
+function updateAIUsageDisplay(usage) {
+  if (!usage) usage = aiUsageCache;
+
   var countEl = document.getElementById('aiUsageCount');
   var limitEl = document.getElementById('aiUsageLimit');
   var fillEl = document.getElementById('aiUsageFill');
   var upgradeBanner = document.getElementById('aiUpgradeBanner');
 
-  if (countEl) countEl.textContent = usage.count;
-  if (limitEl) limitEl.textContent = AI_MONTHLY_LIMIT;
-  if (fillEl) fillEl.style.width = Math.min((usage.count / AI_MONTHLY_LIMIT) * 100, 100) + '%';
+  var limit = usage.isPremium ? 'Unlimited' : (usage.limit || AI_MONTHLY_LIMIT);
+  var count = usage.count || 0;
 
-  if (upgradeBanner) {
-    upgradeBanner.style.display = usage.count >= AI_MONTHLY_LIMIT ? 'block' : 'none';
+  if (countEl) countEl.textContent = count;
+  if (limitEl) limitEl.textContent = limit;
+
+  if (fillEl) {
+    if (usage.isPremium) {
+      fillEl.style.width = '100%';
+      fillEl.style.background = 'linear-gradient(90deg, #10b981 0%, #059669 100%)';
+    } else {
+      fillEl.style.width = Math.min((count / limit) * 100, 100) + '%';
+    }
   }
 
-  // Disable buttons if limit reached
+  if (upgradeBanner) {
+    upgradeBanner.style.display = (!usage.isPremium && !usage.canUse) ? 'block' : 'none';
+  }
+
+  // Disable buttons if limit reached (and not premium)
   var mortgageBtn = document.getElementById('mortgageSearchBtn');
   var lawyerBtn = document.getElementById('lawyerSearchBtn');
 
-  if (usage.count >= AI_MONTHLY_LIMIT) {
+  if (!usage.canUse) {
     if (mortgageBtn) mortgageBtn.disabled = true;
     if (lawyerBtn) lawyerBtn.disabled = true;
+  } else {
+    if (mortgageBtn) mortgageBtn.disabled = false;
+    if (lawyerBtn) lawyerBtn.disabled = false;
   }
 }
 
 async function findMortgageRates(event) {
   event.preventDefault();
 
-  if (!canUseAITools()) {
+  // Check login first
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  // Check usage limit with server
+  var canUse = await canUseAITools();
+  if (!canUse) {
     showToast('You have reached your monthly AI search limit. Please upgrade for more searches.', 'error');
     return;
   }
@@ -1641,8 +1718,14 @@ async function findMortgageRates(event) {
   // Simulate AI processing delay
   await new Promise(function(resolve) { setTimeout(resolve, 2000); });
 
-  // Increment usage
-  incrementAIUsage();
+  // Increment usage on server
+  var usageResult = await incrementAIUsageOnServer();
+  if (!usageResult.success) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="btn-icon">🔍</span> Find Best Rates';
+    showToast(usageResult.error || 'Failed to process request', 'error');
+    return;
+  }
 
   // Generate mock results based on inputs
   var mortgageAmount = propertyValue - downPayment;
@@ -1798,7 +1881,16 @@ function displayMortgageResults(results, amount, needsCMHC) {
 async function findLawyers(event) {
   event.preventDefault();
 
-  if (!canUseAITools()) {
+  // Check login first
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  // Check usage limit with server
+  var canUse = await canUseAITools();
+  if (!canUse) {
     showToast('You have reached your monthly AI search limit. Please upgrade for more searches.', 'error');
     return;
   }
@@ -1816,8 +1908,14 @@ async function findLawyers(event) {
   // Simulate AI processing delay
   await new Promise(function(resolve) { setTimeout(resolve, 2000); });
 
-  // Increment usage
-  incrementAIUsage();
+  // Increment usage on server
+  var usageResult = await incrementAIUsageOnServer();
+  if (!usageResult.success) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="btn-icon">🔍</span> Find Lawyers';
+    showToast(usageResult.error || 'Failed to process request', 'error');
+    return;
+  }
 
   // Generate mock results
   var results = generateLawyerResults(province, city, transactionType, propertyType, language);
