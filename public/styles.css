@@ -4483,3 +4483,547 @@ footer {
     text-align: center;
   }
 }
+
+/* ==========================================
+   AI Tools Section Styles
+   ========================================== */
+
+.ai-tools-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.ai-tools-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.ai-tools-header h1 {
+  font-size: 2rem;
+  color: var(--secondary);
+  margin-bottom: 0.5rem;
+}
+
+.ai-tools-subtitle {
+  color: var(--gray-500);
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.usage-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--gray-100);
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+}
+
+.usage-label {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+}
+
+.usage-count {
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+.usage-bar {
+  width: 100px;
+  height: 8px;
+  background: var(--gray-200);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.usage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.ai-disclaimer-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+}
+
+.disclaimer-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.disclaimer-text {
+  color: #92400e;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.ai-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.ai-tool-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.tool-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tool-icon {
+  font-size: 2.5rem;
+}
+
+.tool-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--secondary);
+}
+
+.tool-description {
+  color: var(--gray-500);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.ai-tool-card .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.ai-tool-card .form-group {
+  margin-bottom: 1rem;
+}
+
+.ai-tool-card label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--secondary);
+  font-size: 0.9rem;
+}
+
+.ai-tool-card select,
+.ai-tool-card input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.btn-full {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+.btn-icon {
+  margin-right: 0.5rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* AI Results */
+.ai-results {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+.ai-results h3 {
+  margin: 0 0 1rem 0;
+  color: var(--secondary);
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  position: relative;
+}
+
+.result-card.best-rate,
+.result-card.top-rated {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+}
+
+.best-badge,
+.top-badge {
+  position: absolute;
+  top: -10px;
+  right: 15px;
+  background: var(--accent);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-logo {
+  font-size: 2rem;
+}
+
+.result-lender {
+  flex: 1;
+}
+
+.result-lender strong {
+  display: block;
+  color: var(--secondary);
+}
+
+.lender-type {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+}
+
+.result-rate {
+  text-align: right;
+}
+
+.rate-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.rate-type {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+}
+
+.result-details {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.detail-item span {
+  color: var(--gray-500);
+  margin-right: 0.5rem;
+}
+
+.result-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.feature-tag {
+  background: white;
+  border: 1px solid var(--gray-300);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+}
+
+.cmhc-notice {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  color: #92400e;
+  font-size: 0.9rem;
+}
+
+.results-disclaimer {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--gray-100);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+/* Lawyer Results */
+.lawyer-card .lawyer-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.lawyer-avatar {
+  font-size: 2.5rem;
+  background: var(--gray-100);
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+
+.lawyer-info {
+  flex: 1;
+}
+
+.lawyer-info strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--secondary);
+}
+
+.firm-name {
+  display: block;
+  color: var(--gray-600);
+  font-size: 0.9rem;
+}
+
+.location {
+  display: block;
+  color: var(--gray-500);
+  font-size: 0.85rem;
+}
+
+.lawyer-rating {
+  text-align: right;
+}
+
+.rating-stars {
+  display: block;
+  color: #f59e0b;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.review-count {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+}
+
+.lawyer-details {
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.detail-label {
+  color: var(--gray-500);
+}
+
+.detail-value {
+  font-weight: 500;
+  color: var(--secondary);
+}
+
+.fee-value {
+  color: var(--primary);
+}
+
+.lawyer-specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.specialty-tag {
+  background: var(--primary-light);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.lawyer-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.lawyer-actions .btn {
+  flex: 1;
+}
+
+/* AI Tools Info Section */
+.ai-tools-info {
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.ai-tools-info h3 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--secondary);
+}
+
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.info-card {
+  text-align: center;
+  padding: 1.5rem;
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+}
+
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.info-card h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--secondary);
+  font-size: 1rem;
+}
+
+.info-card p {
+  margin: 0;
+  color: var(--gray-500);
+  font-size: 0.9rem;
+}
+
+/* Upgrade Banner */
+.ai-upgrade-banner {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.ai-upgrade-banner h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+.ai-upgrade-banner p {
+  margin: 0 0 1.5rem 0;
+  opacity: 0.9;
+}
+
+.ai-upgrade-banner .btn {
+  background: white;
+  color: var(--primary);
+}
+
+.ai-upgrade-banner .btn:hover {
+  background: var(--gray-100);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .ai-tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .ai-tools-container {
+    padding: 1rem;
+  }
+
+  .usage-indicator {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ai-tool-card .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .result-header {
+    flex-wrap: wrap;
+  }
+
+  .result-rate {
+    width: 100%;
+    text-align: left;
+    margin-top: 0.5rem;
+  }
+
+  .info-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .lawyer-actions {
+    flex-direction: column;
+  }
+}
