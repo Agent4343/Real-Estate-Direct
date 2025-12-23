@@ -22,3 +22,7 @@ Thumbs.db
 # Build
 dist/
 build/
+
+# Generated files
+generated-documents/
+uploads/
