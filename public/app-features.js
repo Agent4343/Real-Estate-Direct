@@ -2404,3 +2404,394 @@ window.onLoginSuccess = function() {
 };
 
 // Referrals, savings-calculator, and offer-comparison section loading is handled by onSectionChange()
+
+// ==========================================
+// Sell Wizard Functions
+// ==========================================
+
+var currentWizardStep = 1;
+var totalWizardSteps = 8;
+var wizardValuation = 0;
+
+function checkVerificationComplete() {
+  var verifyId = document.getElementById('verifyId');
+  var verifyOwner = document.getElementById('verifyOwner');
+  var verifyAccurate = document.getElementById('verifyAccurate');
+  var step1Next = document.getElementById('step1Next');
+
+  if (verifyId && verifyOwner && verifyAccurate && step1Next) {
+    var allChecked = verifyId.checked && verifyOwner.checked && verifyAccurate.checked;
+    step1Next.disabled = !allChecked;
+  }
+}
+
+function nextWizardStep() {
+  if (currentWizardStep < totalWizardSteps) {
+    // Validate current step before proceeding
+    if (!validateWizardStep(currentWizardStep)) {
+      return;
+    }
+
+    // Hide current step
+    var currentContent = document.getElementById('wizardStep' + currentWizardStep);
+    if (currentContent) currentContent.style.display = 'none';
+
+    // Mark current step as completed
+    var currentStepEl = document.querySelector('.wizard-step[data-step="' + currentWizardStep + '"]');
+    if (currentStepEl) {
+      currentStepEl.classList.remove('active');
+      currentStepEl.classList.add('completed');
+    }
+
+    // Move to next step
+    currentWizardStep++;
+
+    // Show next step
+    var nextContent = document.getElementById('wizardStep' + currentWizardStep);
+    if (nextContent) nextContent.style.display = 'block';
+
+    // Mark next step as active
+    var nextStepEl = document.querySelector('.wizard-step[data-step="' + currentWizardStep + '"]');
+    if (nextStepEl) {
+      nextStepEl.classList.add('active');
+    }
+
+    // Handle special step actions
+    if (currentWizardStep === 5) {
+      runWizardValuation();
+    } else if (currentWizardStep === 6) {
+      setupPriceStep();
+    } else if (currentWizardStep === 8) {
+      populateReviewSummary();
+    }
+
+    // Scroll to top of wizard
+    var wizard = document.getElementById('sellWizard');
+    if (wizard) wizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function prevWizardStep() {
+  if (currentWizardStep > 1) {
+    // Hide current step
+    var currentContent = document.getElementById('wizardStep' + currentWizardStep);
+    if (currentContent) currentContent.style.display = 'none';
+
+    // Remove active from current step
+    var currentStepEl = document.querySelector('.wizard-step[data-step="' + currentWizardStep + '"]');
+    if (currentStepEl) {
+      currentStepEl.classList.remove('active');
+    }
+
+    // Move to previous step
+    currentWizardStep--;
+
+    // Show previous step
+    var prevContent = document.getElementById('wizardStep' + currentWizardStep);
+    if (prevContent) prevContent.style.display = 'block';
+
+    // Mark previous step as active (remove completed)
+    var prevStepEl = document.querySelector('.wizard-step[data-step="' + currentWizardStep + '"]');
+    if (prevStepEl) {
+      prevStepEl.classList.remove('completed');
+      prevStepEl.classList.add('active');
+    }
+
+    // Scroll to top of wizard
+    var wizard = document.getElementById('sellWizard');
+    if (wizard) wizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function validateWizardStep(step) {
+  switch(step) {
+    case 1:
+      var verifyId = document.getElementById('verifyId');
+      var verifyOwner = document.getElementById('verifyOwner');
+      var verifyAccurate = document.getElementById('verifyAccurate');
+      if (!verifyId.checked || !verifyOwner.checked || !verifyAccurate.checked) {
+        showToast('Please complete all verification checkboxes', 'error');
+        return false;
+      }
+      return true;
+
+    case 2:
+      var province = document.getElementById('propertyProvince').value;
+      var street = document.getElementById('propertyStreet').value;
+      var city = document.getElementById('propertyCity').value;
+      var postal = document.getElementById('propertyPostal').value;
+      if (!province || !street || !city || !postal) {
+        showToast('Please fill in all required address fields', 'error');
+        return false;
+      }
+      return true;
+
+    case 3:
+      var propertyType = document.getElementById('propertyType').value;
+      var beds = document.getElementById('propertyBeds').value;
+      var baths = document.getElementById('propertyBaths').value;
+      var sqft = document.getElementById('propertySqft').value;
+      if (!propertyType || !beds || !baths || !sqft) {
+        showToast('Please fill in all required property details', 'error');
+        return false;
+      }
+      return true;
+
+    case 6:
+      var price = document.getElementById('propertyPrice').value;
+      if (!price || parseInt(price) < 1000) {
+        showToast('Please enter a valid asking price', 'error');
+        return false;
+      }
+      return true;
+
+    default:
+      return true;
+  }
+}
+
+function runWizardValuation() {
+  var loading = document.getElementById('valuationLoading');
+  var estimate = document.getElementById('valuationEstimate');
+
+  if (loading) loading.style.display = 'block';
+  if (estimate) estimate.style.display = 'none';
+
+  // Get property details for valuation
+  var province = document.getElementById('propertyProvince').value;
+  var city = document.getElementById('propertyCity').value;
+  var propertyType = document.getElementById('propertyType').value;
+  var beds = parseInt(document.getElementById('propertyBeds').value) || 3;
+  var baths = parseFloat(document.getElementById('propertyBaths').value) || 2;
+  var sqft = parseInt(document.getElementById('propertySqft').value) || 1500;
+  var condition = document.querySelector('input[name="condition"]:checked');
+  var conditionValue = condition ? condition.value : 'good';
+
+  // Simulate valuation (use the marketData from home valuation if available)
+  setTimeout(function() {
+    var basePrice = calculateBaseValuation(province, city, propertyType, sqft, beds, baths, conditionValue);
+
+    var lowEstimate = Math.round(basePrice * 0.92);
+    var midEstimate = Math.round(basePrice);
+    var highEstimate = Math.round(basePrice * 1.08);
+
+    wizardValuation = midEstimate;
+
+    document.getElementById('estimateLow').textContent = '$' + lowEstimate.toLocaleString();
+    document.getElementById('estimateMid').textContent = '$' + midEstimate.toLocaleString();
+    document.getElementById('estimateHigh').textContent = '$' + highEstimate.toLocaleString();
+    document.getElementById('compCount').textContent = Math.floor(Math.random() * 15) + 5;
+
+    if (loading) loading.style.display = 'none';
+    if (estimate) estimate.style.display = 'block';
+  }, 1500);
+}
+
+function calculateBaseValuation(province, city, propertyType, sqft, beds, baths, condition) {
+  // Base price per sqft by province/city (simplified)
+  var pricePerSqft = {
+    'ON': { 'Toronto': 900, 'Ottawa': 550, 'default': 450 },
+    'BC': { 'Vancouver': 1100, 'Victoria': 700, 'default': 500 },
+    'AB': { 'Calgary': 400, 'Edmonton': 350, 'default': 300 },
+    'QC': { 'Montreal': 500, 'Quebec City': 350, 'default': 300 },
+    'default': { 'default': 350 }
+  };
+
+  var provinceData = pricePerSqft[province] || pricePerSqft['default'];
+  var basePricePerSqft = provinceData[city] || provinceData['default'];
+
+  // Property type multiplier
+  var typeMultiplier = {
+    'detached': 1.1,
+    'semi-detached': 1.0,
+    'townhouse': 0.95,
+    'condo': 0.9,
+    'land': 0.5,
+    'commercial': 1.2
+  };
+
+  // Condition multiplier
+  var conditionMultiplier = {
+    'excellent': 1.1,
+    'good': 1.0,
+    'fair': 0.9,
+    'fixer': 0.75
+  };
+
+  var basePrice = sqft * basePricePerSqft;
+  basePrice *= (typeMultiplier[propertyType] || 1.0);
+  basePrice *= (conditionMultiplier[condition] || 1.0);
+
+  // Add value for bedrooms and bathrooms
+  basePrice += (beds - 3) * 25000;
+  basePrice += (baths - 2) * 15000;
+
+  return Math.max(basePrice, 100000);
+}
+
+function setupPriceStep() {
+  var suggestedPrice = document.getElementById('suggestedPrice');
+  var priceInput = document.getElementById('propertyPrice');
+
+  if (suggestedPrice) {
+    suggestedPrice.textContent = '$' + wizardValuation.toLocaleString();
+  }
+
+  if (priceInput && !priceInput.value) {
+    priceInput.value = wizardValuation;
+  }
+
+  // Add listener for commission calculation
+  if (priceInput) {
+    priceInput.addEventListener('input', updateCommissionPreview);
+    updateCommissionPreview();
+  }
+}
+
+function updateCommissionPreview() {
+  var priceInput = document.getElementById('propertyPrice');
+  var price = parseInt(priceInput.value) || 0;
+
+  var sellerComm = Math.round(price * 0.01);
+  var buyerComm = Math.round(price * 0.01);
+  var netProceeds = price - sellerComm;
+
+  var sellerCommEl = document.getElementById('sellerCommission');
+  var buyerCommEl = document.getElementById('buyerCommission');
+  var netProceedsEl = document.getElementById('netProceeds');
+
+  if (sellerCommEl) sellerCommEl.textContent = '$' + sellerComm.toLocaleString();
+  if (buyerCommEl) buyerCommEl.textContent = '$' + buyerComm.toLocaleString();
+  if (netProceedsEl) netProceedsEl.textContent = '$' + netProceeds.toLocaleString();
+}
+
+function populateReviewSummary() {
+  var street = document.getElementById('propertyStreet').value;
+  var city = document.getElementById('propertyCity').value;
+  var province = document.getElementById('propertyProvince').value;
+  var postal = document.getElementById('propertyPostal').value;
+  var propertyType = document.getElementById('propertyType');
+  var beds = document.getElementById('propertyBeds').value;
+  var baths = document.getElementById('propertyBaths').value;
+  var sqft = document.getElementById('propertySqft').value;
+  var price = document.getElementById('propertyPrice').value;
+
+  document.getElementById('reviewAddress').textContent = street + ', ' + city + ', ' + province + ' ' + postal;
+  document.getElementById('reviewType').textContent = propertyType.options[propertyType.selectedIndex].text;
+  document.getElementById('reviewBedBath').textContent = beds + ' bed / ' + baths + ' bath';
+  document.getElementById('reviewSqft').textContent = parseInt(sqft).toLocaleString() + ' sq ft';
+  document.getElementById('reviewPrice').textContent = '$' + parseInt(price).toLocaleString();
+  document.getElementById('reviewPhotos').textContent = selectedImages.length + ' photos';
+}
+
+function publishListing() {
+  var agreeTerms = document.getElementById('agreeTerms');
+  if (!agreeTerms || !agreeTerms.checked) {
+    showToast('Please agree to the terms and conditions', 'error');
+    return;
+  }
+
+  var description = document.getElementById('propertyDescription').value;
+  if (!description || description.length < 50) {
+    showToast('Please write a description (at least 50 characters)', 'error');
+    return;
+  }
+
+  // Call the original createProperty function
+  var event = { preventDefault: function() {} };
+  createPropertyFromWizard();
+}
+
+function createPropertyFromWizard() {
+  // Gather all data from wizard
+  var propertyData = {
+    address: {
+      street: document.getElementById('propertyStreet').value,
+      unit: document.getElementById('propertyUnit').value,
+      city: document.getElementById('propertyCity').value,
+      province: document.getElementById('propertyProvince').value,
+      postalCode: document.getElementById('propertyPostal').value
+    },
+    propertyType: document.getElementById('propertyType').value,
+    bedrooms: parseInt(document.getElementById('propertyBeds').value),
+    bathrooms: parseFloat(document.getElementById('propertyBaths').value),
+    squareFeet: parseInt(document.getElementById('propertySqft').value),
+    yearBuilt: parseInt(document.getElementById('propertyYear').value) || null,
+    askingPrice: parseInt(document.getElementById('propertyPrice').value),
+    description: document.getElementById('propertyDescription').value,
+    features: [],
+    condition: 'good'
+  };
+
+  // Get features
+  var featureCheckboxes = document.querySelectorAll('input[name="features"]:checked');
+  featureCheckboxes.forEach(function(cb) {
+    propertyData.features.push(cb.value);
+  });
+
+  // Get condition
+  var conditionRadio = document.querySelector('input[name="condition"]:checked');
+  if (conditionRadio) {
+    propertyData.condition = conditionRadio.value;
+  }
+
+  // Submit to API
+  var publishBtn = document.getElementById('publishBtn');
+  if (publishBtn) {
+    publishBtn.disabled = true;
+    publishBtn.innerHTML = '<span class="spinner"></span> Publishing...';
+  }
+
+  fetch(API_BASE + '/properties', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + authToken
+    },
+    body: JSON.stringify(propertyData)
+  })
+  .then(function(response) {
+    if (!response.ok) throw new Error('Failed to create listing');
+    return response.json();
+  })
+  .then(function(property) {
+    // Upload images if any
+    if (selectedImages.length > 0) {
+      return uploadPropertyImages(property._id);
+    }
+    return property;
+  })
+  .then(function() {
+    showToast('Your listing has been published!', 'success');
+    // Reset wizard
+    currentWizardStep = 1;
+    // Show dashboard
+    showSection('dashboard');
+    if (typeof loadDashboard === 'function') loadDashboard();
+  })
+  .catch(function(error) {
+    console.error('Error:', error);
+    showToast('Failed to publish listing: ' + error.message, 'error');
+  })
+  .finally(function() {
+    if (publishBtn) {
+      publishBtn.disabled = false;
+      publishBtn.innerHTML = '<span class="btn-icon">🚀</span> Publish Listing';
+    }
+  });
+}
+
+function uploadPropertyImages(propertyId) {
+  var formData = new FormData();
+  selectedImages.forEach(function(img) {
+    formData.append('images', img.file);
+  });
+
+  return fetch(API_BASE + '/images/property/' + propertyId, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + authToken
+    },
+    body: formData
+  });
+}

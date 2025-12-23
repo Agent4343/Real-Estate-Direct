@@ -941,25 +941,56 @@ function logout() {
 }
 
 function updateAuthUI() {
-  const authButtons = document.getElementById('authButtons');
-  const userInfo = document.getElementById('userInfo');
-  const dashboardLink = document.getElementById('dashboardLink');
-  const sellFormContainer = document.getElementById('sellFormContainer');
-  const sellForm = document.getElementById('sellForm');
+  var authButtons = document.getElementById('authButtons');
+  var userInfo = document.getElementById('userInfo');
+  var dashboardLink = document.getElementById('dashboardLink');
+  var sellFormContainer = document.getElementById('sellFormContainer');
+  var sellForm = document.getElementById('sellForm');
+
+  // Login-gated elements
+  var checklistLoginPrompt = document.getElementById('checklistLoginPrompt');
+  var checklistContent = document.getElementById('checklistContent');
+  var sellerChecklistLoginPrompt = document.getElementById('sellerChecklistLoginPrompt');
+  var sellerChecklistContent = document.getElementById('sellerChecklistContent');
+  var sellLoginPrompt = document.getElementById('sellLoginPrompt');
+  var sellWizard = document.getElementById('sellWizard');
 
   if (authToken && currentUser) {
-    authButtons.style.display = 'none';
-    userInfo.style.display = 'flex';
-    document.getElementById('userName').textContent = currentUser.email;
-    dashboardLink.style.display = 'block';
-    sellFormContainer.style.display = 'none';
-    sellForm.style.display = 'block';
+    // User is logged in
+    if (authButtons) authButtons.style.display = 'none';
+    if (userInfo) userInfo.style.display = 'flex';
+    var userName = document.getElementById('userName');
+    if (userName) userName.textContent = currentUser.name || currentUser.email;
+    if (dashboardLink) dashboardLink.style.display = 'block';
+
+    // Show gated content
+    if (checklistLoginPrompt) checklistLoginPrompt.style.display = 'none';
+    if (checklistContent) checklistContent.style.display = 'block';
+    if (sellerChecklistLoginPrompt) sellerChecklistLoginPrompt.style.display = 'none';
+    if (sellerChecklistContent) sellerChecklistContent.style.display = 'block';
+    if (sellLoginPrompt) sellLoginPrompt.style.display = 'none';
+    if (sellWizard) sellWizard.style.display = 'block';
+
+    // Legacy sell form handling
+    if (sellFormContainer) sellFormContainer.style.display = 'none';
+    if (sellForm) sellForm.style.display = 'none';
   } else {
-    authButtons.style.display = 'flex';
-    userInfo.style.display = 'none';
-    dashboardLink.style.display = 'none';
-    sellFormContainer.style.display = 'block';
-    sellForm.style.display = 'none';
+    // User is not logged in
+    if (authButtons) authButtons.style.display = 'flex';
+    if (userInfo) userInfo.style.display = 'none';
+    if (dashboardLink) dashboardLink.style.display = 'none';
+
+    // Hide gated content, show login prompts
+    if (checklistLoginPrompt) checklistLoginPrompt.style.display = 'block';
+    if (checklistContent) checklistContent.style.display = 'none';
+    if (sellerChecklistLoginPrompt) sellerChecklistLoginPrompt.style.display = 'block';
+    if (sellerChecklistContent) sellerChecklistContent.style.display = 'none';
+    if (sellLoginPrompt) sellLoginPrompt.style.display = 'block';
+    if (sellWizard) sellWizard.style.display = 'none';
+
+    // Legacy sell form handling
+    if (sellFormContainer) sellFormContainer.style.display = 'block';
+    if (sellForm) sellForm.style.display = 'none';
   }
 }
 

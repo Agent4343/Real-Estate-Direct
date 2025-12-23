@@ -370,25 +370,104 @@
         <p>Reach thousands of potential buyers across Canada</p>
       </div>
 
-      <div class="sell-form-container" id="sellFormContainer">
-        <div class="auth-required-card">
-          <div class="auth-icon">🔐</div>
-          <h3>Sign In Required</h3>
-          <p>Please login or create an account to list your property.</p>
-          <div class="auth-buttons-inline">
-            <button onclick="showModal('loginModal')" class="btn btn-outline">Login</button>
-            <button onclick="showModal('registerModal')" class="btn btn-primary">Register</button>
-          </div>
+      <!-- Login Required Prompt -->
+      <div id="sellLoginPrompt" class="login-required-box">
+        <div class="login-required-icon">🏠</div>
+        <h3>Ready to Sell Your Property?</h3>
+        <p>Sign in to create your listing and reach thousands of buyers. Our step-by-step wizard makes it easy.</p>
+        <div class="sell-benefits">
+          <div class="benefit-item"><span>✓</span> Pay only 1% seller commission</div>
+          <div class="benefit-item"><span>✓</span> Free AI-powered valuation</div>
+          <div class="benefit-item"><span>✓</span> Professional listing tools</div>
+          <div class="benefit-item"><span>✓</span> Reach thousands of buyers</div>
         </div>
+        <button onclick="showModal('loginModal')" class="btn btn-primary btn-lg">Sign In to List Property</button>
+        <p class="login-subtext">Don't have an account? <a href="javascript:void(0)" onclick="showModal('registerModal')">Create one free</a></p>
       </div>
 
-      <div class="sell-form" id="sellForm" style="display:none;">
-        <form onsubmit="createProperty(event)" class="listing-form">
-          <div class="form-section">
-            <h3 class="form-section-title">📍 Location</h3>
+      <!-- Sell Wizard (shown when logged in) -->
+      <div id="sellWizard" style="display: none;">
+        <!-- Progress Steps -->
+        <div class="wizard-progress">
+          <div class="wizard-step active" data-step="1">
+            <div class="step-circle">1</div>
+            <span class="step-label">Verify</span>
+          </div>
+          <div class="wizard-step" data-step="2">
+            <div class="step-circle">2</div>
+            <span class="step-label">Address</span>
+          </div>
+          <div class="wizard-step" data-step="3">
+            <div class="step-circle">3</div>
+            <span class="step-label">Details</span>
+          </div>
+          <div class="wizard-step" data-step="4">
+            <div class="step-circle">4</div>
+            <span class="step-label">Features</span>
+          </div>
+          <div class="wizard-step" data-step="5">
+            <div class="step-circle">5</div>
+            <span class="step-label">Valuation</span>
+          </div>
+          <div class="wizard-step" data-step="6">
+            <div class="step-circle">6</div>
+            <span class="step-label">Price</span>
+          </div>
+          <div class="wizard-step" data-step="7">
+            <div class="step-circle">7</div>
+            <span class="step-label">Photos</span>
+          </div>
+          <div class="wizard-step" data-step="8">
+            <div class="step-circle">8</div>
+            <span class="step-label">Review</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Identity Verification -->
+        <div class="wizard-content" id="wizardStep1">
+          <div class="wizard-step-header">
+            <span class="wizard-step-icon">🔐</span>
+            <h3>Identity Verification</h3>
+            <p>FINTRAC requires identity verification for all real estate transactions in Canada</p>
+          </div>
+          <div class="wizard-step-body">
+            <div class="info-box warning">
+              <h4>Why Verification is Required</h4>
+              <p>Under Canadian anti-money laundering regulations (FINTRAC), we must verify the identity of all sellers. This protects you and ensures a secure transaction.</p>
+            </div>
+            <div class="verification-checklist">
+              <div class="verify-item">
+                <input type="checkbox" id="verifyId" onchange="checkVerificationComplete()">
+                <label for="verifyId">I have government-issued photo ID ready (Driver's License, Passport, or Provincial ID)</label>
+              </div>
+              <div class="verify-item">
+                <input type="checkbox" id="verifyOwner" onchange="checkVerificationComplete()">
+                <label for="verifyOwner">I am the legal owner of the property (or authorized representative)</label>
+              </div>
+              <div class="verify-item">
+                <input type="checkbox" id="verifyAccurate" onchange="checkVerificationComplete()">
+                <label for="verifyAccurate">I agree to provide accurate information about the property</label>
+              </div>
+            </div>
+          </div>
+          <div class="wizard-actions">
+            <button class="btn btn-primary btn-lg" id="step1Next" onclick="nextWizardStep()" disabled>Continue to Property Address</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Property Address -->
+        <div class="wizard-content" id="wizardStep2" style="display: none;">
+          <div class="wizard-step-header">
+            <span class="wizard-step-icon">📍</span>
+            <h3>Property Address</h3>
+            <p>Enter the exact address of the property you're selling</p>
+          </div>
+          <div class="wizard-step-body">
             <div class="form-group">
               <label>Province *</label>
-              <select id="propertyProvince" required></select>
+              <select id="propertyProvince" required>
+                <option value="">Select Province</option>
+              </select>
             </div>
             <div class="form-row">
               <div class="form-group flex-2">
@@ -396,7 +475,7 @@
                 <input type="text" id="propertyStreet" required placeholder="123 Main Street">
               </div>
               <div class="form-group flex-1">
-                <label>Unit #</label>
+                <label>Unit/Suite #</label>
                 <input type="text" id="propertyUnit" placeholder="Optional">
               </div>
             </div>
@@ -410,43 +489,47 @@
                 <input type="text" id="propertyPostal" required placeholder="M5V 1A1">
               </div>
             </div>
-            <div class="form-group">
-              <label>Legal Description *</label>
-              <input type="text" id="propertyLegal" required placeholder="e.g., Lot 123, Plan 456, Part Lot 7">
-            </div>
           </div>
+          <div class="wizard-actions">
+            <button class="btn btn-outline" onclick="prevWizardStep()">Back</button>
+            <button class="btn btn-primary" onclick="nextWizardStep()">Continue</button>
+          </div>
+        </div>
 
-          <div class="form-section">
-            <h3 class="form-section-title">🏠 Property Details</h3>
+        <!-- Step 3: Property Details -->
+        <div class="wizard-content" id="wizardStep3" style="display: none;">
+          <div class="wizard-step-header">
+            <span class="wizard-step-icon">🏠</span>
+            <h3>Property Details</h3>
+            <p>Tell us about your property</p>
+          </div>
+          <div class="wizard-step-body">
+            <div class="form-group">
+              <label>Property Type *</label>
+              <select id="propertyType" required>
+                <option value="">Select Type</option>
+                <option value="detached">Detached House</option>
+                <option value="semi-detached">Semi-Detached</option>
+                <option value="townhouse">Townhouse</option>
+                <option value="condo">Condo / Apartment</option>
+                <option value="land">Vacant Land</option>
+                <option value="commercial">Commercial</option>
+              </select>
+            </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Property Type *</label>
-                <select id="propertyType" required>
-                  <option value="detached">Detached House</option>
-                  <option value="semi-detached">Semi-Detached</option>
-                  <option value="townhouse">Townhouse</option>
-                  <option value="condo">Condo / Apartment</option>
-                  <option value="land">Vacant Land</option>
-                  <option value="commercial">Commercial</option>
-                </select>
+                <label>Bedrooms *</label>
+                <input type="number" id="propertyBeds" min="0" value="3" required>
               </div>
               <div class="form-group">
-                <label>Asking Price ($) *</label>
-                <input type="number" id="propertyPrice" required min="1" placeholder="500000">
+                <label>Bathrooms *</label>
+                <input type="number" id="propertyBaths" min="0" step="0.5" value="2" required>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Bedrooms</label>
-                <input type="number" id="propertyBeds" min="0" value="3">
-              </div>
-              <div class="form-group">
-                <label>Bathrooms</label>
-                <input type="number" id="propertyBaths" min="0" step="0.5" value="2">
-              </div>
-              <div class="form-group">
-                <label>Square Feet</label>
-                <input type="number" id="propertySqft" min="0" placeholder="1500">
+                <label>Square Feet *</label>
+                <input type="number" id="propertySqft" min="0" placeholder="1500" required>
               </div>
               <div class="form-group">
                 <label>Year Built</label>
@@ -454,27 +537,25 @@
               </div>
             </div>
             <div class="form-group">
-              <label>Description</label>
-              <textarea id="propertyDescription" rows="4" placeholder="Describe your property's best features, recent upgrades, and what makes it special..."></textarea>
+              <label>Lot Size (sq ft)</label>
+              <input type="number" id="propertyLotSize" min="0" placeholder="5000">
             </div>
           </div>
-
-          <div class="form-section">
-            <h3 class="form-section-title">📸 Photos</h3>
-            <p class="form-helper">Upload up to 20 photos. First photo will be the main listing image.</p>
-            <div class="image-upload-area" id="imageUploadArea">
-              <input type="file" id="propertyImages" multiple accept="image/*" onchange="handleImagePreview(event)" style="display:none;">
-              <div class="upload-placeholder" onclick="document.getElementById('propertyImages').click()">
-                <div class="upload-icon">📷</div>
-                <p>Click to upload photos</p>
-                <span class="upload-hint">JPG, PNG, WEBP up to 10MB each</span>
-              </div>
-            </div>
-            <div class="image-preview-grid" id="imagePreviewGrid"></div>
+          <div class="wizard-actions">
+            <button class="btn btn-outline" onclick="prevWizardStep()">Back</button>
+            <button class="btn btn-primary" onclick="nextWizardStep()">Continue</button>
           </div>
+        </div>
 
-          <div class="form-section">
-            <h3 class="form-section-title">✨ Features & Amenities</h3>
+        <!-- Step 4: Features & Condition -->
+        <div class="wizard-content" id="wizardStep4" style="display: none;">
+          <div class="wizard-step-header">
+            <span class="wizard-step-icon">✨</span>
+            <h3>Features & Condition</h3>
+            <p>Select all features that apply to your property</p>
+          </div>
+          <div class="wizard-step-body">
+            <h4>Property Features</h4>
             <div class="features-checklist">
               <label class="feature-checkbox"><input type="checkbox" name="features" value="parking"> Parking</label>
               <label class="feature-checkbox"><input type="checkbox" name="features" value="garage"> Garage</label>
@@ -484,17 +565,219 @@
               <label class="feature-checkbox"><input type="checkbox" name="features" value="basement"> Finished Basement</label>
               <label class="feature-checkbox"><input type="checkbox" name="features" value="laundry"> In-Unit Laundry</label>
               <label class="feature-checkbox"><input type="checkbox" name="features" value="balcony"> Balcony/Patio</label>
-              <label class="feature-checkbox"><input type="checkbox" name="features" value="newRoof"> New Roof</label>
+              <label class="feature-checkbox"><input type="checkbox" name="features" value="newRoof"> New Roof (5 yrs)</label>
               <label class="feature-checkbox"><input type="checkbox" name="features" value="renovated"> Recently Renovated</label>
+              <label class="feature-checkbox"><input type="checkbox" name="features" value="hardwood"> Hardwood Floors</label>
+              <label class="feature-checkbox"><input type="checkbox" name="features" value="smartHome"> Smart Home Features</label>
+            </div>
+            <h4 style="margin-top: 1.5rem;">Property Condition</h4>
+            <div class="condition-options">
+              <label class="condition-option">
+                <input type="radio" name="condition" value="excellent" checked>
+                <span class="condition-label">
+                  <strong>Excellent</strong>
+                  <small>Move-in ready, no repairs needed</small>
+                </span>
+              </label>
+              <label class="condition-option">
+                <input type="radio" name="condition" value="good">
+                <span class="condition-label">
+                  <strong>Good</strong>
+                  <small>Minor cosmetic updates may be needed</small>
+                </span>
+              </label>
+              <label class="condition-option">
+                <input type="radio" name="condition" value="fair">
+                <span class="condition-label">
+                  <strong>Fair</strong>
+                  <small>Some repairs or updates needed</small>
+                </span>
+              </label>
+              <label class="condition-option">
+                <input type="radio" name="condition" value="fixer">
+                <span class="condition-label">
+                  <strong>Fixer-Upper</strong>
+                  <small>Significant work required</small>
+                </span>
+              </label>
             </div>
           </div>
+          <div class="wizard-actions">
+            <button class="btn btn-outline" onclick="prevWizardStep()">Back</button>
+            <button class="btn btn-primary" onclick="nextWizardStep()">Continue</button>
+          </div>
+        </div>
 
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary btn-lg">
+        <!-- Step 5: AI Valuation -->
+        <div class="wizard-content" id="wizardStep5" style="display: none;">
+          <div class="wizard-step-header">
+            <span class="wizard-step-icon">🤖</span>
+            <h3>Free AI Valuation</h3>
+            <p>Get an instant estimate based on comparable sales in your area</p>
+          </div>
+          <div class="wizard-step-body">
+            <div class="valuation-result" id="wizardValuationResult">
+              <div class="valuation-loading" id="valuationLoading">
+                <div class="spinner"></div>
+                <p>Analyzing comparable sales...</p>
+              </div>
+              <div class="valuation-estimate" id="valuationEstimate" style="display: none;">
+                <div class="estimate-header">Estimated Market Value</div>
+                <div class="estimate-range">
+                  <span class="estimate-low" id="estimateLow">$0</span>
+                  <span class="estimate-mid" id="estimateMid">$0</span>
+                  <span class="estimate-high" id="estimateHigh">$0</span>
+                </div>
+                <div class="estimate-labels">
+                  <span>Low</span>
+                  <span>Suggested</span>
+                  <span>High</span>
+                </div>
+                <div class="estimate-info">
+                  <p>Based on <span id="compCount">0</span> comparable sales in the past 6 months</p>
+                </div>
+              </div>
+            </div>
+            <div class="tip-box">
+              <span class="tip-icon">💡</span>
+              <p><strong>Tip:</strong> Pricing competitively can help your home sell faster. Homes priced right typically sell within 30 days.</p>
+            </div>
+          </div>
+          <div class="wizard-actions">
+            <button class="btn btn-outline" onclick="prevWizardStep()">Back</button>
+            <button class="btn btn-primary" onclick="nextWizardStep()">Set My Price</button>
+          </div>
+        </div>
+
+        <!-- Step 6: Set Price -->
+        <div class="wizard-content" id="wizardStep6" style="display: none;">
+          <div class="wizard-step-header">
+            <span class="wizard-step-icon">💰</span>
+            <h3>Set Your Asking Price</h3>
+            <p>Choose a competitive price for your property</p>
+          </div>
+          <div class="wizard-step-body">
+            <div class="price-suggestion" id="priceSuggestion">
+              <p>Our AI suggests: <strong id="suggestedPrice">$0</strong></p>
+            </div>
+            <div class="form-group price-input-large">
+              <label>Your Asking Price *</label>
+              <div class="price-input-wrapper">
+                <span class="currency-symbol">$</span>
+                <input type="number" id="propertyPrice" min="1" placeholder="500000" required>
+              </div>
+            </div>
+            <div class="commission-preview">
+              <h4>Commission Breakdown</h4>
+              <div class="commission-row">
+                <span>Seller Commission (1%)</span>
+                <span id="sellerCommission">$0</span>
+              </div>
+              <div class="commission-row">
+                <span>Buyer Commission (1%)</span>
+                <span id="buyerCommission">$0</span>
+              </div>
+              <div class="commission-row total">
+                <span>Your Net Proceeds (estimated)</span>
+                <span id="netProceeds">$0</span>
+              </div>
+            </div>
+          </div>
+          <div class="wizard-actions">
+            <button class="btn btn-outline" onclick="prevWizardStep()">Back</button>
+            <button class="btn btn-primary" onclick="nextWizardStep()">Continue to Photos</button>
+          </div>
+        </div>
+
+        <!-- Step 7: Photos -->
+        <div class="wizard-content" id="wizardStep7" style="display: none;">
+          <div class="wizard-step-header">
+            <span class="wizard-step-icon">📸</span>
+            <h3>Upload Photos</h3>
+            <p>Great photos help your listing stand out. Upload at least 5 photos.</p>
+          </div>
+          <div class="wizard-step-body">
+            <div class="photo-tips">
+              <div class="photo-tip"><span>✓</span> Use natural lighting</div>
+              <div class="photo-tip"><span>✓</span> Declutter rooms first</div>
+              <div class="photo-tip"><span>✓</span> Include all rooms</div>
+              <div class="photo-tip"><span>✓</span> Show exterior & yard</div>
+            </div>
+            <div class="image-upload-area" id="imageUploadArea">
+              <input type="file" id="propertyImages" multiple accept="image/*" onchange="handleImagePreview(event)" style="display:none;">
+              <div class="upload-placeholder" onclick="document.getElementById('propertyImages').click()">
+                <div class="upload-icon">📷</div>
+                <p>Click to upload photos</p>
+                <span class="upload-hint">JPG, PNG, WEBP up to 10MB each (max 20 photos)</span>
+              </div>
+            </div>
+            <div class="image-preview-grid" id="imagePreviewGrid"></div>
+            <p class="photo-count">Photos uploaded: <span id="photoCount">0</span>/20 (minimum 5 required)</p>
+          </div>
+          <div class="wizard-actions">
+            <button class="btn btn-outline" onclick="prevWizardStep()">Back</button>
+            <button class="btn btn-primary" onclick="nextWizardStep()" id="photoNextBtn">Continue to Review</button>
+          </div>
+        </div>
+
+        <!-- Step 8: Review & Publish -->
+        <div class="wizard-content" id="wizardStep8" style="display: none;">
+          <div class="wizard-step-header">
+            <span class="wizard-step-icon">✅</span>
+            <h3>Review & Publish</h3>
+            <p>Review your listing details before publishing</p>
+          </div>
+          <div class="wizard-step-body">
+            <div class="form-group">
+              <label>Property Description *</label>
+              <textarea id="propertyDescription" rows="5" placeholder="Describe your property's best features, recent upgrades, neighborhood highlights, and what makes it special..."></textarea>
+              <p class="form-hint">Tip: Mention nearby schools, transit, parks, and recent renovations</p>
+            </div>
+
+            <div class="review-summary">
+              <h4>Listing Summary</h4>
+              <div class="review-grid">
+                <div class="review-item">
+                  <span class="review-label">Address</span>
+                  <span class="review-value" id="reviewAddress">-</span>
+                </div>
+                <div class="review-item">
+                  <span class="review-label">Property Type</span>
+                  <span class="review-value" id="reviewType">-</span>
+                </div>
+                <div class="review-item">
+                  <span class="review-label">Bedrooms / Bathrooms</span>
+                  <span class="review-value" id="reviewBedBath">-</span>
+                </div>
+                <div class="review-item">
+                  <span class="review-label">Square Feet</span>
+                  <span class="review-value" id="reviewSqft">-</span>
+                </div>
+                <div class="review-item">
+                  <span class="review-label">Asking Price</span>
+                  <span class="review-value" id="reviewPrice">-</span>
+                </div>
+                <div class="review-item">
+                  <span class="review-label">Photos</span>
+                  <span class="review-value" id="reviewPhotos">-</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="legal-agreement">
+              <label class="feature-checkbox">
+                <input type="checkbox" id="agreeTerms" required>
+                I confirm that all information is accurate and I agree to the <a href="javascript:void(0)" onclick="showSection('terms')">Terms of Service</a> and <a href="javascript:void(0)" onclick="showSection('privacy')">Privacy Policy</a>
+              </label>
+            </div>
+          </div>
+          <div class="wizard-actions">
+            <button class="btn btn-outline" onclick="prevWizardStep()">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="publishListing()" id="publishBtn">
               <span class="btn-icon">🚀</span> Publish Listing
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </section>
 
@@ -637,22 +920,34 @@
           </div>
         </div>
 
-        <!-- Interactive Buyer Checklist -->
+        <!-- Interactive Buyer Checklist - Login Required -->
         <div class="interactive-checklist-container">
-          <div class="checklist-header">
-            <div class="checklist-title">
-              <span class="checklist-icon">📋</span>
-              <div>
-                <h2>Your Home Buying Checklist</h2>
-                <p>Track your progress through every step of the buying process</p>
+          <!-- Show this when NOT logged in -->
+          <div id="checklistLoginPrompt" class="login-required-box">
+            <div class="login-required-icon">🔒</div>
+            <h3>Track Your Home Buying Progress</h3>
+            <p>Sign in to use our interactive checklist and track your progress through all 39 steps of the home buying process.</p>
+            <button onclick="showModal('loginModal')" class="btn btn-primary">Sign In to Track Progress</button>
+            <p class="login-subtext">Don't have an account? <a href="javascript:void(0)" onclick="showModal('registerModal')">Create one free</a></p>
+          </div>
+
+          <!-- Show this when logged in -->
+          <div id="checklistContent" style="display: none;">
+            <div class="checklist-header">
+              <div class="checklist-title">
+                <span class="checklist-icon">📋</span>
+                <div>
+                  <h2>Your Home Buying Checklist</h2>
+                  <p>Track your progress through every step of the buying process</p>
+                </div>
+              </div>
+              <div class="checklist-actions">
+                <div id="buyerOverallProgress" class="overall-progress"></div>
+                <button onclick="resetBuyerChecklist()" class="btn btn-outline btn-sm">Reset Progress</button>
               </div>
             </div>
-            <div class="checklist-actions">
-              <div id="buyerOverallProgress" class="overall-progress"></div>
-              <button onclick="resetBuyerChecklist()" class="btn btn-outline btn-sm">Reset Progress</button>
-            </div>
+            <div id="buyerChecklist" class="interactive-checklist"></div>
           </div>
-          <div id="buyerChecklist" class="interactive-checklist"></div>
         </div>
 
         <div class="guide-steps">
