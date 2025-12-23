@@ -19,21 +19,21 @@
         <span class="logo-text">Real Estate Direct</span>
       </div>
       <div class="nav-links">
-        <a href="#" onclick="showSection('home')">Home</a>
-        <a href="#" onclick="showSection('search')">Buy</a>
-        <a href="#" onclick="showSection('sell')">Sell</a>
-        <a href="#" onclick="showSection('how-to-buy')">How to Buy</a>
-        <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
-        <a href="#" onclick="showSection('calculator')">Calculator</a>
-        <a href="#" onclick="showSection('dashboard')" id="dashboardLink" style="display:none;">Dashboard</a>
-        <a href="#" onclick="showSection('messages')" id="messagesLink" style="display:none;">Messages</a>
-        <a href="#" onclick="showSection('transactions')" id="transactionsLink" style="display:none;">Transactions</a>
-        <a href="#" onclick="showSection('documents')" id="documentsLink" style="display:none;">Documents</a>
-        <a href="#" onclick="showSection('notifications')" id="notificationsLink" style="display:none;">Notifications</a>
-        <a href="#" onclick="showSection('analytics')" id="analyticsLink" style="display:none;">Analytics</a>
-        <a href="#" onclick="showSection('ai-tools')" id="aiToolsLink" style="display:none;">AI Tools</a>
-        <a href="#" onclick="showSection('profile')" id="profileLink" style="display:none;">Profile</a>
-        <a href="#" onclick="showSection('admin')" id="adminLink" style="display:none;">Admin</a>
+        <a href="javascript:void(0)" onclick="showSection('home'); return false;">Home</a>
+        <a href="javascript:void(0)" onclick="showSection('search'); return false;">Buy</a>
+        <a href="javascript:void(0)" onclick="showSection('sell'); return false;">Sell</a>
+        <a href="javascript:void(0)" onclick="showSection('how-to-buy'); return false;">How to Buy</a>
+        <a href="javascript:void(0)" onclick="showSection('how-to-sell'); return false;">How to Sell</a>
+        <a href="javascript:void(0)" onclick="showSection('calculator'); return false;">Calculator</a>
+        <a href="javascript:void(0)" onclick="showSection('dashboard'); return false;" id="dashboardLink" style="display:none;">Dashboard</a>
+        <a href="javascript:void(0)" onclick="showSection('messages'); return false;" id="messagesLink" style="display:none;">Messages</a>
+        <a href="javascript:void(0)" onclick="showSection('transactions'); return false;" id="transactionsLink" style="display:none;">Transactions</a>
+        <a href="javascript:void(0)" onclick="showSection('documents'); return false;" id="documentsLink" style="display:none;">Documents</a>
+        <a href="javascript:void(0)" onclick="showSection('notifications'); return false;" id="notificationsLink" style="display:none;">Notifications</a>
+        <a href="javascript:void(0)" onclick="showSection('analytics'); return false;" id="analyticsLink" style="display:none;">Analytics</a>
+        <a href="javascript:void(0)" onclick="showSection('ai-tools'); return false;" id="aiToolsLink" style="display:none;">AI Tools</a>
+        <a href="javascript:void(0)" onclick="showSection('profile'); return false;" id="profileLink" style="display:none;">Profile</a>
+        <a href="javascript:void(0)" onclick="showSection('admin'); return false;" id="adminLink" style="display:none;">Admin</a>
       </div>
       <div class="auth-buttons" id="authButtons">
         <button onclick="showModal('loginModal')" class="btn btn-outline">Login</button>
@@ -58,7 +58,7 @@
           <div class="empty-state">No notifications</div>
         </div>
         <div class="notification-footer">
-          <a href="#" onclick="showSection('notifications'); closeNotificationPanel();">View all notifications</a>
+          <a href="javascript:void(0)" onclick="showSection('notifications'); closeNotificationPanel();">View all notifications</a>
         </div>
       </div>
     </nav>
@@ -1251,9 +1251,9 @@
         <button type="submit" class="btn btn-primary btn-block">Sign In</button>
       </form>
       <p class="modal-footer">
-        <a href="#" onclick="showModal('forgotPasswordModal'); closeModal('loginModal');">Forgot password?</a>
+        <a href="javascript:void(0)" onclick="showModal('forgotPasswordModal'); closeModal('loginModal');">Forgot password?</a>
       </p>
-      <p class="modal-footer">Don't have an account? <a href="#" onclick="showModal('registerModal'); closeModal('loginModal');">Create one</a></p>
+      <p class="modal-footer">Don't have an account? <a href="javascript:void(0)" onclick="showModal('registerModal'); closeModal('loginModal');">Create one</a></p>
     </div>
   </div>
 
@@ -1272,7 +1272,7 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
       </form>
-      <p class="modal-footer"><a href="#" onclick="showModal('loginModal'); closeModal('forgotPasswordModal');">Back to Login</a></p>
+      <p class="modal-footer"><a href="javascript:void(0)" onclick="showModal('loginModal'); closeModal('forgotPasswordModal');">Back to Login</a></p>
     </div>
   </div>
 
@@ -1299,7 +1299,7 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Create Account</button>
       </form>
-      <p class="modal-footer">Already have an account? <a href="#" onclick="showModal('loginModal'); closeModal('registerModal');">Sign in</a></p>
+      <p class="modal-footer">Already have an account? <a href="javascript:void(0)" onclick="showModal('loginModal'); closeModal('registerModal');">Sign in</a></p>
     </div>
   </div>
 
@@ -2730,7 +2730,7 @@
           </h3>
           <div class="faq-answer">
             <p>FINTRAC (Financial Transactions and Reports Analysis Centre of Canada) is Canada's financial intelligence unit. While FINTRAC reporting requirements primarily apply to licensed real estate professionals, all parties in a real estate transaction should be prepared to verify their identity. Your lawyer will handle FINTRAC compliance as part of the closing process.</p>
-            <p><a href="#" onclick="showSection('fintrac')">Learn more about FINTRAC requirements →</a></p>
+            <p><a href="javascript:void(0)" onclick="showSection('fintrac')">Learn more about FINTRAC requirements →</a></p>
           </div>
         </div>
 
@@ -3155,17 +3155,17 @@
         <span>Real Estate Direct</span>
       </div>
       <div class="footer-links">
-        <a href="#" onclick="showSection('how-to-buy')">How to Buy</a>
-        <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
-        <a href="#" onclick="showSection('home-valuation')">Home Valuation</a>
-        <a href="#" onclick="showSection('savings-calculator')">Savings Calculator</a>
-        <a href="#" onclick="showSection('calculator')">Tax Calculator</a>
-        <a href="#" onclick="showSection('blog')">Resources</a>
-        <a href="#" onclick="showSection('referrals')">Refer & Earn</a>
-        <a href="#" onclick="showSection('faq')">FAQ</a>
-        <a href="#" onclick="showSection('fintrac')">FINTRAC/AML</a>
-        <a href="#" onclick="showSection('privacy')">Privacy</a>
-        <a href="#" onclick="showSection('terms')">Terms</a>
+        <a href="javascript:void(0)" onclick="showSection('how-to-buy')">How to Buy</a>
+        <a href="javascript:void(0)" onclick="showSection('how-to-sell')">How to Sell</a>
+        <a href="javascript:void(0)" onclick="showSection('home-valuation')">Home Valuation</a>
+        <a href="javascript:void(0)" onclick="showSection('savings-calculator')">Savings Calculator</a>
+        <a href="javascript:void(0)" onclick="showSection('calculator')">Tax Calculator</a>
+        <a href="javascript:void(0)" onclick="showSection('blog')">Resources</a>
+        <a href="javascript:void(0)" onclick="showSection('referrals')">Refer & Earn</a>
+        <a href="javascript:void(0)" onclick="showSection('faq')">FAQ</a>
+        <a href="javascript:void(0)" onclick="showSection('fintrac')">FINTRAC/AML</a>
+        <a href="javascript:void(0)" onclick="showSection('privacy')">Privacy</a>
+        <a href="javascript:void(0)" onclick="showSection('terms')">Terms</a>
       </div>
       <p class="footer-disclaimer">© 2025 Real Estate Direct. This platform provides tools for convenience only. Consult with licensed real estate professionals and lawyers for legal advice.</p>
     </div>
