@@ -5059,3 +5059,1043 @@ footer {
 .ai-login-required a:hover {
   text-decoration: underline;
 }
+
+/* ==========================================
+   New Features Styles - Landing Page Updates
+   ========================================== */
+
+/* Hero Badge */
+.hero-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Savings Comparison in Hero */
+.savings-highlight {
+  margin: 2rem 0;
+}
+
+.savings-comparison {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+}
+
+.savings-item {
+  text-align: center;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+}
+
+.savings-item.traditional {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.savings-item.ours {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.savings-item .label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gray-300);
+  margin-bottom: 0.25rem;
+}
+
+.savings-item .rate {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.savings-item .example {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  margin-top: 0.25rem;
+}
+
+.savings-vs {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gray-400);
+  padding: 0.5rem;
+}
+
+.savings-result {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+}
+
+.you-save {
+  color: var(--white);
+  font-size: 1.1rem;
+}
+
+.you-save strong {
+  font-size: 1.5rem;
+}
+
+.hero-calc-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--white);
+}
+
+.hero-calc-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Trust Badges */
+.hero-trust {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--gray-700);
+}
+
+.hero-trust p {
+  color: var(--gray-400);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.trust-badges {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.trust-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--gray-300);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================
+   Testimonials Section
+   ========================================== */
+
+.testimonials-section {
+  padding: 4rem 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--gray-50);
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.testimonial-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.testimonial-savings {
+  position: absolute;
+  top: -10px;
+  right: 15px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.testimonial-content {
+  margin: 1rem 0;
+}
+
+.testimonial-content p {
+  color: var(--gray-700);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.author-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-info strong {
+  color: var(--gray-800);
+  font-size: 0.95rem;
+}
+
+.author-info span {
+  color: var(--gray-500);
+  font-size: 0.8rem;
+}
+
+.testimonial-rating {
+  color: #fbbf24;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.testimonials-stats {
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  flex-wrap: wrap;
+}
+
+.testimonial-stat {
+  text-align: center;
+}
+
+.testimonial-stat .stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.testimonial-stat .stat-label {
+  color: var(--gray-500);
+  font-size: 0.9rem;
+}
+
+/* ==========================================
+   Valuation Teaser Section
+   ========================================== */
+
+.valuation-teaser-section {
+  background: linear-gradient(135deg, var(--gray-800) 0%, var(--secondary) 100%);
+  padding: 4rem 2rem;
+  margin: 0 auto;
+}
+
+.valuation-teaser-content {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.valuation-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.valuation-teaser-section h2 {
+  color: var(--white);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.valuation-teaser-section p {
+  color: var(--gray-300);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+/* ==========================================
+   Referral Banner
+   ========================================== */
+
+.referral-banner {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 2rem;
+  margin: 2rem;
+  border-radius: var(--radius-lg);
+}
+
+.referral-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.referral-icon {
+  font-size: 3rem;
+}
+
+.referral-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.referral-text h3 {
+  color: #92400e;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+}
+
+.referral-text p {
+  color: #78350f;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ==========================================
+   Savings Calculator Section
+   ========================================== */
+
+.savings-calc-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.savings-calc-form {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.savings-calc-form input[type="range"] {
+  width: 100%;
+  margin-top: 0.75rem;
+  accent-color: var(--primary);
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--gray-700);
+}
+
+.radio-label input {
+  accent-color: var(--primary);
+}
+
+.savings-calc-results {
+  text-align: center;
+}
+
+.savings-comparison-card {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.comparison-side {
+  flex: 1;
+  min-width: 250px;
+  max-width: 350px;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.comparison-side.traditional {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #ef4444;
+}
+
+.comparison-side.ours {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border: 2px solid #10b981;
+}
+
+.comparison-side h3 {
+  margin: 0 0 1.5rem 0;
+  color: var(--gray-800);
+}
+
+.commission-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.breakdown-item .rate {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+.breakdown-item.total .amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.comparison-side.traditional .breakdown-item.total .amount {
+  color: #dc2626;
+}
+
+.comparison-side.ours .breakdown-item.total .amount {
+  color: #059669;
+}
+
+.savings-total-card {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.savings-total-card .savings-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.savings-amount .label {
+  display: block;
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.savings-amount .value {
+  display: block;
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.savings-note {
+  margin-top: 1rem;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.savings-cta {
+  margin-top: 2rem;
+}
+
+/* ==========================================
+   Home Valuation Section
+   ========================================== */
+
+.valuation-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.valuation-form-card {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.valuation-results-card {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.valuation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.valuation-header h3 {
+  margin: 0;
+  color: var(--gray-800);
+}
+
+.valuation-badge {
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.valuation-estimate {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  padding: 2rem;
+  border-radius: var(--radius);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.estimate-range {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--gray-600);
+  margin-bottom: 0.5rem;
+}
+
+.estimate-primary {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.valuation-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.valuation-details .detail-item {
+  text-align: center;
+  padding: 1rem;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+}
+
+.valuation-details .label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  margin-bottom: 0.25rem;
+}
+
+.valuation-details .value {
+  display: block;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.valuation-details .trend-up {
+  color: #10b981;
+}
+
+.valuation-comparables {
+  margin-bottom: 1.5rem;
+}
+
+.valuation-comparables h4 {
+  margin: 0 0 1rem 0;
+  color: var(--gray-700);
+  font-size: 0.95rem;
+}
+
+.comparable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.comparable-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.valuation-cta {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.valuation-cta p {
+  color: var(--gray-600);
+  margin-bottom: 1rem;
+}
+
+.valuation-cta .btn {
+  margin: 0.25rem;
+}
+
+.valuation-disclaimer {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  text-align: center;
+  margin: 0;
+}
+
+/* ==========================================
+   Referrals Section
+   ========================================== */
+
+.referrals-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.referrals-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.referrals-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.referrals-header h1 {
+  font-size: 2.5rem;
+  color: var(--gray-900);
+  margin-bottom: 0.75rem;
+}
+
+.referrals-header p {
+  color: var(--gray-500);
+  font-size: 1.1rem;
+}
+
+.referrals-how-it-works {
+  margin-bottom: 3rem;
+}
+
+.referrals-how-it-works h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--gray-800);
+}
+
+.referral-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.referral-step {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.referral-step .step-number {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 30px;
+  height: 30px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.referral-step .step-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.referral-step h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--gray-800);
+  font-size: 1rem;
+}
+
+.referral-step p {
+  color: var(--gray-500);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.referral-share-card {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.share-content {
+  text-align: center;
+}
+
+.share-content h3 {
+  margin: 0 0 1rem 0;
+  color: var(--gray-800);
+}
+
+.referral-link-box {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 500px;
+  margin: 0 auto 1.5rem;
+}
+
+.referral-link-box input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  background: var(--gray-50);
+}
+
+.share-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.referral-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.referral-stat {
+  text-align: center;
+}
+
+.referral-stat .stat-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.referral-stat .stat-label {
+  color: var(--gray-500);
+  font-size: 0.85rem;
+}
+
+.referral-terms {
+  background: var(--gray-50);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+}
+
+.referral-terms h4 {
+  margin: 0 0 1rem 0;
+  color: var(--gray-700);
+}
+
+.referral-terms ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--gray-600);
+  font-size: 0.9rem;
+}
+
+.referral-terms li {
+  margin-bottom: 0.5rem;
+}
+
+/* ==========================================
+   Blog Section
+   ========================================== */
+
+.blog-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.blog-featured {
+  margin-bottom: 2rem;
+}
+
+.blog-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blog-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.blog-card.featured {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.blog-image {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  min-height: 200px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 1rem;
+}
+
+.blog-image.small {
+  min-height: 100px;
+}
+
+.blog-category {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.blog-content {
+  padding: 1.5rem;
+}
+
+.blog-content h3 {
+  margin: 0 0 0.75rem 0;
+  color: var(--gray-800);
+  font-size: 1.1rem;
+}
+
+.blog-card.featured .blog-content h3 {
+  font-size: 1.5rem;
+}
+
+.blog-content p {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.blog-meta {
+  display: flex;
+  gap: 1.5rem;
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ==========================================
+   Offer Comparison Section
+   ========================================== */
+
+.offer-comparison-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.no-offers-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+}
+
+.no-offers-state .empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.no-offers-state h3 {
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.no-offers-state p {
+  color: var(--gray-500);
+  margin-bottom: 1.5rem;
+}
+
+.offers-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.offer-comparison-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.offer-comparison-card.best-offer {
+  border: 2px solid #10b981;
+}
+
+.offer-header {
+  padding: 1rem 1.5rem;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.offer-header.best {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.offer-body {
+  padding: 1.5rem;
+}
+
+.offer-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.offer-row:last-child {
+  border-bottom: none;
+}
+
+.offer-row .label {
+  color: var(--gray-500);
+  font-size: 0.9rem;
+}
+
+.offer-row .value {
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+/* ==========================================
+   Mobile Responsive - New Features
+   ========================================== */
+
+@media (max-width: 768px) {
+  .savings-comparison {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .savings-vs {
+    display: none;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-stats {
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .trust-badges {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .testimonials-stats {
+    gap: 2rem;
+  }
+
+  .referral-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .valuation-container {
+    grid-template-columns: 1fr;
+  }
+
+  .valuation-details {
+    grid-template-columns: 1fr;
+  }
+
+  .savings-comparison-card {
+    flex-direction: column;
+  }
+
+  .blog-card.featured {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .referral-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .savings-amount .value {
+    font-size: 2rem;
+  }
+}
