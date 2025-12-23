@@ -3257,6 +3257,232 @@
             <p class="results-disclaimer">Contact lawyers directly to verify availability, fees, and to confirm they can handle your specific transaction.</p>
           </div>
         </div>
+
+        <!-- Property Description Generator -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">✍️</span>
+            <h2>Property Description Generator</h2>
+          </div>
+          <p class="tool-description">Generate compelling property descriptions that attract buyers to your listing.</p>
+
+          <form id="descriptionForm" onsubmit="generateDescription(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Property Type</label>
+                <select id="descPropertyType" required>
+                  <option value="">Select Type</option>
+                  <option value="detached">Detached House</option>
+                  <option value="semi-detached">Semi-Detached</option>
+                  <option value="townhouse">Townhouse</option>
+                  <option value="condo">Condo/Apartment</option>
+                  <option value="bungalow">Bungalow</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="descCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bedrooms</label>
+                <input type="number" id="descBedrooms" min="0" max="20" placeholder="3" required>
+              </div>
+              <div class="form-group">
+                <label>Bathrooms</label>
+                <input type="number" id="descBathrooms" min="0" max="10" step="0.5" placeholder="2" required>
+              </div>
+              <div class="form-group">
+                <label>Square Feet</label>
+                <input type="number" id="descSqft" placeholder="1500">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Key Features (comma separated)</label>
+              <input type="text" id="descFeatures" placeholder="hardwood floors, updated kitchen, large backyard">
+            </div>
+            <div class="form-group">
+              <label>Highlights</label>
+              <textarea id="descHighlights" rows="2" placeholder="Any special selling points..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">✨</span> Generate Description
+            </button>
+          </form>
+
+          <div id="descriptionResults" class="ai-results" style="display:none;">
+            <h3>Generated Description</h3>
+            <div id="generatedDescription" class="generated-text"></div>
+            <div class="result-actions">
+              <button onclick="copyToClipboard('generatedDescription')" class="btn btn-outline btn-sm">Copy to Clipboard</button>
+              <button onclick="regenerateDescription()" class="btn btn-outline btn-sm">Regenerate</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Price Suggestion -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">💰</span>
+            <h2>AI Price Suggestion</h2>
+          </div>
+          <p class="tool-description">Get an AI-powered price estimate based on comparable properties and market data.</p>
+
+          <form id="priceSuggestionForm" onsubmit="suggestPrice(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="priceProvince" required>
+                  <option value="">Select Province</option>
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="priceCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Property Type</label>
+                <select id="pricePropertyType" required>
+                  <option value="detached">Detached House</option>
+                  <option value="semi-detached">Semi-Detached</option>
+                  <option value="townhouse">Townhouse</option>
+                  <option value="condo">Condo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Bedrooms</label>
+                <input type="number" id="priceBedrooms" min="0" max="20" placeholder="3" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bathrooms</label>
+                <input type="number" id="priceBathrooms" min="0" max="10" step="0.5" placeholder="2" required>
+              </div>
+              <div class="form-group">
+                <label>Square Feet</label>
+                <input type="number" id="priceSqft" placeholder="1500" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">📊</span> Get Price Estimate
+            </button>
+          </form>
+
+          <div id="priceResults" class="ai-results" style="display:none;">
+            <h3>Price Estimate</h3>
+            <div class="price-estimate">
+              <div class="suggested-price" id="suggestedPrice">$0</div>
+              <div class="price-range">Range: <span id="priceLow">$0</span> - <span id="priceHigh">$0</span></div>
+            </div>
+            <p class="price-methodology" id="priceMethodology"></p>
+            <p class="results-disclaimer">This is an AI-generated estimate. Consult a professional appraiser for accurate valuation.</p>
+          </div>
+        </div>
+
+        <!-- Listing Title Generator -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">📝</span>
+            <h2>Listing Title Generator</h2>
+          </div>
+          <p class="tool-description">Generate eye-catching listing titles that stand out in search results.</p>
+
+          <form id="titleForm" onsubmit="generateTitles(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Property Type</label>
+                <select id="titlePropertyType" required>
+                  <option value="detached">Detached House</option>
+                  <option value="semi-detached">Semi-Detached</option>
+                  <option value="townhouse">Townhouse</option>
+                  <option value="condo">Condo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="titleCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bedrooms</label>
+                <input type="number" id="titleBedrooms" min="0" placeholder="3" required>
+              </div>
+              <div class="form-group">
+                <label>Bathrooms</label>
+                <input type="number" id="titleBathrooms" min="0" step="0.5" placeholder="2" required>
+              </div>
+              <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" id="titlePrice" placeholder="500000">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">✨</span> Generate Titles
+            </button>
+          </form>
+
+          <div id="titleResults" class="ai-results" style="display:none;">
+            <h3>Suggested Titles</h3>
+            <div class="title-options" id="titleOptions"></div>
+          </div>
+        </div>
+
+        <!-- Neighbourhood Insights -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">🏘️</span>
+            <h2>Neighbourhood Insights</h2>
+          </div>
+          <p class="tool-description">Get AI-powered insights about any neighbourhood including schools, transit, and lifestyle.</p>
+
+          <form id="neighbourhoodForm" onsubmit="getNeighbourhoodInsights(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="insightProvince" required>
+                  <option value="">Select Province</option>
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="insightCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Postal Code (optional)</label>
+              <input type="text" id="insightPostalCode" placeholder="e.g., M5V 1J2">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">🔍</span> Get Insights
+            </button>
+          </form>
+
+          <div id="insightResults" class="ai-results" style="display:none;">
+            <h3>Neighbourhood Insights</h3>
+            <div id="neighbourhoodInsights" class="generated-text"></div>
+          </div>
+        </div>
       </div>
 
       <div class="ai-tools-info">
