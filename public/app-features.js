@@ -1,8 +1,52 @@
 // ==========================================
+// Section Change Callback - handles all section-specific loading
+// This is called by showSection() in app.js
+// ==========================================
+
+function onSectionChange(sectionId) {
+  switch(sectionId) {
+    case 'admin':
+      loadAdminDashboard();
+      break;
+    case 'messages':
+      if (typeof loadConversations === 'function') loadConversations();
+      break;
+    case 'profile':
+      if (typeof loadProfile === 'function') loadProfile();
+      break;
+    case 'transactions':
+      if (typeof loadTransactions === 'function') loadTransactions();
+      break;
+    case 'notifications':
+      if (typeof loadNotifications === 'function') loadNotifications();
+      break;
+    case 'documents':
+      if (typeof loadDocuments === 'function') loadDocuments();
+      if (typeof loadUserTransactionsForDocuments === 'function') loadUserTransactionsForDocuments();
+      break;
+    case 'analytics':
+      if (typeof loadAnalytics === 'function') loadAnalytics();
+      break;
+    case 'ai-tools':
+      if (typeof loadAIToolsUsage === 'function') loadAIToolsUsage();
+      break;
+    case 'referrals':
+      if (typeof updateReferralUI === 'function') updateReferralUI();
+      break;
+    case 'savings-calculator':
+      if (typeof calculateSavings === 'function') calculateSavings();
+      break;
+    case 'offer-comparison':
+      if (typeof loadOfferComparison === 'function') loadOfferComparison();
+      break;
+  }
+}
+
+// ==========================================
 // Admin Dashboard Functions
 // ==========================================
 
-let isAdmin = false;
+var isAdmin = false;
 
 async function checkAdminStatus() {
   if (!authToken) return;
@@ -522,32 +566,7 @@ async function requestPasswordReset(event) {
   }
 }
 
-// ==========================================
-// Section Loading
-// ==========================================
-
-var originalShowSection = window.showSection;
-window.showSection = function(sectionId) {
-  originalShowSection(sectionId);
-
-  switch(sectionId) {
-    case 'admin':
-      loadAdminDashboard();
-      break;
-    case 'messages':
-      loadConversations();
-      break;
-    case 'profile':
-      loadProfile();
-      break;
-    case 'transactions':
-      loadTransactions();
-      break;
-    case 'saved-searches':
-      loadSavedSearches();
-      break;
-  }
-};
+// Section loading is now handled by onSectionChange() at the top of this file
 
 // Check admin status on login
 var originalLogin = window.login;
@@ -853,16 +872,7 @@ function loadProvinceForms() {
   // Form types are already in the select, province-specific info loaded on demand
 }
 
-// Update showSection to include documents
-var prevShowSection = window.showSection;
-window.showSection = function(sectionId) {
-  prevShowSection(sectionId);
-
-  if (sectionId === 'documents') {
-    loadDocuments();
-    loadUserTransactionsForDocuments();
-  }
-};
+// Documents section loading is handled by onSectionChange()
 
 async function loadUserTransactionsForDocuments() {
   if (!authToken) return;
@@ -1538,19 +1548,7 @@ window.onLoginSuccess = function() {
   if (analyticsLink) analyticsLink.style.display = 'inline';
 };
 
-// Load analytics when section is shown
-var mapShowSection = window.showSection;
-window.showSection = function(sectionId) {
-  mapShowSection(sectionId);
-
-  if (sectionId === 'analytics') {
-    loadAnalytics();
-  }
-
-  if (sectionId === 'ai-tools') {
-    loadAIToolsUsage();
-  }
-};
+// Analytics and AI-tools section loading is handled by onSectionChange()
 
 // ==========================================
 // AI Tools - Mortgage & Lawyer Finder
@@ -2405,19 +2403,4 @@ window.onLoginSuccess = function() {
   updateReferralUI();
 };
 
-// Update referral UI when showing referrals section
-var originalShowSection = window.showSection;
-if (originalShowSection) {
-  window.showSection = function(sectionId) {
-    originalShowSection(sectionId);
-    if (sectionId === 'referrals') {
-      updateReferralUI();
-    }
-    if (sectionId === 'savings-calculator') {
-      calculateSavings();
-    }
-    if (sectionId === 'offer-comparison') {
-      loadOfferComparison();
-    }
-  };
-}
+// Referrals, savings-calculator, and offer-comparison section loading is handled by onSectionChange()

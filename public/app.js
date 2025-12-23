@@ -786,8 +786,14 @@ function showSection(sectionId) {
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    // Handle section-specific loading
     if (sectionId === 'dashboard' && authToken) {
       loadDashboard();
+    }
+
+    // Call the section change callback if defined (in app-features.js)
+    if (typeof onSectionChange === 'function') {
+      onSectionChange(sectionId);
     }
   } catch (error) {
     console.error('showSection error:', error);
@@ -816,7 +822,6 @@ function showTab(tabId, event) {
 // ==========================================
 
 function showModal(modalId) {
-  alert('showModal called: ' + modalId);
   try {
     var modal = document.getElementById(modalId);
     if (modal) {
