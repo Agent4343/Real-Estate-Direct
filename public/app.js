@@ -793,6 +793,12 @@ function showSection(sectionId) {
     if (sectionId === 'dashboard' && authToken) {
       loadDashboard();
     }
+    if (sectionId === 'professionals') {
+      initProfessionalsPage();
+    }
+    if (sectionId === 'showings' && authToken) {
+      initShowingsPage();
+    }
 
     // Call the section change callback if defined (in app-features.js)
     if (typeof onSectionChange === 'function') {
@@ -947,6 +953,7 @@ function updateAuthUI() {
   var authButtons = document.getElementById('authButtons');
   var userInfo = document.getElementById('userInfo');
   var dashboardLink = document.getElementById('dashboardLink');
+  var showingsLink = document.getElementById('showingsLink');
   var sellFormContainer = document.getElementById('sellFormContainer');
   var sellForm = document.getElementById('sellForm');
 
@@ -965,6 +972,7 @@ function updateAuthUI() {
     var userName = document.getElementById('userName');
     if (userName) userName.textContent = currentUser.name || currentUser.email;
     if (dashboardLink) dashboardLink.style.display = 'block';
+    if (showingsLink) showingsLink.style.display = 'block';
 
     // Show gated content
     if (checklistLoginPrompt) checklistLoginPrompt.style.display = 'none';
@@ -982,6 +990,7 @@ function updateAuthUI() {
     if (authButtons) authButtons.style.display = 'flex';
     if (userInfo) userInfo.style.display = 'none';
     if (dashboardLink) dashboardLink.style.display = 'none';
+    if (showingsLink) showingsLink.style.display = 'none';
 
     // Hide gated content, show login prompts
     if (checklistLoginPrompt) checklistLoginPrompt.style.display = 'block';
@@ -1724,14 +1733,16 @@ async function loadDashboard() {
         const safeId = escapeHtml(p._id);
         const safeStatus = escapeHtml(p.status);
         return `
-          <div class="dashboard-item">
-            <div>
+          <div class="dashboard-item property-item">
+            <div class="property-item-info">
               <strong>${escapeHtml(p.address?.street)}, ${escapeHtml(p.address?.city)}</strong>
               <br><small>${formatCurrency(p.askingPrice)} - ${escapeHtml(p.propertyType)}</small>
             </div>
-            <div>
+            <div class="property-item-actions">
               <span class="status-badge status-${safeStatus}">${safeStatus}</span>
               ${p.status === 'draft' ? `<button class="btn btn-sm btn-primary" onclick="activateListing('${safeId}')">Activate</button>` : ''}
+              <button class="btn btn-sm btn-outline" onclick="editProperty('${safeId}')" title="Edit">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="confirmDeleteProperty('${safeId}')" title="Delete">Delete</button>
             </div>
           </div>
         `;
@@ -1831,6 +1842,155 @@ async function activateListing(propertyId) {
 }
 
 // ==========================================
+// Edit Property Functions
+// ==========================================
+
+async function editProperty(propertyId) {
+  try {
+    // Fetch the property data
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to load property');
+    }
+
+    const property = await response.json();
+
+    // Populate the edit form
+    document.getElementById('editPropertyId').value = property._id;
+    document.getElementById('editStreet').value = property.address?.street || '';
+    document.getElementById('editUnit').value = property.address?.unit || '';
+    document.getElementById('editCity').value = property.address?.city || '';
+    document.getElementById('editProvince').value = property.address?.province || property.province || '';
+    document.getElementById('editPostalCode').value = property.address?.postalCode || '';
+    document.getElementById('editAskingPrice').value = property.askingPrice || '';
+    document.getElementById('editPropertyType').value = property.propertyType || '';
+    document.getElementById('editBedrooms').value = property.bedrooms || '';
+    document.getElementById('editBathrooms').value = property.bathrooms || '';
+    document.getElementById('editSquareFeet').value = property.squareFeet || '';
+    document.getElementById('editYearBuilt').value = property.yearBuilt || '';
+    document.getElementById('editDescription').value = property.description || '';
+    document.getElementById('editLegalDescription').value = property.legalDescription || '';
+    document.getElementById('editStatus').value = property.status || 'draft';
+    document.getElementById('editParkingSpaces').value = property.parkingSpaces || '';
+
+    // Show the modal
+    showModal('editPropertyModal');
+  } catch (error) {
+    showToast('Failed to load property: ' + error.message, 'error');
+  }
+}
+
+async function savePropertyEdit(event) {
+  event.preventDefault();
+
+  const propertyId = document.getElementById('editPropertyId').value;
+
+  const propertyData = {
+    address: {
+      street: document.getElementById('editStreet').value,
+      unit: document.getElementById('editUnit').value,
+      city: document.getElementById('editCity').value,
+      province: document.getElementById('editProvince').value,
+      postalCode: document.getElementById('editPostalCode').value
+    },
+    province: document.getElementById('editProvince').value,
+    askingPrice: parseFloat(document.getElementById('editAskingPrice').value),
+    propertyType: document.getElementById('editPropertyType').value,
+    bedrooms: parseInt(document.getElementById('editBedrooms').value) || 0,
+    bathrooms: parseFloat(document.getElementById('editBathrooms').value) || 0,
+    squareFeet: parseFloat(document.getElementById('editSquareFeet').value) || 0,
+    yearBuilt: parseInt(document.getElementById('editYearBuilt').value) || null,
+    description: document.getElementById('editDescription').value,
+    legalDescription: document.getElementById('editLegalDescription').value,
+    status: document.getElementById('editStatus').value,
+    parkingSpaces: parseInt(document.getElementById('editParkingSpaces').value) || 0
+  };
+
+  try {
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify(propertyData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeModal('editPropertyModal');
+      showToast('Property updated successfully!', 'success');
+      loadDashboard(); // Refresh the property list
+    } else {
+      showToast(data.error || 'Failed to update property', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to update property: ' + error.message, 'error');
+  }
+}
+
+// ==========================================
+// Delete Property Functions
+// ==========================================
+
+async function confirmDeleteProperty(propertyId) {
+  try {
+    // Fetch the property to show its address in the confirmation
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    if (response.ok) {
+      const property = await response.json();
+      const address = property.address
+        ? `${property.address.street}, ${property.address.city}`
+        : 'This property';
+      document.getElementById('deletePropertyAddress').textContent = address;
+    }
+
+    document.getElementById('deletePropertyId').value = propertyId;
+    showModal('deletePropertyModal');
+  } catch (error) {
+    // Still show the modal even if we can't fetch the address
+    document.getElementById('deletePropertyAddress').textContent = 'This property';
+    document.getElementById('deletePropertyId').value = propertyId;
+    showModal('deletePropertyModal');
+  }
+}
+
+async function deleteProperty() {
+  const propertyId = document.getElementById('deletePropertyId').value;
+
+  if (!propertyId) {
+    showToast('No property selected', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeModal('deletePropertyModal');
+      showToast('Property deleted successfully', 'success');
+      loadDashboard(); // Refresh the property list
+    } else {
+      showToast(data.error || 'Failed to delete property', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to delete property: ' + error.message, 'error');
+  }
+}
+
+// ==========================================
 // FAQ Page Functions
 // ==========================================
 
@@ -1867,4 +2027,593 @@ function toggleFaq(element) {
   
   // Toggle current item
   faqItem.classList.toggle('open');
+}
+
+// ==========================================
+// Professional Directory Functions
+// ==========================================
+
+var proSearchTimeout = null;
+var currentProPage = 1;
+
+function debounceProSearch() {
+  if (proSearchTimeout) clearTimeout(proSearchTimeout);
+  proSearchTimeout = setTimeout(searchProfessionals, 300);
+}
+
+async function searchProfessionals(page) {
+  page = page || 1;
+  currentProPage = page;
+
+  var category = document.getElementById('proCategory') ? document.getElementById('proCategory').value : '';
+  var province = document.getElementById('proProvince') ? document.getElementById('proProvince').value : '';
+  var city = document.getElementById('proCity') ? document.getElementById('proCity').value : '';
+  var minRating = document.getElementById('proRating') ? document.getElementById('proRating').value : '';
+
+  var params = new URLSearchParams();
+  if (category) params.append('category', category);
+  if (province) params.append('province', province);
+  if (city) params.append('city', city);
+  if (minRating) params.append('minRating', minRating);
+  params.append('page', page);
+  params.append('limit', 12);
+
+  var grid = document.getElementById('proGrid');
+  if (!grid) return;
+  grid.innerHTML = '<p class="loading">Searching...</p>';
+
+  try {
+    var response = await fetch(API_BASE + '/professionals/search?' + params);
+    var data = await response.json();
+
+    var countEl = document.getElementById('proResultCount');
+    if (countEl) {
+      countEl.textContent = (data.pagination && data.pagination.total ? data.pagination.total : 0) + ' professionals found';
+    }
+
+    if (data.professionals && data.professionals.length > 0) {
+      grid.innerHTML = data.professionals.map(function(pro) { return renderProCard(pro); }).join('');
+      renderProPagination(data.pagination);
+    } else {
+      grid.innerHTML = '<p class="empty-state">No professionals found. Try adjusting your filters.</p>';
+      var pagEl = document.getElementById('proPagination');
+      if (pagEl) pagEl.innerHTML = '';
+    }
+  } catch (error) {
+    console.error('Error searching professionals:', error);
+    grid.innerHTML = '<p class="error">Failed to load professionals. Please try again.</p>';
+  }
+}
+
+function renderProCard(pro) {
+  var avg = pro.rating && pro.rating.average ? pro.rating.average : 0;
+  var count = pro.rating && pro.rating.count ? pro.rating.count : 0;
+  var fullStars = Math.floor(avg);
+  var stars = '';
+  for (var i = 0; i < fullStars; i++) stars += '★';
+  for (var i = fullStars; i < 5; i++) stars += '☆';
+
+  var categoryNames = {
+    'lawyer': 'Real Estate Lawyer',
+    'notary': 'Notary',
+    'inspector': 'Home Inspector',
+    'appraiser': 'Property Appraiser',
+    'mortgage_broker': 'Mortgage Broker',
+    'photographer': 'Photographer',
+    'stager': 'Home Stager',
+    'mover': 'Moving Company',
+    'cleaner': 'Cleaning Service',
+    'contractor': 'General Contractor',
+    'surveyor': 'Land Surveyor',
+    'insurance': 'Insurance Agent'
+  };
+
+  var city = pro.location && pro.location.city ? pro.location.city : '';
+  var prov = pro.location && pro.location.province ? pro.location.province : '';
+
+  return '<div class="pro-card" onclick="viewProfessional(\'' + escapeHtml(pro._id) + '\')">' +
+    '<div class="pro-card-header">' +
+      '<div class="pro-logo">' +
+        (pro.logo ? '<img src="' + sanitizeUrl(pro.logo) + '" alt="' + escapeHtml(pro.name) + '">' : '🏢') +
+      '</div>' +
+      '<div class="pro-info">' +
+        '<div class="pro-name">' + escapeHtml(pro.name) + '</div>' +
+        '<div class="pro-category">' + escapeHtml(categoryNames[pro.category] || pro.category) + '</div>' +
+        '<div class="pro-badges">' +
+          (pro.verified ? '<span class="pro-badge verified">✓ Verified</span>' : '') +
+          (pro.isPartner ? '<span class="pro-badge partner">Partner</span>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="pro-card-body">' +
+      '<div class="pro-rating">' +
+        '<span class="pro-stars">' + stars + '</span>' +
+        '<span class="pro-rating-text">' + avg.toFixed(1) + ' (' + count + ' reviews)</span>' +
+      '</div>' +
+      '<div class="pro-location">📍 ' + escapeHtml(city) + ', ' + escapeHtml(prov) + '</div>' +
+      (pro.referralDiscount ? '<div class="pro-discount">🎁 ' + escapeHtml(pro.referralDiscount) + '</div>' : '') +
+    '</div>' +
+  '</div>';
+}
+
+function renderProPagination(pagination) {
+  var pagEl = document.getElementById('proPagination');
+  if (!pagEl) return;
+
+  if (!pagination || pagination.pages <= 1) {
+    pagEl.innerHTML = '';
+    return;
+  }
+
+  var html = '';
+  html += '<button onclick="searchProfessionals(' + (pagination.page - 1) + ')" ' + (pagination.page <= 1 ? 'disabled' : '') + '>« Prev</button>';
+
+  for (var i = 1; i <= pagination.pages; i++) {
+    if (i === 1 || i === pagination.pages || (i >= pagination.page - 2 && i <= pagination.page + 2)) {
+      html += '<button onclick="searchProfessionals(' + i + ')" class="' + (i === pagination.page ? 'active' : '') + '">' + i + '</button>';
+    } else if (i === pagination.page - 3 || i === pagination.page + 3) {
+      html += '<button disabled>...</button>';
+    }
+  }
+
+  html += '<button onclick="searchProfessionals(' + (pagination.page + 1) + ')" ' + (pagination.page >= pagination.pages ? 'disabled' : '') + '>Next »</button>';
+
+  pagEl.innerHTML = html;
+}
+
+async function loadFeaturedProfessionals() {
+  try {
+    var response = await fetch(API_BASE + '/professionals/featured?limit=6');
+    var professionals = await response.json();
+
+    var grid = document.getElementById('proFeaturedGrid');
+    var featured = document.getElementById('proFeatured');
+    if (professionals && professionals.length > 0) {
+      grid.innerHTML = professionals.map(function(pro) { return renderProCard(pro); }).join('');
+    } else if (featured) {
+      featured.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Error loading featured professionals:', error);
+    var featured = document.getElementById('proFeatured');
+    if (featured) featured.style.display = 'none';
+  }
+}
+
+async function viewProfessional(proId) {
+  try {
+    var response = await fetch(API_BASE + '/professionals/' + proId);
+    var pro = await response.json();
+
+    var categoryNames = {
+      'lawyer': 'Real Estate Lawyer',
+      'notary': 'Notary',
+      'inspector': 'Home Inspector',
+      'appraiser': 'Property Appraiser',
+      'mortgage_broker': 'Mortgage Broker',
+      'photographer': 'Photographer',
+      'stager': 'Home Stager',
+      'mover': 'Moving Company',
+      'cleaner': 'Cleaning Service',
+      'contractor': 'General Contractor',
+      'surveyor': 'Land Surveyor',
+      'insurance': 'Insurance Agent'
+    };
+
+    var avg = pro.rating && pro.rating.average ? pro.rating.average : 0;
+    var count = pro.rating && pro.rating.count ? pro.rating.count : 0;
+    var fullStars = Math.floor(avg);
+    var stars = '';
+    for (var i = 0; i < fullStars; i++) stars += '★';
+    for (var i = fullStars; i < 5; i++) stars += '☆';
+
+    var city = pro.location && pro.location.city ? pro.location.city : '';
+    var prov = pro.location && pro.location.province ? pro.location.province : '';
+    var phone = pro.contact && pro.contact.phone ? pro.contact.phone : '';
+    var email = pro.contact && pro.contact.email ? pro.contact.email : '';
+    var website = pro.contact && pro.contact.website ? pro.contact.website : '';
+
+    var content = document.getElementById('proDetailContent');
+    var html = '<div class="pro-detail-header">' +
+      '<div class="pro-detail-logo">' +
+        (pro.logo ? '<img src="' + sanitizeUrl(pro.logo) + '" alt="' + escapeHtml(pro.name) + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);">' : '🏢') +
+      '</div>' +
+      '<div class="pro-detail-info">' +
+        '<h2>' + escapeHtml(pro.name) + '</h2>' +
+        (pro.companyName ? '<p style="color:var(--gray-600);">' + escapeHtml(pro.companyName) + '</p>' : '') +
+        '<div class="pro-detail-meta">' +
+          '<span>' + escapeHtml(categoryNames[pro.category] || pro.category) + '</span>' +
+          '<span>📍 ' + escapeHtml(city) + ', ' + escapeHtml(prov) + '</span>' +
+          '<span class="pro-stars">' + stars + ' (' + count + ' reviews)</span>' +
+        '</div>' +
+        '<div class="pro-badges">' +
+          (pro.verified ? '<span class="pro-badge verified">✓ Verified</span>' : '') +
+          (pro.isPartner ? '<span class="pro-badge partner">Platform Partner</span>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    if (pro.description) {
+      html += '<div class="pro-detail-section"><h3>About</h3><p>' + escapeHtml(pro.description) + '</p></div>';
+    }
+
+    if (pro.referralDiscount) {
+      html += '<div class="pro-discount" style="margin-bottom:1.5rem;">🎁 Special Offer: ' + escapeHtml(pro.referralDiscount) + '</div>';
+    }
+
+    html += '<div class="pro-detail-section"><h3>Contact</h3><div class="pro-contact-grid">';
+    if (phone) {
+      html += '<div class="pro-contact-item" onclick="trackProContact(\'' + pro._id + '\')">' +
+        '<span class="pro-contact-icon">📞</span>' +
+        '<div><div class="pro-contact-label">Phone</div><div class="pro-contact-value"><a href="tel:' + escapeHtml(phone) + '">' + escapeHtml(phone) + '</a></div></div>' +
+      '</div>';
+    }
+    if (email) {
+      html += '<div class="pro-contact-item" onclick="trackProContact(\'' + pro._id + '\')">' +
+        '<span class="pro-contact-icon">✉️</span>' +
+        '<div><div class="pro-contact-label">Email</div><div class="pro-contact-value"><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a></div></div>' +
+      '</div>';
+    }
+    if (website) {
+      html += '<div class="pro-contact-item" onclick="trackProContact(\'' + pro._id + '\')">' +
+        '<span class="pro-contact-icon">🌐</span>' +
+        '<div><div class="pro-contact-label">Website</div><div class="pro-contact-value"><a href="' + sanitizeUrl(website) + '" target="_blank">Visit Website</a></div></div>' +
+      '</div>';
+    }
+    html += '</div></div>';
+
+    content.innerHTML = html;
+    showModal('proDetailModal');
+  } catch (error) {
+    showToast('Failed to load professional details', 'error');
+  }
+}
+
+async function trackProContact(proId) {
+  try {
+    await fetch(API_BASE + '/professionals/' + proId + '/contact-click', { method: 'POST' });
+  } catch (e) {
+    // Silently fail
+  }
+}
+
+async function submitProfessionalSuggestion(event) {
+  event.preventDefault();
+
+  if (!authToken) {
+    showToast('Please login to suggest a professional', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  var data = {
+    name: document.getElementById('suggestName').value,
+    companyName: document.getElementById('suggestCompany').value,
+    category: document.getElementById('suggestCategory').value,
+    location: {
+      city: document.getElementById('suggestCity').value,
+      province: document.getElementById('suggestProvince').value
+    },
+    contact: {
+      phone: document.getElementById('suggestPhone').value,
+      email: document.getElementById('suggestEmail').value,
+      website: document.getElementById('suggestWebsite').value
+    },
+    description: document.getElementById('suggestReason').value
+  };
+
+  try {
+    var response = await fetch(API_BASE + '/professionals/suggest', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify(data)
+    });
+
+    var result = await response.json();
+
+    if (response.ok) {
+      closeModal('suggestProModal');
+      showToast('Thank you! Your suggestion has been submitted for review.', 'success');
+      event.target.reset();
+    } else {
+      showToast(result.error || 'Failed to submit suggestion', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to submit suggestion: ' + error.message, 'error');
+  }
+}
+
+// ==========================================
+// Showings Functions
+// ==========================================
+
+function showShowingsTab(tab) {
+  document.querySelectorAll('.showings-tabs .tab-btn').forEach(function(btn) { btn.classList.remove('active'); });
+  event.target.classList.add('active');
+
+  if (tab === 'requests') {
+    document.getElementById('showingRequestsTab').style.display = 'block';
+    document.getElementById('scheduledShowingsTab').style.display = 'none';
+    loadShowingRequests();
+  } else {
+    document.getElementById('showingRequestsTab').style.display = 'none';
+    document.getElementById('scheduledShowingsTab').style.display = 'block';
+    loadMyShowings();
+  }
+}
+
+async function loadShowingRequests() {
+  if (!authToken) return;
+
+  var list = document.getElementById('showingRequestsList');
+  if (!list) return;
+  list.innerHTML = '<p class="loading">Loading...</p>';
+
+  try {
+    var response = await fetch(API_BASE + '/showings/my-properties', {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+    var showings = await response.json();
+
+    if (showings && showings.length > 0) {
+      list.innerHTML = showings.map(function(s) { return renderShowingCard(s, 'seller'); }).join('');
+    } else {
+      list.innerHTML = '<p class="empty-state">No showing requests yet.</p>';
+    }
+  } catch (error) {
+    list.innerHTML = '<p class="error">Failed to load showing requests.</p>';
+  }
+}
+
+async function loadMyShowings() {
+  if (!authToken) return;
+
+  var list = document.getElementById('scheduledShowingsList');
+  if (!list) return;
+  list.innerHTML = '<p class="loading">Loading...</p>';
+
+  try {
+    var response = await fetch(API_BASE + '/showings/my-requests', {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+    var showings = await response.json();
+
+    if (showings && showings.length > 0) {
+      list.innerHTML = showings.map(function(s) { return renderShowingCard(s, 'buyer'); }).join('');
+    } else {
+      list.innerHTML = '<p class="empty-state">You have not requested any showings yet. <a href="javascript:void(0)" onclick="showSection(\'search\')">Browse properties</a> to schedule viewings.</p>';
+    }
+  } catch (error) {
+    list.innerHTML = '<p class="error">Failed to load your showings.</p>';
+  }
+}
+
+function renderShowingCard(showing, role) {
+  var dateObj = new Date(showing.requestedDate);
+  var date = dateObj.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
+
+  var address = showing.property && showing.property.address
+    ? showing.property.address.street + ', ' + showing.property.address.city
+    : 'Property';
+
+  var timeStart = showing.timeSlot && showing.timeSlot.start ? showing.timeSlot.start : '';
+  var timeEnd = showing.timeSlot && showing.timeSlot.end ? showing.timeSlot.end : '';
+  var buyerName = showing.buyer && showing.buyer.name ? showing.buyer.name : '';
+
+  var actions = '';
+  if (role === 'seller' && showing.status === 'pending') {
+    actions = '<button class="btn btn-sm btn-primary" onclick="openRespondModal(\'' + showing._id + '\', \'' + escapeHtml(address) + '\', \'' + date + '\', \'' + timeStart + '\')">Respond</button>';
+  } else if (role === 'buyer' && (showing.status === 'pending' || showing.status === 'approved')) {
+    actions = '<button class="btn btn-sm btn-outline" onclick="cancelShowing(\'' + showing._id + '\')">Cancel</button>';
+  }
+
+  return '<div class="showing-card">' +
+    '<div class="showing-info">' +
+      '<h4>' + escapeHtml(address) + '</h4>' +
+      '<div class="showing-meta">' +
+        '<span>📅 ' + date + '</span>' +
+        '<span>🕐 ' + timeStart + ' - ' + timeEnd + '</span>' +
+        (role === 'seller' && buyerName ? '<span>👤 ' + escapeHtml(buyerName) + '</span>' : '') +
+      '</div>' +
+      (showing.buyerMessage ? '<p style="margin-top:0.5rem;color:var(--gray-600);font-size:0.875rem;">"' + escapeHtml(showing.buyerMessage) + '"</p>' : '') +
+    '</div>' +
+    '<div class="showing-actions">' +
+      '<span class="showing-status ' + showing.status + '">' + showing.status + '</span>' +
+      actions +
+    '</div>' +
+  '</div>';
+}
+
+function openScheduleShowing(propertyId, address) {
+  if (!authToken) {
+    showToast('Please login to schedule a showing', 'info');
+    showModal('loginModal');
+    return;
+  }
+
+  document.getElementById('showingPropertyId').value = propertyId;
+  document.getElementById('showingPropertyAddress').textContent = address;
+  document.getElementById('showingTimeSlots').innerHTML = '<p class="hint">Select a date to see available times</p>';
+  document.getElementById('showingTimeStart').value = '';
+  document.getElementById('showingTimeEnd').value = '';
+
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('showingDate').min = tomorrow.toISOString().split('T')[0];
+  document.getElementById('showingDate').value = '';
+
+  showModal('scheduleShowingModal');
+}
+
+async function loadAvailableSlots() {
+  var propertyId = document.getElementById('showingPropertyId').value;
+  var date = document.getElementById('showingDate').value;
+
+  if (!propertyId || !date) return;
+
+  var slotsContainer = document.getElementById('showingTimeSlots');
+  slotsContainer.innerHTML = '<p class="loading">Loading available times...</p>';
+
+  try {
+    var response = await fetch(API_BASE + '/showings/available-slots/' + propertyId + '/' + date);
+    var data = await response.json();
+
+    if (data.availableSlots && data.availableSlots.length > 0) {
+      slotsContainer.innerHTML = data.availableSlots.map(function(slot) {
+        return '<div class="time-slot" onclick="selectTimeSlot(this, \'' + slot.start + '\', \'' + slot.end + '\')">' + slot.start + '</div>';
+      }).join('');
+    } else {
+      slotsContainer.innerHTML = '<p class="hint">No available times for this date. Please select another date.</p>';
+    }
+  } catch (error) {
+    slotsContainer.innerHTML = '<p class="error">Failed to load available times.</p>';
+  }
+}
+
+function selectTimeSlot(element, start, end) {
+  document.querySelectorAll('.time-slot').forEach(function(s) { s.classList.remove('selected'); });
+  element.classList.add('selected');
+  document.getElementById('showingTimeStart').value = start;
+  document.getElementById('showingTimeEnd').value = end;
+}
+
+async function submitShowingRequest(event) {
+  event.preventDefault();
+
+  var propertyId = document.getElementById('showingPropertyId').value;
+  var date = document.getElementById('showingDate').value;
+  var start = document.getElementById('showingTimeStart').value;
+  var end = document.getElementById('showingTimeEnd').value;
+  var phone = document.getElementById('showingPhone').value;
+  var message = document.getElementById('showingMessage').value;
+
+  if (!start || !end) {
+    showToast('Please select a time slot', 'error');
+    return;
+  }
+
+  try {
+    var response = await fetch(API_BASE + '/showings/request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify({
+        propertyId: propertyId,
+        requestedDate: date,
+        timeSlot: { start: start, end: end },
+        buyerPhone: phone,
+        buyerMessage: message
+      })
+    });
+
+    var data = await response.json();
+
+    if (response.ok) {
+      closeModal('scheduleShowingModal');
+      showToast('Showing request submitted! The seller will respond soon.', 'success');
+    } else {
+      showToast(data.error || 'Failed to submit request', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to submit request: ' + error.message, 'error');
+  }
+}
+
+function openRespondModal(showingId, address, date, time) {
+  document.getElementById('respondShowingId').value = showingId;
+  document.getElementById('showingDetails').innerHTML = '<p><strong>Property:</strong> ' + escapeHtml(address) + '</p><p><strong>Requested:</strong> ' + date + ' at ' + time + '</p>';
+  showModal('respondShowingModal');
+}
+
+async function approveShowing() {
+  var showingId = document.getElementById('respondShowingId').value;
+  var message = document.getElementById('showingResponseMessage').value;
+
+  try {
+    var response = await fetch(API_BASE + '/showings/' + showingId + '/approve', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify({ message: message })
+    });
+
+    if (response.ok) {
+      closeModal('respondShowingModal');
+      showToast('Showing approved! The buyer has been notified.', 'success');
+      loadShowingRequests();
+    } else {
+      var data = await response.json();
+      showToast(data.error || 'Failed to approve showing', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to approve showing: ' + error.message, 'error');
+  }
+}
+
+async function rejectShowing() {
+  var showingId = document.getElementById('respondShowingId').value;
+  var message = document.getElementById('showingResponseMessage').value;
+
+  try {
+    var response = await fetch(API_BASE + '/showings/' + showingId + '/reject', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify({ message: message })
+    });
+
+    if (response.ok) {
+      closeModal('respondShowingModal');
+      showToast('Showing declined.', 'info');
+      loadShowingRequests();
+    } else {
+      var data = await response.json();
+      showToast(data.error || 'Failed to decline showing', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to decline showing: ' + error.message, 'error');
+  }
+}
+
+async function cancelShowing(showingId) {
+  if (!confirm('Are you sure you want to cancel this showing?')) return;
+
+  try {
+    var response = await fetch(API_BASE + '/showings/' + showingId + '/cancel', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify({ reason: 'Cancelled by user' })
+    });
+
+    if (response.ok) {
+      showToast('Showing cancelled.', 'info');
+      loadMyShowings();
+    } else {
+      var data = await response.json();
+      showToast(data.error || 'Failed to cancel showing', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to cancel showing: ' + error.message, 'error');
+  }
+}
+
+function initProfessionalsPage() {
+  loadFeaturedProfessionals();
+  searchProfessionals();
+}
+
+function initShowingsPage() {
+  loadShowingRequests();
 }
