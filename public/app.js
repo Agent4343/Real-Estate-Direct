@@ -816,6 +816,7 @@ function showTab(tabId, event) {
 // ==========================================
 
 function showModal(modalId) {
+  alert('showModal called: ' + modalId);
   try {
     var modal = document.getElementById(modalId);
     if (modal) {
