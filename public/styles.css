@@ -3842,3 +3842,88 @@ footer {
     white-space: nowrap;
   }
 }
+
+/* ==========================================
+   Map Integration Styles
+   ========================================== */
+
+.view-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: flex-end;
+}
+
+.view-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.view-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.property-map {
+  height: 600px;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+/* Leaflet popup styling */
+.map-popup {
+  padding: 0.5rem;
+}
+
+.map-popup h4 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--gray-800);
+}
+
+.popup-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.popup-details {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  margin: 0 0 0.75rem 0;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius) !important;
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem 1rem !important;
+}
+
+@media (max-width: 768px) {
+  .property-map {
+    height: 400px;
+  }
+
+  .view-toggle {
+    justify-content: center;
+  }
+}

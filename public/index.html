@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Leaflet Maps CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 </head>
 <body>
   <header>
@@ -204,11 +206,24 @@
           <button onclick="clearFilters()" class="btn btn-outline">Clear</button>
         </div>
       </div>
-      <div class="property-grid" id="propertyGrid">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading properties...</p>
+      <div class="view-toggle">
+        <button class="view-btn active" id="gridViewBtn" onclick="setSearchView('grid')">
+          <span>📋</span> Grid
+        </button>
+        <button class="view-btn" id="mapViewBtn" onclick="setSearchView('map')">
+          <span>🗺️</span> Map
+        </button>
+      </div>
+      <div id="searchGridView">
+        <div class="property-grid" id="propertyGrid">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading properties...</p>
+          </div>
         </div>
+      </div>
+      <div id="searchMapView" style="display:none;">
+        <div id="propertyMap" class="property-map"></div>
       </div>
     </section>
 
@@ -2116,6 +2131,8 @@
     </div>
   </footer>
 
+  <!-- Leaflet Maps JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="app.js"></script>
   <script src="app-features.js"></script>
 </body>

@@ -1159,3 +1159,229 @@ setInterval(function() {
     loadNotifications();
   }
 }, 30000);
+
+// ==========================================
+// Map Integration Functions
+// ==========================================
+
+var propertyMap = null;
+var mapMarkers = [];
+var currentSearchView = 'grid';
+
+// Canadian city coordinates for demo/fallback
+var canadianCities = {
+  'Toronto': [43.6532, -79.3832],
+  'Vancouver': [49.2827, -123.1207],
+  'Montreal': [45.5017, -73.5673],
+  'Calgary': [51.0447, -114.0719],
+  'Edmonton': [53.5461, -113.4938],
+  'Ottawa': [45.4215, -75.6972],
+  'Winnipeg': [49.8951, -97.1384],
+  'Quebec City': [46.8139, -71.2080],
+  'Hamilton': [43.2557, -79.8711],
+  'Victoria': [48.4284, -123.3656],
+  'Halifax': [44.6488, -63.5752],
+  'Regina': [50.4452, -104.6189],
+  'Saskatoon': [52.1332, -106.6700],
+  'St. John\'s': [47.5615, -52.7126],
+  'Mississauga': [43.5890, -79.6441],
+  'Brampton': [43.7315, -79.7624],
+  'Markham': [43.8561, -79.3370],
+  'Surrey': [49.1913, -122.8490],
+  'Burnaby': [49.2488, -122.9805],
+  'Richmond': [49.1666, -123.1336]
+};
+
+function setSearchView(view) {
+  currentSearchView = view;
+
+  var gridBtn = document.getElementById('gridViewBtn');
+  var mapBtn = document.getElementById('mapViewBtn');
+  var gridView = document.getElementById('searchGridView');
+  var mapView = document.getElementById('searchMapView');
+
+  if (view === 'grid') {
+    gridBtn.classList.add('active');
+    mapBtn.classList.remove('active');
+    gridView.style.display = 'block';
+    mapView.style.display = 'none';
+  } else {
+    gridBtn.classList.remove('active');
+    mapBtn.classList.add('active');
+    gridView.style.display = 'none';
+    mapView.style.display = 'block';
+    initializeMap();
+  }
+}
+
+function initializeMap() {
+  if (propertyMap) {
+    propertyMap.invalidateSize();
+    return;
+  }
+
+  // Check if Leaflet is loaded
+  if (typeof L === 'undefined') {
+    console.warn('Leaflet not loaded yet');
+    setTimeout(initializeMap, 500);
+    return;
+  }
+
+  // Initialize map centered on Canada
+  propertyMap = L.map('propertyMap').setView([56.1304, -106.3468], 4);
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(propertyMap);
+
+  // Load properties on map
+  loadPropertiesOnMap();
+}
+
+async function loadPropertiesOnMap() {
+  if (!propertyMap) return;
+
+  // Clear existing markers
+  mapMarkers.forEach(function(marker) {
+    propertyMap.removeLayer(marker);
+  });
+  mapMarkers = [];
+
+  try {
+    var response = await fetch(API_BASE + '/properties');
+    var properties = [];
+
+    if (response.ok) {
+      properties = await response.json();
+    } else {
+      // Use demo properties
+      properties = getDemoMapProperties();
+    }
+
+    addPropertiesToMap(properties);
+  } catch (err) {
+    console.error('Failed to load properties for map:', err);
+    addPropertiesToMap(getDemoMapProperties());
+  }
+}
+
+function getDemoMapProperties() {
+  var cities = Object.keys(canadianCities);
+  return cities.slice(0, 10).map(function(city, index) {
+    var coords = canadianCities[city];
+    return {
+      _id: 'demo-' + index,
+      address: {
+        street: (100 + index * 10) + ' ' + city + ' Street',
+        city: city,
+        province: getProvinceForCity(city)
+      },
+      askingPrice: 400000 + (index * 50000),
+      bedrooms: 2 + (index % 3),
+      bathrooms: 1 + (index % 2),
+      squareFeet: 1000 + (index * 200),
+      propertyType: ['detached', 'condo', 'townhouse'][index % 3],
+      coordinates: { lat: coords[0], lng: coords[1] }
+    };
+  });
+}
+
+function getProvinceForCity(city) {
+  var provinceMap = {
+    'Toronto': 'ON', 'Mississauga': 'ON', 'Brampton': 'ON', 'Markham': 'ON', 'Hamilton': 'ON', 'Ottawa': 'ON',
+    'Vancouver': 'BC', 'Victoria': 'BC', 'Surrey': 'BC', 'Burnaby': 'BC', 'Richmond': 'BC',
+    'Montreal': 'QC', 'Quebec City': 'QC',
+    'Calgary': 'AB', 'Edmonton': 'AB',
+    'Winnipeg': 'MB',
+    'Regina': 'SK', 'Saskatoon': 'SK',
+    'Halifax': 'NS',
+    'St. John\'s': 'NL'
+  };
+  return provinceMap[city] || 'ON';
+}
+
+function addPropertiesToMap(properties) {
+  if (!propertyMap || !properties) return;
+
+  var bounds = [];
+
+  properties.forEach(function(property) {
+    var coords = getPropertyCoordinates(property);
+    if (!coords) return;
+
+    var marker = L.marker([coords.lat, coords.lng]);
+
+    var popupContent = createMapPopup(property);
+    marker.bindPopup(popupContent, { maxWidth: 300 });
+
+    marker.addTo(propertyMap);
+    mapMarkers.push(marker);
+    bounds.push([coords.lat, coords.lng]);
+  });
+
+  // Fit map to show all markers
+  if (bounds.length > 0) {
+    propertyMap.fitBounds(bounds, { padding: [50, 50] });
+  }
+}
+
+function getPropertyCoordinates(property) {
+  // If property has coordinates, use them
+  if (property.coordinates && property.coordinates.lat && property.coordinates.lng) {
+    return property.coordinates;
+  }
+
+  // Otherwise try to get from city name
+  var city = property.address && property.address.city;
+  if (city && canadianCities[city]) {
+    var coords = canadianCities[city];
+    // Add some randomness so properties in same city don't overlap
+    return {
+      lat: coords[0] + (Math.random() - 0.5) * 0.05,
+      lng: coords[1] + (Math.random() - 0.5) * 0.05
+    };
+  }
+
+  return null;
+}
+
+function createMapPopup(property) {
+  var address = property.address ?
+    property.address.street + ', ' + property.address.city :
+    'Property';
+  var price = property.askingPrice ?
+    '$' + property.askingPrice.toLocaleString() :
+    'Price TBD';
+  var beds = property.bedrooms || '-';
+  var baths = property.bathrooms || '-';
+  var sqft = property.squareFeet ?
+    property.squareFeet.toLocaleString() + ' sqft' :
+    '-';
+
+  return '<div class="map-popup">' +
+    '<h4>' + address + '</h4>' +
+    '<p class="popup-price">' + price + '</p>' +
+    '<p class="popup-details">' + beds + ' bed | ' + baths + ' bath | ' + sqft + '</p>' +
+    '<button class="btn btn-primary btn-sm" onclick="viewPropertyFromMap(\'' + property._id + '\')">View Details</button>' +
+    '</div>';
+}
+
+function viewPropertyFromMap(propertyId) {
+  if (typeof viewProperty === 'function') {
+    viewProperty(propertyId);
+  } else {
+    showToast('Property details not available', 'info');
+  }
+}
+
+// Update map when search is performed
+var originalSearchProperties = window.searchProperties;
+if (originalSearchProperties) {
+  window.searchProperties = async function() {
+    await originalSearchProperties();
+    if (currentSearchView === 'map') {
+      loadPropertiesOnMap();
+    }
+  };
+}
