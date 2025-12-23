@@ -24,6 +24,10 @@
         <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
         <a href="#" onclick="showSection('calculator')">Calculator</a>
         <a href="#" onclick="showSection('dashboard')" id="dashboardLink" style="display:none;">Dashboard</a>
+        <a href="#" onclick="showSection('messages')" id="messagesLink" style="display:none;">Messages</a>
+        <a href="#" onclick="showSection('transactions')" id="transactionsLink" style="display:none;">Transactions</a>
+        <a href="#" onclick="showSection('profile')" id="profileLink" style="display:none;">Profile</a>
+        <a href="#" onclick="showSection('admin')" id="adminLink" style="display:none;">Admin</a>
       </div>
       <div class="auth-buttons" id="authButtons">
         <button onclick="showModal('loginModal')" class="btn btn-outline">Login</button>
@@ -1327,6 +1331,285 @@
     </div>
   </section>
 
+  <!-- Admin Dashboard Section -->
+  <section id="admin" class="section">
+    <div class="admin-container">
+      <h1>Admin Dashboard</h1>
+      <p class="admin-subtitle">Platform earnings and management</p>
+
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-value" id="adminTotalEarnings">$0</span>
+            <span class="stat-label">Total Earnings</span>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-info">
+            <span class="stat-value" id="adminPendingCommissions">$0</span>
+            <span class="stat-label">Pending Commissions</span>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">🏠</div>
+          <div class="stat-info">
+            <span class="stat-value" id="adminTotalTransactions">0</span>
+            <span class="stat-label">Total Transactions</span>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value" id="adminTotalUsers">0</span>
+            <span class="stat-label">Registered Users</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="showAdminTab('pending')">Pending Payments</button>
+        <button class="admin-tab" onclick="showAdminTab('paid')">Paid Commissions</button>
+      </div>
+
+      <div id="admin-pending" class="admin-tab-content active">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Seller</th>
+              <th>Sale Price</th>
+              <th>Commission</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pendingCommissionsTable">
+            <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="admin-paid" class="admin-tab-content">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Seller</th>
+              <th>Sale Price</th>
+              <th>Commission</th>
+              <th>Paid Date</th>
+            </tr>
+          </thead>
+          <tbody id="paidCommissionsTable">
+            <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Messages Section -->
+  <section id="messages" class="section">
+    <div class="messages-container">
+      <div class="messages-sidebar">
+        <div class="messages-header">
+          <h2>Messages</h2>
+          <span class="unread-badge" id="totalUnreadBadge" style="display:none;">0</span>
+        </div>
+        <div class="conversations-list" id="conversationsList">
+          <div class="empty-state">No conversations yet</div>
+        </div>
+      </div>
+      <div class="messages-main">
+        <div id="noConversationSelected" class="no-conversation">
+          <div class="no-conversation-icon">💬</div>
+          <h3>Select a conversation</h3>
+          <p>Choose a conversation from the sidebar to view messages</p>
+        </div>
+        <div id="conversationView" class="conversation-view" style="display:none;">
+          <div class="conversation-header">
+            <h3 id="conversationName">User Name</h3>
+            <p id="conversationProperty">Property Address</p>
+          </div>
+          <div class="messages-list" id="messagesList"></div>
+          <div class="message-input-container">
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleMessageKeypress(event)">
+            <button onclick="sendMessage()" class="btn btn-primary">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Profile Section -->
+  <section id="profile" class="section">
+    <div class="profile-container">
+      <h1>My Profile</h1>
+      <div class="profile-grid">
+        <div class="profile-card">
+          <h3>Personal Information</h3>
+          <form id="profileForm" onsubmit="updateProfile(event)">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="profileName" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="profileEmail" disabled>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="profilePhone" placeholder="(555) 555-5555">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+
+        <div class="profile-card">
+          <h3>Change Password</h3>
+          <form id="passwordForm" onsubmit="changePassword(event)">
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" id="currentPassword" required>
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="newPassword" required minlength="8">
+            </div>
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" id="confirmPassword" required minlength="8">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Password</button>
+          </form>
+        </div>
+
+        <div class="profile-card">
+          <h3>Notification Preferences</h3>
+          <form id="notificationForm" onsubmit="updateNotifications(event)">
+            <label class="checkbox-label">
+              <input type="checkbox" id="notifyOffers" checked>
+              <span>Email me about new offers</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="notifyMessages" checked>
+              <span>Email me about new messages</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="notifyTransactions" checked>
+              <span>Email me about transaction updates</span>
+            </label>
+            <button type="submit" class="btn btn-primary">Save Preferences</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transaction Tracking Section -->
+  <section id="transactions" class="section">
+    <div class="transactions-container">
+      <h1>My Transactions</h1>
+      <p class="transactions-subtitle">Track your active and completed real estate transactions</p>
+      <div class="transactions-filter">
+        <button class="filter-btn active" onclick="filterTransactions('all')">All</button>
+        <button class="filter-btn" onclick="filterTransactions('active')">Active</button>
+        <button class="filter-btn" onclick="filterTransactions('completed')">Completed</button>
+      </div>
+      <div id="transactionsList" class="transactions-list">
+        <div class="empty-state">No transactions yet</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Property Comparison Section -->
+  <section id="compare" class="section">
+    <div class="compare-container">
+      <h1>Compare Properties</h1>
+      <p class="compare-subtitle">Compare up to 3 properties side by side</p>
+      <div id="compareGrid" class="compare-grid">
+        <div class="compare-slot empty" onclick="openPropertySelector(0)">
+          <div class="add-property-icon">+</div>
+          <p>Add Property</p>
+        </div>
+        <div class="compare-slot empty" onclick="openPropertySelector(1)">
+          <div class="add-property-icon">+</div>
+          <p>Add Property</p>
+        </div>
+        <div class="compare-slot empty" onclick="openPropertySelector(2)">
+          <div class="add-property-icon">+</div>
+          <p>Add Property</p>
+        </div>
+      </div>
+      <div id="comparisonTable" class="comparison-table" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- Saved Searches Section -->
+  <section id="saved-searches" class="section">
+    <div class="saved-searches-container">
+      <h1>Saved Searches</h1>
+      <p class="saved-searches-subtitle">Get notified when new properties match your criteria</p>
+      <div class="create-search-form">
+        <h3>Create New Saved Search</h3>
+        <form id="savedSearchForm" onsubmit="createSavedSearch(event)">
+          <div class="search-form-grid">
+            <div class="form-group">
+              <label>Search Name</label>
+              <input type="text" id="searchName" placeholder="e.g., Toronto Condos" required>
+            </div>
+            <div class="form-group">
+              <label>Province</label>
+              <select id="searchProvince">
+                <option value="">Any Province</option>
+                <option value="ON">Ontario</option>
+                <option value="BC">British Columbia</option>
+                <option value="AB">Alberta</option>
+                <option value="QC">Quebec</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Min Price</label>
+              <input type="number" id="searchMinPrice" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label>Max Price</label>
+              <input type="number" id="searchMaxPrice" placeholder="No max">
+            </div>
+            <div class="form-group">
+              <label>Property Type</label>
+              <select id="searchPropertyType">
+                <option value="">Any Type</option>
+                <option value="house">House</option>
+                <option value="condo">Condo</option>
+                <option value="townhouse">Townhouse</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Min Bedrooms</label>
+              <select id="searchMinBeds">
+                <option value="">Any</option>
+                <option value="1">1+</option>
+                <option value="2">2+</option>
+                <option value="3">3+</option>
+                <option value="4">4+</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Search</button>
+        </form>
+      </div>
+      <div class="saved-searches-list">
+        <h3>Your Saved Searches</h3>
+        <div id="savedSearchesList">
+          <div class="empty-state">No saved searches yet</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- FAQ and Help Section -->
   <section id="faq" class="section">
     <div class="faq-container">
@@ -1583,5 +1866,6 @@
   </footer>
 
   <script src="app.js"></script>
+  <script src="app-features.js"></script>
 </body>
 </html>
