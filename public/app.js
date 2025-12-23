@@ -1724,14 +1724,16 @@ async function loadDashboard() {
         const safeId = escapeHtml(p._id);
         const safeStatus = escapeHtml(p.status);
         return `
-          <div class="dashboard-item">
-            <div>
+          <div class="dashboard-item property-item">
+            <div class="property-item-info">
               <strong>${escapeHtml(p.address?.street)}, ${escapeHtml(p.address?.city)}</strong>
               <br><small>${formatCurrency(p.askingPrice)} - ${escapeHtml(p.propertyType)}</small>
             </div>
-            <div>
+            <div class="property-item-actions">
               <span class="status-badge status-${safeStatus}">${safeStatus}</span>
               ${p.status === 'draft' ? `<button class="btn btn-sm btn-primary" onclick="activateListing('${safeId}')">Activate</button>` : ''}
+              <button class="btn btn-sm btn-outline" onclick="editProperty('${safeId}')" title="Edit">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="confirmDeleteProperty('${safeId}')" title="Delete">Delete</button>
             </div>
           </div>
         `;
@@ -1827,6 +1829,155 @@ async function activateListing(propertyId) {
     }
   } catch (error) {
     alert('Failed to activate listing: ' + error.message);
+  }
+}
+
+// ==========================================
+// Edit Property Functions
+// ==========================================
+
+async function editProperty(propertyId) {
+  try {
+    // Fetch the property data
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to load property');
+    }
+
+    const property = await response.json();
+
+    // Populate the edit form
+    document.getElementById('editPropertyId').value = property._id;
+    document.getElementById('editStreet').value = property.address?.street || '';
+    document.getElementById('editUnit').value = property.address?.unit || '';
+    document.getElementById('editCity').value = property.address?.city || '';
+    document.getElementById('editProvince').value = property.address?.province || property.province || '';
+    document.getElementById('editPostalCode').value = property.address?.postalCode || '';
+    document.getElementById('editAskingPrice').value = property.askingPrice || '';
+    document.getElementById('editPropertyType').value = property.propertyType || '';
+    document.getElementById('editBedrooms').value = property.bedrooms || '';
+    document.getElementById('editBathrooms').value = property.bathrooms || '';
+    document.getElementById('editSquareFeet').value = property.squareFeet || '';
+    document.getElementById('editYearBuilt').value = property.yearBuilt || '';
+    document.getElementById('editDescription').value = property.description || '';
+    document.getElementById('editLegalDescription').value = property.legalDescription || '';
+    document.getElementById('editStatus').value = property.status || 'draft';
+    document.getElementById('editParkingSpaces').value = property.parkingSpaces || '';
+
+    // Show the modal
+    showModal('editPropertyModal');
+  } catch (error) {
+    showToast('Failed to load property: ' + error.message, 'error');
+  }
+}
+
+async function savePropertyEdit(event) {
+  event.preventDefault();
+
+  const propertyId = document.getElementById('editPropertyId').value;
+
+  const propertyData = {
+    address: {
+      street: document.getElementById('editStreet').value,
+      unit: document.getElementById('editUnit').value,
+      city: document.getElementById('editCity').value,
+      province: document.getElementById('editProvince').value,
+      postalCode: document.getElementById('editPostalCode').value
+    },
+    province: document.getElementById('editProvince').value,
+    askingPrice: parseFloat(document.getElementById('editAskingPrice').value),
+    propertyType: document.getElementById('editPropertyType').value,
+    bedrooms: parseInt(document.getElementById('editBedrooms').value) || 0,
+    bathrooms: parseFloat(document.getElementById('editBathrooms').value) || 0,
+    squareFeet: parseFloat(document.getElementById('editSquareFeet').value) || 0,
+    yearBuilt: parseInt(document.getElementById('editYearBuilt').value) || null,
+    description: document.getElementById('editDescription').value,
+    legalDescription: document.getElementById('editLegalDescription').value,
+    status: document.getElementById('editStatus').value,
+    parkingSpaces: parseInt(document.getElementById('editParkingSpaces').value) || 0
+  };
+
+  try {
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify(propertyData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeModal('editPropertyModal');
+      showToast('Property updated successfully!', 'success');
+      loadDashboard(); // Refresh the property list
+    } else {
+      showToast(data.error || 'Failed to update property', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to update property: ' + error.message, 'error');
+  }
+}
+
+// ==========================================
+// Delete Property Functions
+// ==========================================
+
+async function confirmDeleteProperty(propertyId) {
+  try {
+    // Fetch the property to show its address in the confirmation
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    if (response.ok) {
+      const property = await response.json();
+      const address = property.address
+        ? `${property.address.street}, ${property.address.city}`
+        : 'This property';
+      document.getElementById('deletePropertyAddress').textContent = address;
+    }
+
+    document.getElementById('deletePropertyId').value = propertyId;
+    showModal('deletePropertyModal');
+  } catch (error) {
+    // Still show the modal even if we can't fetch the address
+    document.getElementById('deletePropertyAddress').textContent = 'This property';
+    document.getElementById('deletePropertyId').value = propertyId;
+    showModal('deletePropertyModal');
+  }
+}
+
+async function deleteProperty() {
+  const propertyId = document.getElementById('deletePropertyId').value;
+
+  if (!propertyId) {
+    showToast('No property selected', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeModal('deletePropertyModal');
+      showToast('Property deleted successfully', 'success');
+      loadDashboard(); // Refresh the property list
+    } else {
+      showToast(data.error || 'Failed to delete property', 'error');
+    }
+  } catch (error) {
+    showToast('Failed to delete property: ' + error.message, 'error');
   }
 }
 

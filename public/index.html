@@ -1848,6 +1848,154 @@
     </div>
   </div>
 
+  <!-- Edit Property Modal -->
+  <div id="editPropertyModal" class="modal">
+    <div class="modal-content modal-large">
+      <span class="close" onclick="closeModal('editPropertyModal')">&times;</span>
+      <div class="modal-header">
+        <h2>Edit Property</h2>
+        <p>Update your property listing details</p>
+      </div>
+      <form onsubmit="savePropertyEdit(event)">
+        <input type="hidden" id="editPropertyId">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Street Address *</label>
+            <input type="text" id="editStreet" required placeholder="123 Main Street">
+          </div>
+          <div class="form-group">
+            <label>Unit/Suite</label>
+            <input type="text" id="editUnit" placeholder="Unit 101">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>City *</label>
+            <input type="text" id="editCity" required placeholder="Toronto">
+          </div>
+          <div class="form-group">
+            <label>Province *</label>
+            <select id="editProvince" required>
+              <option value="">Select Province</option>
+              <option value="ON">Ontario</option>
+              <option value="BC">British Columbia</option>
+              <option value="AB">Alberta</option>
+              <option value="QC">Quebec</option>
+              <option value="MB">Manitoba</option>
+              <option value="SK">Saskatchewan</option>
+              <option value="NS">Nova Scotia</option>
+              <option value="NB">New Brunswick</option>
+              <option value="NL">Newfoundland and Labrador</option>
+              <option value="PE">Prince Edward Island</option>
+              <option value="NT">Northwest Territories</option>
+              <option value="YT">Yukon</option>
+              <option value="NU">Nunavut</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Postal Code *</label>
+            <input type="text" id="editPostalCode" required placeholder="M5V 1A1">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Asking Price ($) *</label>
+            <input type="number" id="editAskingPrice" required min="1" placeholder="500000">
+          </div>
+          <div class="form-group">
+            <label>Property Type *</label>
+            <select id="editPropertyType" required>
+              <option value="">Select Type</option>
+              <option value="detached">Detached House</option>
+              <option value="semi-detached">Semi-Detached</option>
+              <option value="townhouse">Townhouse</option>
+              <option value="condo">Condo</option>
+              <option value="residential">Residential</option>
+              <option value="multi-family">Multi-Family</option>
+              <option value="commercial">Commercial</option>
+              <option value="land">Land</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Bedrooms</label>
+            <input type="number" id="editBedrooms" min="0" placeholder="3">
+          </div>
+          <div class="form-group">
+            <label>Bathrooms</label>
+            <input type="number" id="editBathrooms" min="0" step="0.5" placeholder="2.5">
+          </div>
+          <div class="form-group">
+            <label>Square Feet</label>
+            <input type="number" id="editSquareFeet" min="0" placeholder="2000">
+          </div>
+          <div class="form-group">
+            <label>Year Built</label>
+            <input type="number" id="editYearBuilt" min="1800" max="2025" placeholder="2005">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="editDescription" rows="4" placeholder="Describe your property..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Legal Description *</label>
+          <input type="text" id="editLegalDescription" required placeholder="Lot 10, Plan 123, Part 1">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Listing Status</label>
+            <select id="editStatus">
+              <option value="draft">Draft</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="sold">Sold</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Parking Spaces</label>
+            <input type="number" id="editParkingSpaces" min="0" placeholder="2">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal('editPropertyModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Property Confirmation Modal -->
+  <div id="deletePropertyModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('deletePropertyModal')">&times;</span>
+      <div class="modal-header">
+        <h2>Delete Property</h2>
+        <p>Are you sure you want to delete this property?</p>
+      </div>
+      <div class="delete-warning">
+        <div class="warning-icon">⚠️</div>
+        <p><strong>This action cannot be undone.</strong></p>
+        <p>The property listing and all associated data will be permanently removed.</p>
+        <p id="deletePropertyAddress" class="delete-property-name"></p>
+      </div>
+      <input type="hidden" id="deletePropertyId">
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal('deletePropertyModal')">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="deleteProperty()">Delete Property</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Terms of Service Section -->
   <section id="terms" class="section">
     <div class="legal-container">

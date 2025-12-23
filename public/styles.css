@@ -1258,6 +1258,113 @@ header {
   margin-bottom: 1.5rem;
 }
 
+/* Dashboard Items */
+.dashboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--white);
+  border-radius: var(--radius);
+  margin-bottom: 0.75rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.dashboard-item:hover {
+  box-shadow: var(--shadow);
+}
+
+.property-item {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.property-item-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.property-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* Delete Confirmation Modal */
+.delete-warning {
+  text-align: center;
+  padding: 1.5rem;
+  background: #fef2f2;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+}
+
+.delete-warning .warning-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.delete-warning p {
+  margin-bottom: 0.5rem;
+  color: #991b1b;
+}
+
+.delete-property-name {
+  font-weight: 600;
+  color: var(--gray-900);
+  font-size: 1.1rem;
+  margin-top: 1rem !important;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+/* Form Rows */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .property-item-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+}
+
 .tab-header h3 {
   font-size: 1.25rem;
   color: var(--gray-900);
