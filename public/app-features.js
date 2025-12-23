@@ -1546,4 +1546,527 @@ window.showSection = function(sectionId) {
   if (sectionId === 'analytics') {
     loadAnalytics();
   }
+
+  if (sectionId === 'ai-tools') {
+    loadAIToolsUsage();
+  }
+};
+
+// ==========================================
+// AI Tools - Mortgage & Lawyer Finder
+// ==========================================
+
+var AI_MONTHLY_LIMIT = 5; // Free tier limit (synced with server)
+var aiUsageCache = { count: 0, limit: AI_MONTHLY_LIMIT, canUse: true, isPremium: false };
+
+// Check if user is logged in for AI tools
+function isLoggedInForAI() {
+  return !!authToken;
+}
+
+// Fetch AI usage from server
+async function fetchAIUsage() {
+  if (!isLoggedInForAI()) {
+    return { count: 0, limit: AI_MONTHLY_LIMIT, canUse: false, isPremium: false };
+  }
+
+  try {
+    var response = await fetch(API_BASE + '/ai/usage', {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+
+    if (response.ok) {
+      var data = await response.json();
+      aiUsageCache = data;
+      return data;
+    }
+  } catch (err) {
+    console.error('Failed to fetch AI usage:', err);
+  }
+
+  return aiUsageCache;
+}
+
+// Increment AI usage on server
+async function incrementAIUsageOnServer() {
+  if (!isLoggedInForAI()) {
+    return { success: false, error: 'Not logged in' };
+  }
+
+  try {
+    var response = await fetch(API_BASE + '/ai/use', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + authToken,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    var data = await response.json();
+
+    if (response.ok) {
+      aiUsageCache = data;
+      updateAIUsageDisplay(data);
+      return { success: true, data: data };
+    } else {
+      return { success: false, error: data.error };
+    }
+  } catch (err) {
+    console.error('Failed to increment AI usage:', err);
+    return { success: false, error: 'Network error' };
+  }
+}
+
+// Check if user can use AI tools (server check)
+async function canUseAITools() {
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    return false;
+  }
+
+  var usage = await fetchAIUsage();
+  return usage.canUse;
+}
+
+// Load AI tools usage from server
+async function loadAIToolsUsage() {
+  if (!isLoggedInForAI()) {
+    // Show login required message
+    var container = document.querySelector('.ai-tools-container');
+    if (container) {
+      var loginBanner = document.createElement('div');
+      loginBanner.className = 'ai-login-required';
+      loginBanner.innerHTML = '<h3>Account Required</h3><p>Please <a href="#" onclick="showModal(\'loginModal\'); return false;">log in</a> or <a href="#" onclick="showModal(\'registerModal\'); return false;">create an account</a> to use AI-powered tools.</p>';
+      container.insertBefore(loginBanner, container.firstChild);
+    }
+    return;
+  }
+
+  var usage = await fetchAIUsage();
+  updateAIUsageDisplay(usage);
+}
+
+function updateAIUsageDisplay(usage) {
+  if (!usage) usage = aiUsageCache;
+
+  var countEl = document.getElementById('aiUsageCount');
+  var limitEl = document.getElementById('aiUsageLimit');
+  var fillEl = document.getElementById('aiUsageFill');
+  var upgradeBanner = document.getElementById('aiUpgradeBanner');
+
+  var limit = usage.isPremium ? 'Unlimited' : (usage.limit || AI_MONTHLY_LIMIT);
+  var count = usage.count || 0;
+
+  if (countEl) countEl.textContent = count;
+  if (limitEl) limitEl.textContent = limit;
+
+  if (fillEl) {
+    if (usage.isPremium) {
+      fillEl.style.width = '100%';
+      fillEl.style.background = 'linear-gradient(90deg, #10b981 0%, #059669 100%)';
+    } else {
+      fillEl.style.width = Math.min((count / limit) * 100, 100) + '%';
+    }
+  }
+
+  if (upgradeBanner) {
+    upgradeBanner.style.display = (!usage.isPremium && !usage.canUse) ? 'block' : 'none';
+  }
+
+  // Disable buttons if limit reached (and not premium)
+  var mortgageBtn = document.getElementById('mortgageSearchBtn');
+  var lawyerBtn = document.getElementById('lawyerSearchBtn');
+
+  if (!usage.canUse) {
+    if (mortgageBtn) mortgageBtn.disabled = true;
+    if (lawyerBtn) lawyerBtn.disabled = true;
+  } else {
+    if (mortgageBtn) mortgageBtn.disabled = false;
+    if (lawyerBtn) lawyerBtn.disabled = false;
+  }
+}
+
+async function findMortgageRates(event) {
+  event.preventDefault();
+
+  // Check login first
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  // Check usage limit with server
+  var canUse = await canUseAITools();
+  if (!canUse) {
+    showToast('You have reached your monthly AI search limit. Please upgrade for more searches.', 'error');
+    return;
+  }
+
+  var province = document.getElementById('mortgageProvince').value;
+  var city = document.getElementById('mortgageCity').value;
+  var propertyValue = parseFloat(document.getElementById('mortgagePropertyValue').value);
+  var downPayment = parseFloat(document.getElementById('mortgageDownPayment').value);
+  var mortgageType = document.getElementById('mortgageType').value;
+  var term = document.getElementById('mortgageTerm').value;
+  var firstTimeBuyer = document.querySelector('input[name="firstTimeBuyer"]:checked').value === 'yes';
+
+  var btn = document.getElementById('mortgageSearchBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Searching...';
+
+  // Simulate AI processing delay
+  await new Promise(function(resolve) { setTimeout(resolve, 2000); });
+
+  // Increment usage on server
+  var usageResult = await incrementAIUsageOnServer();
+  if (!usageResult.success) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="btn-icon">🔍</span> Find Best Rates';
+    showToast(usageResult.error || 'Failed to process request', 'error');
+    return;
+  }
+
+  // Generate mock results based on inputs
+  var mortgageAmount = propertyValue - downPayment;
+  var ltv = (mortgageAmount / propertyValue) * 100;
+  var needsCMHC = downPayment < (propertyValue * 0.2);
+
+  var results = generateMortgageResults(province, city, mortgageAmount, mortgageType, term, firstTimeBuyer, needsCMHC);
+
+  displayMortgageResults(results, mortgageAmount, needsCMHC);
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="btn-icon">🔍</span> Find Best Rates';
+}
+
+function generateMortgageResults(province, city, amount, type, term, firstTime, needsCMHC) {
+  var baseRate = 4.5; // Base rate
+  var results = [];
+
+  // Major banks
+  var banks = [
+    { name: 'TD Canada Trust', type: 'Bank', logo: '🏦' },
+    { name: 'RBC Royal Bank', type: 'Bank', logo: '🏦' },
+    { name: 'BMO Bank of Montreal', type: 'Bank', logo: '🏦' },
+    { name: 'Scotiabank', type: 'Bank', logo: '🏦' },
+    { name: 'CIBC', type: 'Bank', logo: '🏦' },
+    { name: 'National Bank', type: 'Bank', logo: '🏦' },
+    { name: 'Meridian Credit Union', type: 'Credit Union', logo: '🏛️' },
+    { name: 'MCAP', type: 'Mortgage Company', logo: '📋' },
+    { name: 'First National', type: 'Mortgage Company', logo: '📋' },
+    { name: 'Butler Mortgage', type: 'Broker', logo: '👤' }
+  ];
+
+  banks.forEach(function(bank, index) {
+    var rateVariation = (Math.random() * 0.8 - 0.4).toFixed(2);
+    var fixedRate = (baseRate + parseFloat(rateVariation)).toFixed(2);
+    var variableRate = (baseRate - 0.5 + parseFloat(rateVariation)).toFixed(2);
+
+    // Credit unions and brokers often have better rates
+    if (bank.type === 'Credit Union' || bank.type === 'Broker') {
+      fixedRate = (parseFloat(fixedRate) - 0.15).toFixed(2);
+      variableRate = (parseFloat(variableRate) - 0.15).toFixed(2);
+    }
+
+    // First time buyer discount
+    if (firstTime && index < 5) {
+      fixedRate = (parseFloat(fixedRate) - 0.1).toFixed(2);
+    }
+
+    var monthlyPayment = calculateMonthlyPayment(amount, parseFloat(fixedRate), parseInt(term) * 12);
+
+    if (type === 'fixed' || type === 'both') {
+      results.push({
+        lender: bank.name,
+        type: bank.type,
+        logo: bank.logo,
+        rateType: 'Fixed',
+        rate: fixedRate,
+        term: term + ' Year',
+        monthlyPayment: monthlyPayment,
+        features: getRandomFeatures()
+      });
+    }
+
+    if (type === 'variable' || type === 'both') {
+      results.push({
+        lender: bank.name,
+        type: bank.type,
+        logo: bank.logo,
+        rateType: 'Variable',
+        rate: variableRate,
+        term: term + ' Year',
+        monthlyPayment: calculateMonthlyPayment(amount, parseFloat(variableRate), parseInt(term) * 12),
+        features: getRandomFeatures()
+      });
+    }
+  });
+
+  // Sort by rate
+  results.sort(function(a, b) { return parseFloat(a.rate) - parseFloat(b.rate); });
+
+  return results.slice(0, 8); // Return top 8
+}
+
+function calculateMonthlyPayment(principal, annualRate, months) {
+  var monthlyRate = annualRate / 100 / 12;
+  var payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+  return Math.round(payment);
+}
+
+function getRandomFeatures() {
+  var allFeatures = [
+    'Pre-approval available',
+    'No prepayment penalty',
+    '20% annual prepayment',
+    'Portable mortgage',
+    'Rate hold 120 days',
+    'Online application',
+    'Cash back option',
+    'Skip-a-payment option'
+  ];
+
+  var count = Math.floor(Math.random() * 2) + 2;
+  var features = [];
+
+  for (var i = 0; i < count; i++) {
+    var idx = Math.floor(Math.random() * allFeatures.length);
+    if (features.indexOf(allFeatures[idx]) === -1) {
+      features.push(allFeatures[idx]);
+    }
+  }
+
+  return features;
+}
+
+function displayMortgageResults(results, amount, needsCMHC) {
+  var container = document.getElementById('mortgageResultsList');
+  var resultsDiv = document.getElementById('mortgageResults');
+
+  var cmhcNotice = '';
+  if (needsCMHC) {
+    cmhcNotice = '<div class="cmhc-notice">⚠️ With less than 20% down payment, CMHC insurance will be required (adds 2.8-4% to mortgage amount)</div>';
+  }
+
+  var html = cmhcNotice + results.map(function(r, idx) {
+    return '<div class="result-card ' + (idx === 0 ? 'best-rate' : '') + '">' +
+      (idx === 0 ? '<span class="best-badge">Best Rate</span>' : '') +
+      '<div class="result-header">' +
+        '<span class="result-logo">' + r.logo + '</span>' +
+        '<div class="result-lender">' +
+          '<strong>' + r.lender + '</strong>' +
+          '<span class="lender-type">' + r.type + '</span>' +
+        '</div>' +
+        '<div class="result-rate">' +
+          '<span class="rate-value">' + r.rate + '%</span>' +
+          '<span class="rate-type">' + r.rateType + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="result-details">' +
+        '<div class="detail-item"><span>Term:</span> ' + r.term + '</div>' +
+        '<div class="detail-item"><span>Monthly:</span> $' + r.monthlyPayment.toLocaleString() + '</div>' +
+      '</div>' +
+      '<div class="result-features">' +
+        r.features.map(function(f) { return '<span class="feature-tag">' + f + '</span>'; }).join('') +
+      '</div>' +
+      '<button class="btn btn-outline btn-sm" onclick="contactLender(\'' + r.lender + '\')">Contact Lender</button>' +
+    '</div>';
+  }).join('');
+
+  container.innerHTML = html;
+  resultsDiv.style.display = 'block';
+}
+
+async function findLawyers(event) {
+  event.preventDefault();
+
+  // Check login first
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  // Check usage limit with server
+  var canUse = await canUseAITools();
+  if (!canUse) {
+    showToast('You have reached your monthly AI search limit. Please upgrade for more searches.', 'error');
+    return;
+  }
+
+  var province = document.getElementById('lawyerProvince').value;
+  var city = document.getElementById('lawyerCity').value;
+  var transactionType = document.getElementById('transactionType').value;
+  var propertyType = document.getElementById('lawyerPropertyType').value;
+  var language = document.getElementById('lawyerLanguage').value;
+
+  var btn = document.getElementById('lawyerSearchBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Searching...';
+
+  // Simulate AI processing delay
+  await new Promise(function(resolve) { setTimeout(resolve, 2000); });
+
+  // Increment usage on server
+  var usageResult = await incrementAIUsageOnServer();
+  if (!usageResult.success) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="btn-icon">🔍</span> Find Lawyers';
+    showToast(usageResult.error || 'Failed to process request', 'error');
+    return;
+  }
+
+  // Generate mock results
+  var results = generateLawyerResults(province, city, transactionType, propertyType, language);
+
+  displayLawyerResults(results);
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="btn-icon">🔍</span> Find Lawyers';
+}
+
+function generateLawyerResults(province, city, transactionType, propertyType, language) {
+  var provinceNames = {
+    'ON': 'Ontario', 'BC': 'British Columbia', 'AB': 'Alberta', 'QC': 'Quebec',
+    'MB': 'Manitoba', 'SK': 'Saskatchewan', 'NS': 'Nova Scotia', 'NB': 'New Brunswick',
+    'PE': 'Prince Edward Island', 'NL': 'Newfoundland and Labrador'
+  };
+
+  var firstNames = ['Sarah', 'Michael', 'Jennifer', 'David', 'Lisa', 'Robert', 'Amanda', 'James', 'Michelle', 'Christopher'];
+  var lastNames = ['Chen', 'Smith', 'Patel', 'Williams', 'Brown', 'Singh', 'Martin', 'Thompson', 'Anderson', 'Lee'];
+
+  var firms = [
+    ' Law Professional Corporation',
+    ' & Associates',
+    ' Legal Services',
+    ' Law Office',
+    ' Real Estate Law'
+  ];
+
+  var results = [];
+
+  for (var i = 0; i < 6; i++) {
+    var firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    var lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    var firm = lastName + firms[Math.floor(Math.random() * firms.length)];
+
+    var baseFee = propertyType === 'commercial' ? 2500 : propertyType === 'land' ? 1200 : 1500;
+    var feeVariation = Math.floor(Math.random() * 800) - 400;
+    var fee = baseFee + feeVariation;
+
+    var rating = (4 + Math.random()).toFixed(1);
+    var reviews = Math.floor(Math.random() * 150) + 10;
+    var yearsExp = Math.floor(Math.random() * 25) + 3;
+
+    var languages = ['English'];
+    if (province === 'QC' || language === 'french' || language === 'both') {
+      languages.push('French');
+    }
+    if (Math.random() > 0.7) {
+      var otherLangs = ['Mandarin', 'Cantonese', 'Punjabi', 'Hindi', 'Spanish', 'Arabic'];
+      languages.push(otherLangs[Math.floor(Math.random() * otherLangs.length)]);
+    }
+
+    var specialties = ['Residential Real Estate'];
+    if (propertyType === 'commercial') specialties.push('Commercial Transactions');
+    if (Math.random() > 0.5) specialties.push('Mortgage Refinancing');
+    if (Math.random() > 0.7) specialties.push('Title Insurance');
+
+    results.push({
+      name: firstName + ' ' + lastName,
+      firm: firm,
+      city: city,
+      province: provinceNames[province] || province,
+      fee: fee,
+      rating: rating,
+      reviews: reviews,
+      yearsExperience: yearsExp,
+      languages: languages,
+      specialties: specialties,
+      phone: '(416) ' + Math.floor(Math.random() * 900 + 100) + '-' + Math.floor(Math.random() * 9000 + 1000),
+      email: firstName.toLowerCase() + '@' + lastName.toLowerCase() + 'law.ca'
+    });
+  }
+
+  // Sort by rating
+  results.sort(function(a, b) { return parseFloat(b.rating) - parseFloat(a.rating); });
+
+  return results;
+}
+
+function displayLawyerResults(results) {
+  var container = document.getElementById('lawyerResultsList');
+  var resultsDiv = document.getElementById('lawyerResults');
+
+  var html = results.map(function(r, idx) {
+    return '<div class="result-card lawyer-card ' + (idx === 0 ? 'top-rated' : '') + '">' +
+      (idx === 0 ? '<span class="top-badge">Top Rated</span>' : '') +
+      '<div class="lawyer-header">' +
+        '<div class="lawyer-avatar">⚖️</div>' +
+        '<div class="lawyer-info">' +
+          '<strong>' + r.name + '</strong>' +
+          '<span class="firm-name">' + r.firm + '</span>' +
+          '<span class="location">' + r.city + ', ' + r.province + '</span>' +
+        '</div>' +
+        '<div class="lawyer-rating">' +
+          '<span class="rating-stars">★ ' + r.rating + '</span>' +
+          '<span class="review-count">(' + r.reviews + ' reviews)</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="lawyer-details">' +
+        '<div class="detail-row">' +
+          '<span class="detail-label">Experience:</span>' +
+          '<span class="detail-value">' + r.yearsExperience + ' years</span>' +
+        '</div>' +
+        '<div class="detail-row">' +
+          '<span class="detail-label">Est. Fee:</span>' +
+          '<span class="detail-value fee-value">$' + r.fee.toLocaleString() + ' - $' + (r.fee + 500).toLocaleString() + '</span>' +
+        '</div>' +
+        '<div class="detail-row">' +
+          '<span class="detail-label">Languages:</span>' +
+          '<span class="detail-value">' + r.languages.join(', ') + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="lawyer-specialties">' +
+        r.specialties.map(function(s) { return '<span class="specialty-tag">' + s + '</span>'; }).join('') +
+      '</div>' +
+      '<div class="lawyer-actions">' +
+        '<button class="btn btn-outline btn-sm" onclick="copyToClipboard(\'' + r.phone + '\')">📞 ' + r.phone + '</button>' +
+        '<button class="btn btn-primary btn-sm" onclick="emailLawyer(\'' + r.email + '\')">✉️ Contact</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  container.innerHTML = html;
+  resultsDiv.style.display = 'block';
+}
+
+function contactLender(lenderName) {
+  showToast('Opening contact form for ' + lenderName + '...', 'info');
+  // In production, this would open a contact modal or redirect to lender site
+}
+
+function emailLawyer(email) {
+  window.location.href = 'mailto:' + email + '?subject=Real%20Estate%20Legal%20Services%20Inquiry';
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('Phone number copied to clipboard!', 'success');
+  }).catch(function() {
+    showToast('Phone: ' + text, 'info');
+  });
+}
+
+function showUpgradeModal() {
+  showToast('Premium upgrade coming soon! Contact support for early access.', 'info');
+}
+
+// Add AI Tools link on login
+var prevOnLogin3 = window.onLoginSuccess;
+window.onLoginSuccess = function() {
+  if (prevOnLogin3) prevOnLogin3();
+  var aiToolsLink = document.getElementById('aiToolsLink');
+  if (aiToolsLink) aiToolsLink.style.display = 'inline';
 };

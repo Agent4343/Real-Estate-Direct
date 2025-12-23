@@ -31,6 +31,7 @@
         <a href="#" onclick="showSection('documents')" id="documentsLink" style="display:none;">Documents</a>
         <a href="#" onclick="showSection('notifications')" id="notificationsLink" style="display:none;">Notifications</a>
         <a href="#" onclick="showSection('analytics')" id="analyticsLink" style="display:none;">Analytics</a>
+        <a href="#" onclick="showSection('ai-tools')" id="aiToolsLink" style="display:none;">AI Tools</a>
         <a href="#" onclick="showSection('profile')" id="profileLink" style="display:none;">Profile</a>
         <a href="#" onclick="showSection('admin')" id="adminLink" style="display:none;">Admin</a>
       </div>
@@ -1285,10 +1286,37 @@
         </ul>
 
         <h2>8. Limitation of Liability</h2>
-        <p>Real Estate Direct is not a real estate brokerage, law firm, or financial institution. We do not provide legal, financial, or real estate advice. The Platform is provided "as is" without warranties of any kind.</p>
-        <p>To the maximum extent permitted by law, Real Estate Direct shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Platform.</p>
+        <p>Real Estate Direct is not a real estate brokerage, law firm, mortgage broker, or financial institution. We do not provide legal, financial, mortgage, or real estate advice. The Platform is provided "as is" without warranties of any kind.</p>
+        <p><strong>TO THE MAXIMUM EXTENT PERMITTED BY LAW:</strong></p>
+        <ul>
+          <li>Real Estate Direct shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Platform</li>
+          <li>We are not responsible for the accuracy of property listings, user-provided information, or third-party data</li>
+          <li>We do not guarantee the success of any real estate transaction facilitated through the Platform</li>
+          <li>Users assume all risks associated with buying, selling, or transacting in real estate</li>
+          <li>Our total liability for any claim shall not exceed the fees paid by you to the Platform in the 12 months preceding the claim</li>
+        </ul>
 
-        <h2>9. Prohibited Activities</h2>
+        <h2>9. AI-Powered Tools Disclaimer</h2>
+        <p>The Platform may offer AI-powered tools including mortgage rate comparisons and lawyer recommendations. By using these tools, you acknowledge:</p>
+        <ul>
+          <li><strong>Not Financial Advice:</strong> AI-generated mortgage rate information is for informational purposes only and does not constitute financial advice or a mortgage offer</li>
+          <li><strong>Not Legal Referral:</strong> Lawyer recommendations are based on publicly available information and do not constitute a legal referral or endorsement</li>
+          <li><strong>No Guarantees:</strong> We do not guarantee the accuracy, completeness, or timeliness of AI-generated information</li>
+          <li><strong>User Responsibility:</strong> You are responsible for independently verifying all information and conducting your own due diligence</li>
+          <li><strong>Third-Party Services:</strong> We are not responsible for the services, rates, or conduct of any mortgage broker, bank, or lawyer</li>
+          <li><strong>Usage Limits:</strong> AI tools are subject to usage limits. Abuse of these features may result in account suspension</li>
+        </ul>
+
+        <h2>10. Indemnification</h2>
+        <p>You agree to indemnify, defend, and hold harmless Real Estate Direct, its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including legal fees) arising from:</p>
+        <ul>
+          <li>Your use of the Platform</li>
+          <li>Your violation of these Terms</li>
+          <li>Your violation of any rights of another party</li>
+          <li>Any transaction you enter into through the Platform</li>
+        </ul>
+
+        <h2>11. Prohibited Activities</h2>
         <p>Users may not:</p>
         <ul>
           <li>Use the Platform for fraudulent purposes</li>
@@ -1298,16 +1326,22 @@
           <li>Attempt to gain unauthorized access to the Platform</li>
         </ul>
 
-        <h2>10. Termination</h2>
+        <h2>12. Termination</h2>
         <p>We reserve the right to terminate or suspend your account at any time for violations of these Terms. Upon termination, you remain responsible for any outstanding fees or obligations.</p>
 
-        <h2>11. Governing Law</h2>
+        <h2>13. Governing Law</h2>
         <p>These Terms are governed by the laws of Canada and the province of Ontario. Any disputes shall be resolved in the courts of Ontario.</p>
 
-        <h2>12. Changes to Terms</h2>
+        <h2>14. Dispute Resolution</h2>
+        <p>Before initiating any legal proceedings, you agree to first attempt to resolve any dispute through informal negotiation by contacting us. If the dispute cannot be resolved within 30 days, either party may proceed with formal dispute resolution.</p>
+
+        <h2>15. Changes to Terms</h2>
         <p>We may update these Terms from time to time. Continued use of the Platform after changes constitutes acceptance of the new Terms.</p>
 
-        <h2>13. Contact</h2>
+        <h2>16. Severability</h2>
+        <p>If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.</p>
+
+        <h2>17. Contact</h2>
         <p>For questions about these Terms, please contact us at legal@realestatedirect.ca</p>
       </div>
     </div>
@@ -1721,6 +1755,20 @@
       </div>
 
       <div id="doc-generate" class="doc-tab-content">
+        <div class="legal-warning-banner">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-content">
+            <h4>Important Legal Notice</h4>
+            <p>Documents generated by this platform are templates only and <strong>do not constitute legal advice</strong>. Before signing any document:</p>
+            <ul>
+              <li>Have all documents reviewed by a qualified real estate lawyer in your province</li>
+              <li>Ensure you understand all terms and conditions before signing</li>
+              <li>Provincial laws vary - what applies in Ontario may differ in Quebec or BC</li>
+              <li>Self-represented parties should complete the Self-Represented Party Acknowledgement form</li>
+            </ul>
+            <p class="warning-disclaimer">Real Estate Direct is NOT a real estate brokerage, law firm, or licensed real estate professional.</p>
+          </div>
+        </div>
         <div class="generate-document-form">
           <h3>Generate a New Document</h3>
           <form id="generateDocForm" onsubmit="generateDocument(event)">
@@ -1745,13 +1793,24 @@
                 <label>Document Type</label>
                 <select id="docType" required>
                   <option value="">Select Document Type</option>
-                  <option value="agreement_purchase_sale">Agreement of Purchase and Sale</option>
-                  <option value="listing_agreement">Listing Agreement</option>
-                  <option value="property_disclosure">Property Disclosure Statement</option>
-                  <option value="buyer_representation">Buyer Representation Agreement</option>
-                  <option value="condition_waiver">Condition Waiver</option>
-                  <option value="amendment">Amendment to Agreement</option>
-                  <option value="counter_offer">Counter Offer</option>
+                  <optgroup label="Core Transaction Documents">
+                    <option value="agreement_purchase_sale">Agreement of Purchase and Sale</option>
+                    <option value="listing_agreement">Listing Agreement</option>
+                    <option value="counter_offer">Counter Offer</option>
+                    <option value="amendment">Amendment to Agreement</option>
+                    <option value="condition_waiver">Condition Waiver</option>
+                  </optgroup>
+                  <optgroup label="Disclosure Documents">
+                    <option value="property_disclosure">Property Disclosure Statement</option>
+                    <option value="spis">Seller Property Information Statement (SPIS) - Ontario</option>
+                    <option value="quebec_declaration">Seller's Declaration Form - Quebec</option>
+                    <option value="bc_disclosure">Property Disclosure Statement - BC</option>
+                  </optgroup>
+                  <optgroup label="Representation & Acknowledgements">
+                    <option value="buyer_representation">Buyer Representation Agreement</option>
+                    <option value="self_represented_acknowledgement">Self-Represented Party Acknowledgement</option>
+                    <option value="fintrac_id_verification">FINTRAC Identity Verification Record</option>
+                  </optgroup>
                 </select>
               </div>
             </div>
@@ -1987,6 +2046,212 @@
     </div>
   </section>
 
+  <!-- AI Tools Section -->
+  <section id="ai-tools" class="section">
+    <div class="ai-tools-container">
+      <div class="ai-tools-header">
+        <h1>AI-Powered Tools</h1>
+        <p class="ai-tools-subtitle">Smart tools to help you find the best mortgage rates and real estate lawyers in your area</p>
+        <div class="usage-indicator">
+          <span class="usage-label">Monthly Usage:</span>
+          <span class="usage-count"><span id="aiUsageCount">0</span> / <span id="aiUsageLimit">5</span> searches</span>
+          <div class="usage-bar">
+            <div class="usage-fill" id="aiUsageFill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-disclaimer-banner">
+        <span class="disclaimer-icon">⚠️</span>
+        <div class="disclaimer-text">
+          <strong>Important:</strong> AI-generated results are for informational purposes only. Always verify information independently and consult with licensed professionals before making financial or legal decisions.
+        </div>
+      </div>
+
+      <div class="ai-tools-grid">
+        <!-- Mortgage Rate Finder -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">🏦</span>
+            <h2>Mortgage Rate Finder</h2>
+          </div>
+          <p class="tool-description">Find and compare the best mortgage rates from banks and brokers across Canada based on your needs.</p>
+
+          <form id="mortgageFinderForm" onsubmit="findMortgageRates(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="mortgageProvince" required>
+                  <option value="">Select Province</option>
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                  <option value="PE">Prince Edward Island</option>
+                  <option value="NL">Newfoundland and Labrador</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="mortgageCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Property Value ($)</label>
+                <input type="number" id="mortgagePropertyValue" placeholder="500000" required min="50000">
+              </div>
+              <div class="form-group">
+                <label>Down Payment ($)</label>
+                <input type="number" id="mortgageDownPayment" placeholder="100000" required min="0">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Mortgage Type</label>
+                <select id="mortgageType" required>
+                  <option value="fixed">Fixed Rate</option>
+                  <option value="variable">Variable Rate</option>
+                  <option value="both">Compare Both</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Term Length</label>
+                <select id="mortgageTerm" required>
+                  <option value="5">5 Years</option>
+                  <option value="3">3 Years</option>
+                  <option value="2">2 Years</option>
+                  <option value="1">1 Year</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>First-Time Buyer?</label>
+              <div class="radio-group">
+                <label><input type="radio" name="firstTimeBuyer" value="yes"> Yes</label>
+                <label><input type="radio" name="firstTimeBuyer" value="no" checked> No</label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="mortgageSearchBtn">
+              <span class="btn-icon">🔍</span> Find Best Rates
+            </button>
+          </form>
+
+          <div id="mortgageResults" class="ai-results" style="display:none;">
+            <h3>Recommended Mortgage Options</h3>
+            <div class="results-list" id="mortgageResultsList"></div>
+            <p class="results-disclaimer">Rates shown are estimates and may vary. Contact lenders directly for current rates and pre-approval.</p>
+          </div>
+        </div>
+
+        <!-- Lawyer Finder -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">⚖️</span>
+            <h2>Real Estate Lawyer Finder</h2>
+          </div>
+          <p class="tool-description">Find qualified real estate lawyers in your area to handle your property transaction.</p>
+
+          <form id="lawyerFinderForm" onsubmit="findLawyers(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="lawyerProvince" required>
+                  <option value="">Select Province</option>
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                  <option value="PE">Prince Edward Island</option>
+                  <option value="NL">Newfoundland and Labrador</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="lawyerCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Transaction Type</label>
+              <select id="transactionType" required>
+                <option value="purchase">Buying a Property</option>
+                <option value="sale">Selling a Property</option>
+                <option value="both">Both (Buying and Selling)</option>
+                <option value="refinance">Refinancing</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Property Type</label>
+              <select id="lawyerPropertyType" required>
+                <option value="residential">Residential (House/Condo)</option>
+                <option value="commercial">Commercial</option>
+                <option value="land">Vacant Land</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Preferred Language</label>
+              <select id="lawyerLanguage">
+                <option value="english">English</option>
+                <option value="french">French</option>
+                <option value="both">Bilingual (English/French)</option>
+                <option value="any">No Preference</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="lawyerSearchBtn">
+              <span class="btn-icon">🔍</span> Find Lawyers
+            </button>
+          </form>
+
+          <div id="lawyerResults" class="ai-results" style="display:none;">
+            <h3>Recommended Real Estate Lawyers</h3>
+            <div class="results-list" id="lawyerResultsList"></div>
+            <p class="results-disclaimer">Contact lawyers directly to verify availability, fees, and to confirm they can handle your specific transaction.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-tools-info">
+        <h3>How It Works</h3>
+        <div class="info-cards">
+          <div class="info-card">
+            <span class="info-icon">1</span>
+            <h4>Enter Your Details</h4>
+            <p>Provide your location and requirements</p>
+          </div>
+          <div class="info-card">
+            <span class="info-icon">2</span>
+            <h4>AI Analysis</h4>
+            <p>Our AI searches and compares options</p>
+          </div>
+          <div class="info-card">
+            <span class="info-icon">3</span>
+            <h4>Get Results</h4>
+            <p>Review personalized recommendations</p>
+          </div>
+          <div class="info-card">
+            <span class="info-icon">4</span>
+            <h4>Contact Directly</h4>
+            <p>Reach out to providers you choose</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-upgrade-banner" id="aiUpgradeBanner" style="display:none;">
+        <h3>Upgrade for More Searches</h3>
+        <p>You've used all your free AI searches this month. Upgrade to Premium for unlimited access.</p>
+        <button class="btn btn-primary" onclick="showUpgradeModal()">Upgrade Now</button>
+      </div>
+    </div>
+  </section>
+
   <!-- Signature Modal -->
   <div id="signatureModal" class="modal">
     <div class="modal-content">
@@ -2025,6 +2290,76 @@
       </form>
     </div>
   </div>
+
+  <!-- FINTRAC/AML Compliance Notice Section -->
+  <section id="fintrac" class="section">
+    <div class="fintrac-container">
+      <h1>Anti-Money Laundering Compliance</h1>
+      <p class="fintrac-subtitle">Important information about FINTRAC requirements and identity verification in Canadian real estate</p>
+
+      <div class="fintrac-notice">
+        <div class="fintrac-icon">🛡️</div>
+        <div class="fintrac-content">
+          <h3>What is FINTRAC?</h3>
+          <p>The <strong>Financial Transactions and Reports Analysis Centre of Canada (FINTRAC)</strong> is Canada's financial intelligence unit. Real estate transactions are subject to anti-money laundering (AML) regulations under the <em>Proceeds of Crime (Money Laundering) and Terrorist Financing Act (PCMLTFA)</em>.</p>
+        </div>
+      </div>
+
+      <div class="fintrac-requirements">
+        <h3>Identity Verification Requirements</h3>
+        <p>When buying or selling real estate in Canada, identity verification is required. Here's what you need to know:</p>
+
+        <div class="requirement-cards">
+          <div class="requirement-card">
+            <h4>For Buyers</h4>
+            <ul>
+              <li>Valid government-issued photo ID (passport, driver's license)</li>
+              <li>Proof of address (utility bill, bank statement)</li>
+              <li>Source of funds documentation</li>
+              <li>Verification by lawyer or notary at closing</li>
+            </ul>
+          </div>
+
+          <div class="requirement-card">
+            <h4>For Sellers</h4>
+            <ul>
+              <li>Valid government-issued photo ID</li>
+              <li>Proof of property ownership (title deed)</li>
+              <li>Verification by lawyer at closing</li>
+              <li>Banking information for proceeds</li>
+            </ul>
+          </div>
+
+          <div class="requirement-card">
+            <h4>Third Party Involvement</h4>
+            <ul>
+              <li>Disclose if acting on behalf of another party</li>
+              <li>Beneficial owner information required</li>
+              <li>Corporate buyers must provide director info</li>
+              <li>Trust arrangements require beneficiary disclosure</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="fintrac-warning">
+        <h3>Important Notices</h3>
+        <div class="warning-box">
+          <p><strong>Suspicious Transactions:</strong> Real estate professionals are required to report suspicious transactions to FINTRAC. Large cash transactions (over $10,000) and suspicious activity may be reported.</p>
+        </div>
+        <div class="warning-box">
+          <p><strong>Foreign Buyers:</strong> Non-Canadian buyers are subject to the <em>Prohibition on the Purchase of Residential Property by Non-Canadians Act</em> which restricts certain foreign purchases until 2027.</p>
+        </div>
+        <div class="warning-box">
+          <p><strong>Record Keeping:</strong> Transaction records must be kept for at least 5 years. This includes identification documents, transaction records, and correspondence.</p>
+        </div>
+      </div>
+
+      <div class="fintrac-disclaimer">
+        <p><strong>Disclaimer:</strong> This information is provided for educational purposes only and does not constitute legal advice. For specific questions about FINTRAC compliance, consult with a qualified lawyer or visit <a href="https://fintrac-canafe.canada.ca" target="_blank" rel="noopener">fintrac-canafe.canada.ca</a>.</p>
+      </div>
+    </div>
+  </section>
 
   <!-- FAQ and Help Section -->
   <section id="faq" class="section">
@@ -2250,6 +2585,37 @@
             <p>Most disputes can be resolved between the parties with the help of their lawyers. For issues related to the platform itself, please contact our support team. We encourage all parties to maintain written communication through the platform for documentation purposes.</p>
           </div>
         </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What is FINTRAC and does it apply to me?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>FINTRAC (Financial Transactions and Reports Analysis Centre of Canada) is Canada's financial intelligence unit. While FINTRAC reporting requirements primarily apply to licensed real estate professionals, all parties in a real estate transaction should be prepared to verify their identity. Your lawyer will handle FINTRAC compliance as part of the closing process.</p>
+            <p><a href="#" onclick="showSection('fintrac')">Learn more about FINTRAC requirements →</a></p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            What is a Self-Represented Party Acknowledgement?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>In Ontario and some other provinces, when you buy or sell property without a real estate agent, you may be asked to sign a Self-Represented Party Acknowledgement. This document confirms that you understand you are not being represented by a licensed agent and that you're acting on your own behalf. You can generate this form in our Documents section.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <h3 class="faq-question" onclick="toggleFaq(this)">
+            Can foreign buyers purchase property through this platform?
+            <span class="faq-toggle">+</span>
+          </h3>
+          <div class="faq-answer">
+            <p>Foreign buyers are currently subject to the <em>Prohibition on the Purchase of Residential Property by Non-Canadians Act</em>, which restricts certain non-Canadian individuals and entities from purchasing residential property in specified urban areas until 2027. There are exceptions for work permit holders, refugees, and certain other categories. Consult with a lawyer if you're unsure whether these restrictions apply to you.</p>
+          </div>
+        </div>
       </div>
 
       <div class="faq-contact">
@@ -2274,6 +2640,7 @@
         <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
         <a href="#" onclick="showSection('calculator')">Tax Calculator</a>
         <a href="#" onclick="showSection('faq')">FAQ</a>
+        <a href="#" onclick="showSection('fintrac')">FINTRAC/AML</a>
         <a href="#" onclick="showSection('privacy')">Privacy</a>
         <a href="#" onclick="showSection('terms')">Terms</a>
       </div>
