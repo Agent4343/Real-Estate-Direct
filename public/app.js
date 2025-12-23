@@ -1,39 +1,61 @@
 // API Configuration
-const API_BASE = '/api';
-let authToken = localStorage.getItem('authToken');
-let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+var API_BASE = '/api';
+var authToken = localStorage.getItem('authToken');
+var currentUser = null;
+try {
+  currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+} catch(e) {
+  currentUser = null;
+}
 
 // Image upload state
-let selectedImages = [];
-const MAX_IMAGES = 20;
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+var selectedImages = [];
+var MAX_IMAGES = 20;
+var MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 // User preferences (loaded from API when logged in)
-let favorites = [];
-let checklistProgress = {};
+var favorites = [];
+var checklistProgress = {};
+
+// Test if JavaScript is working - this runs immediately
+console.log('JavaScript loaded successfully');
 
 // Initialize app
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM ready, initializing app...');
+
   try {
-    loadProvinces().catch(function(e) { console.error('loadProvinces error:', e); });
+    loadProvinces();
     updateAuthUI();
-    searchProperties().catch(function(e) { console.error('searchProperties error:', e); });
+    searchProperties();
     initImageUpload();
 
     // Load user preferences from API if logged in
     if (authToken) {
-      try {
-        await loadUserPreferences();
-      } catch (e) {
-        console.error('loadUserPreferences error:', e);
-      }
+      loadUserPreferences();
     }
 
     initChecklists();
+
+    // Add touch support for iOS
+    addTouchSupport();
+
+    console.log('App initialized successfully');
   } catch (error) {
     console.error('App initialization error:', error);
   }
 });
+
+// Add touch event support for iOS Safari
+function addTouchSupport() {
+  // Make all clickable elements respond to touch on iOS
+  var clickables = document.querySelectorAll('a, button, .btn, [onclick]');
+  clickables.forEach(function(el) {
+    el.style.cursor = 'pointer';
+    // Add touch feedback
+    el.addEventListener('touchstart', function() {}, {passive: true});
+  });
+}
 
 // ==========================================
 // User Preferences API
