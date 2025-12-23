@@ -26,6 +26,7 @@
         <a href="#" onclick="showSection('dashboard')" id="dashboardLink" style="display:none;">Dashboard</a>
         <a href="#" onclick="showSection('messages')" id="messagesLink" style="display:none;">Messages</a>
         <a href="#" onclick="showSection('transactions')" id="transactionsLink" style="display:none;">Transactions</a>
+        <a href="#" onclick="showSection('documents')" id="documentsLink" style="display:none;">Documents</a>
         <a href="#" onclick="showSection('profile')" id="profileLink" style="display:none;">Profile</a>
         <a href="#" onclick="showSection('admin')" id="adminLink" style="display:none;">Admin</a>
       </div>
@@ -1652,6 +1653,169 @@
       </div>
     </div>
   </section>
+
+  <!-- Document Management Section -->
+  <section id="documents" class="section">
+    <div class="documents-container">
+      <h1>My Documents</h1>
+      <p class="documents-subtitle">Manage your real estate documents, forms, and e-signatures</p>
+
+      <div class="documents-tabs">
+        <button class="doc-tab active" onclick="showDocTab('all')">All Documents</button>
+        <button class="doc-tab" onclick="showDocTab('pending')">Pending Signatures</button>
+        <button class="doc-tab" onclick="showDocTab('signed')">Completed</button>
+        <button class="doc-tab" onclick="showDocTab('generate')">Generate New</button>
+      </div>
+
+      <div id="doc-all" class="doc-tab-content active">
+        <div class="documents-list" id="allDocumentsList">
+          <div class="empty-state">Loading documents...</div>
+        </div>
+      </div>
+
+      <div id="doc-pending" class="doc-tab-content">
+        <div class="documents-list" id="pendingDocumentsList">
+          <div class="empty-state">No documents pending signature</div>
+        </div>
+      </div>
+
+      <div id="doc-signed" class="doc-tab-content">
+        <div class="documents-list" id="signedDocumentsList">
+          <div class="empty-state">No completed documents</div>
+        </div>
+      </div>
+
+      <div id="doc-generate" class="doc-tab-content">
+        <div class="generate-document-form">
+          <h3>Generate a New Document</h3>
+          <form id="generateDocForm" onsubmit="generateDocument(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="docProvince" required onchange="loadProvinceForms()">
+                  <option value="">Select Province</option>
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                  <option value="PE">Prince Edward Island</option>
+                  <option value="NL">Newfoundland and Labrador</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Document Type</label>
+                <select id="docType" required>
+                  <option value="">Select Document Type</option>
+                  <option value="agreement_purchase_sale">Agreement of Purchase and Sale</option>
+                  <option value="listing_agreement">Listing Agreement</option>
+                  <option value="property_disclosure">Property Disclosure Statement</option>
+                  <option value="buyer_representation">Buyer Representation Agreement</option>
+                  <option value="condition_waiver">Condition Waiver</option>
+                  <option value="amendment">Amendment to Agreement</option>
+                  <option value="counter_offer">Counter Offer</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Related Transaction (optional)</label>
+              <select id="docTransaction">
+                <option value="">None - Standalone Document</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Document Title</label>
+              <input type="text" id="docTitle" placeholder="Enter document title" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Document</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Document Viewer Modal -->
+  <div id="documentViewerModal" class="modal">
+    <div class="modal-content modal-large">
+      <span class="close" onclick="closeModal('documentViewerModal')">&times;</span>
+      <div id="documentViewerContent">
+        <div class="document-viewer-header">
+          <h2 id="docViewerTitle">Document Title</h2>
+          <div class="document-meta">
+            <span id="docViewerType" class="doc-type-badge">Type</span>
+            <span id="docViewerStatus" class="doc-status-badge">Status</span>
+          </div>
+        </div>
+        <div class="document-details">
+          <div class="doc-info-grid">
+            <div class="doc-info-item">
+              <label>Province</label>
+              <span id="docViewerProvince">-</span>
+            </div>
+            <div class="doc-info-item">
+              <label>Form Number</label>
+              <span id="docViewerFormNumber">-</span>
+            </div>
+            <div class="doc-info-item">
+              <label>Created</label>
+              <span id="docViewerCreated">-</span>
+            </div>
+          </div>
+        </div>
+        <div class="signatures-section">
+          <h3>Signatures</h3>
+          <div id="signaturesContainer"></div>
+        </div>
+        <div class="document-actions">
+          <button onclick="downloadDocument()" class="btn btn-outline">Download PDF</button>
+          <button onclick="openSignatureModal()" class="btn btn-primary" id="signDocBtn" style="display:none;">Sign Document</button>
+          <button onclick="sendForSignature()" class="btn btn-secondary" id="sendForSigBtn" style="display:none;">Send for Signature</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signature Modal -->
+  <div id="signatureModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('signatureModal')">&times;</span>
+      <div class="modal-header">
+        <h2>Sign Document</h2>
+        <p>Add your electronic signature</p>
+      </div>
+      <form onsubmit="submitSignature(event)">
+        <div class="form-group">
+          <label>Your Role</label>
+          <select id="signatureRole" required>
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+            <option value="witness">Witness</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Full Legal Name</label>
+          <input type="text" id="signatureName" required placeholder="As it should appear on the document">
+        </div>
+        <div class="form-group">
+          <label>Signature</label>
+          <div class="signature-pad-container">
+            <canvas id="signaturePad" width="400" height="150"></canvas>
+            <button type="button" class="btn btn-outline btn-sm" onclick="clearSignaturePad()">Clear</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="signatureAgreement" required>
+            <span>I agree that my electronic signature is legally binding</span>
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Apply Signature</button>
+      </form>
+    </div>
+  </div>
 
   <!-- FAQ and Help Section -->
   <section id="faq" class="section">

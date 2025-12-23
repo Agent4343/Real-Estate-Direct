@@ -557,3 +557,341 @@ if (originalLogin) {
     checkAdminStatus();
   };
 }
+
+// ==========================================
+// Document Management Functions
+// ==========================================
+
+var currentDocumentId = null;
+var signaturePadCanvas = null;
+var signaturePadCtx = null;
+var isDrawing = false;
+
+async function loadDocuments() {
+  if (!authToken) return;
+
+  try {
+    var response = await fetch(API_BASE + '/documents/my-documents', {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+
+    if (response.ok) {
+      var documents = await response.json();
+      renderDocuments(documents);
+    }
+  } catch (err) {
+    console.error('Failed to load documents:', err);
+  }
+}
+
+function renderDocuments(documents) {
+  var allContainer = document.getElementById('allDocumentsList');
+  var pendingContainer = document.getElementById('pendingDocumentsList');
+  var signedContainer = document.getElementById('signedDocumentsList');
+
+  if (!documents || documents.length === 0) {
+    allContainer.innerHTML = '<div class="empty-state">No documents yet. Generate a new document to get started.</div>';
+    pendingContainer.innerHTML = '<div class="empty-state">No documents pending signature</div>';
+    signedContainer.innerHTML = '<div class="empty-state">No completed documents</div>';
+    return;
+  }
+
+  var allDocs = documents;
+  var pendingDocs = documents.filter(function(d) {
+    return d.status === 'pending_signatures' || d.status === 'partially_signed' || d.status === 'draft';
+  });
+  var signedDocs = documents.filter(function(d) { return d.status === 'signed'; });
+
+  allContainer.innerHTML = allDocs.length > 0 ? renderDocumentList(allDocs) : '<div class="empty-state">No documents yet</div>';
+  pendingContainer.innerHTML = pendingDocs.length > 0 ? renderDocumentList(pendingDocs) : '<div class="empty-state">No documents pending signature</div>';
+  signedContainer.innerHTML = signedDocs.length > 0 ? renderDocumentList(signedDocs) : '<div class="empty-state">No completed documents</div>';
+}
+
+function renderDocumentList(docs) {
+  return docs.map(function(doc) {
+    var statusClass = getDocStatusClass(doc.status);
+    var docType = formatDocType(doc.documentType);
+    var date = new Date(doc.createdAt).toLocaleDateString();
+    return '<div class="document-card" onclick="viewDocument(\'' + doc._id + '\')">' +
+      '<div class="doc-icon">📄</div>' +
+      '<div class="doc-info">' +
+      '<h4>' + (doc.title || docType) + '</h4>' +
+      '<p>' + doc.province + ' - ' + docType + '</p>' +
+      '<span class="doc-date">' + date + '</span>' +
+      '</div>' +
+      '<span class="doc-status ' + statusClass + '">' + formatStatus(doc.status) + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function getDocStatusClass(status) {
+  switch(status) {
+    case 'signed': return 'completed';
+    case 'draft': return 'draft';
+    case 'pending_signatures': return 'pending';
+    case 'partially_signed': return 'pending';
+    default: return '';
+  }
+}
+
+function formatDocType(type) {
+  if (!type) return 'Document';
+  return type.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+}
+
+function formatStatus(status) {
+  if (!status) return 'Unknown';
+  return status.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+}
+
+function showDocTab(tabName) {
+  document.querySelectorAll('.doc-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.doc-tab-content').forEach(function(c) { c.classList.remove('active'); });
+  event.target.classList.add('active');
+  document.getElementById('doc-' + tabName).classList.add('active');
+}
+
+async function viewDocument(docId) {
+  currentDocumentId = docId;
+
+  try {
+    var response = await fetch(API_BASE + '/documents/' + docId, {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+
+    if (response.ok) {
+      var doc = await response.json();
+      displayDocument(doc);
+      showModal('documentViewerModal');
+    } else {
+      showToast('Failed to load document', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to load document', 'error');
+  }
+}
+
+function displayDocument(doc) {
+  document.getElementById('docViewerTitle').textContent = doc.title || formatDocType(doc.documentType);
+  document.getElementById('docViewerType').textContent = formatDocType(doc.documentType);
+  document.getElementById('docViewerStatus').textContent = formatStatus(doc.status);
+  document.getElementById('docViewerStatus').className = 'doc-status-badge ' + getDocStatusClass(doc.status);
+  document.getElementById('docViewerProvince').textContent = doc.province;
+  document.getElementById('docViewerFormNumber').textContent = doc.formNumber || '-';
+  document.getElementById('docViewerCreated').textContent = new Date(doc.createdAt).toLocaleDateString();
+
+  // Render signatures
+  var sigContainer = document.getElementById('signaturesContainer');
+  if (doc.requiredSignatures && doc.requiredSignatures.length > 0) {
+    sigContainer.innerHTML = doc.requiredSignatures.map(function(req) {
+      var signed = doc.signatures && doc.signatures.find(function(s) { return s.role === req.role; });
+      if (signed) {
+        return '<div class="signature-item signed">' +
+          '<span class="sig-role">' + req.role + '</span>' +
+          '<span class="sig-status">Signed by ' + signed.name + ' on ' + new Date(signed.signedAt).toLocaleDateString() + '</span>' +
+          '</div>';
+      } else {
+        return '<div class="signature-item pending">' +
+          '<span class="sig-role">' + req.role + '</span>' +
+          '<span class="sig-status">Pending</span>' +
+          '</div>';
+      }
+    }).join('');
+  } else {
+    sigContainer.innerHTML = '<p>No signatures required</p>';
+  }
+
+  // Show/hide action buttons
+  var canSign = doc.status !== 'signed' && doc.requiredSignatures && doc.requiredSignatures.length > 0;
+  var canSend = doc.status === 'draft' && doc.createdBy && doc.createdBy._id === currentUserId;
+  document.getElementById('signDocBtn').style.display = canSign ? 'inline-block' : 'none';
+  document.getElementById('sendForSigBtn').style.display = canSend ? 'inline-block' : 'none';
+}
+
+async function generateDocument(event) {
+  event.preventDefault();
+
+  var docData = {
+    province: document.getElementById('docProvince').value,
+    documentType: document.getElementById('docType').value,
+    transactionId: document.getElementById('docTransaction').value || undefined,
+    data: {
+      title: document.getElementById('docTitle').value
+    }
+  };
+
+  try {
+    var response = await fetch(API_BASE + '/documents/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify(docData)
+    });
+
+    if (response.ok) {
+      showToast('Document generated successfully', 'success');
+      document.getElementById('generateDocForm').reset();
+      loadDocuments();
+      showDocTab('all');
+      document.querySelector('.doc-tab').click();
+    } else {
+      var data = await response.json();
+      showToast(data.error || 'Failed to generate document', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to generate document', 'error');
+  }
+}
+
+function openSignatureModal() {
+  showModal('signatureModal');
+  initSignaturePad();
+}
+
+function initSignaturePad() {
+  signaturePadCanvas = document.getElementById('signaturePad');
+  signaturePadCtx = signaturePadCanvas.getContext('2d');
+
+  signaturePadCtx.fillStyle = 'white';
+  signaturePadCtx.fillRect(0, 0, signaturePadCanvas.width, signaturePadCanvas.height);
+  signaturePadCtx.strokeStyle = '#000';
+  signaturePadCtx.lineWidth = 2;
+  signaturePadCtx.lineCap = 'round';
+
+  signaturePadCanvas.onmousedown = startDrawing;
+  signaturePadCanvas.onmousemove = draw;
+  signaturePadCanvas.onmouseup = stopDrawing;
+  signaturePadCanvas.onmouseout = stopDrawing;
+
+  signaturePadCanvas.ontouchstart = function(e) {
+    e.preventDefault();
+    startDrawing(e.touches[0]);
+  };
+  signaturePadCanvas.ontouchmove = function(e) {
+    e.preventDefault();
+    draw(e.touches[0]);
+  };
+  signaturePadCanvas.ontouchend = stopDrawing;
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  var rect = signaturePadCanvas.getBoundingClientRect();
+  signaturePadCtx.beginPath();
+  signaturePadCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  var rect = signaturePadCanvas.getBoundingClientRect();
+  signaturePadCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+  signaturePadCtx.stroke();
+}
+
+function stopDrawing() {
+  isDrawing = false;
+}
+
+function clearSignaturePad() {
+  if (signaturePadCtx) {
+    signaturePadCtx.fillStyle = 'white';
+    signaturePadCtx.fillRect(0, 0, signaturePadCanvas.width, signaturePadCanvas.height);
+  }
+}
+
+async function submitSignature(event) {
+  event.preventDefault();
+
+  if (!currentDocumentId) return;
+
+  var signatureData = signaturePadCanvas.toDataURL('image/png');
+
+  var sigData = {
+    role: document.getElementById('signatureRole').value,
+    name: document.getElementById('signatureName').value,
+    signatureData: signatureData
+  };
+
+  try {
+    var response = await fetch(API_BASE + '/documents/' + currentDocumentId + '/sign', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify(sigData)
+    });
+
+    if (response.ok) {
+      showToast('Document signed successfully', 'success');
+      closeModal('signatureModal');
+      closeModal('documentViewerModal');
+      loadDocuments();
+    } else {
+      var data = await response.json();
+      showToast(data.error || 'Failed to sign document', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to sign document', 'error');
+  }
+}
+
+async function sendForSignature() {
+  showToast('Send for signature feature - Enter recipient email addresses', 'info');
+}
+
+function downloadDocument() {
+  if (!currentDocumentId) return;
+  window.open(API_BASE + '/documents/' + currentDocumentId + '/pdf', '_blank');
+}
+
+function loadProvinceForms() {
+  var province = document.getElementById('docProvince').value;
+  if (!province) return;
+  // Form types are already in the select, province-specific info loaded on demand
+}
+
+// Update showSection to include documents
+var prevShowSection = window.showSection;
+window.showSection = function(sectionId) {
+  prevShowSection(sectionId);
+
+  if (sectionId === 'documents') {
+    loadDocuments();
+    loadUserTransactionsForDocuments();
+  }
+};
+
+async function loadUserTransactionsForDocuments() {
+  if (!authToken) return;
+
+  try {
+    var response = await fetch(API_BASE + '/transactions/my', {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+
+    if (response.ok) {
+      var transactions = await response.json();
+      var select = document.getElementById('docTransaction');
+      if (select && transactions.length > 0) {
+        select.innerHTML = '<option value="">None - Standalone Document</option>' +
+          transactions.map(function(t) {
+            var addr = t.property && t.property.address ? t.property.address.street : 'Transaction';
+            return '<option value="' + t._id + '">' + addr + '</option>';
+          }).join('');
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load transactions for documents:', err);
+  }
+}
+
+// Show documents link when logged in
+var prevOnLogin = window.onLoginSuccess;
+window.onLoginSuccess = function() {
+  if (prevOnLogin) prevOnLogin();
+  var docsLink = document.getElementById('documentsLink');
+  if (docsLink) docsLink.style.display = 'inline';
+};

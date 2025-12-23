@@ -3277,3 +3277,298 @@ footer {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ==========================================
+   Document Management Styles
+   ========================================== */
+
+.documents-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.documents-container h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.documents-subtitle {
+  color: var(--gray-500);
+  margin-bottom: 2rem;
+}
+
+.documents-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.doc-tab {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.doc-tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.doc-tab.active {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+
+.doc-tab-content {
+  display: none;
+}
+
+.doc-tab-content.active {
+  display: block;
+}
+
+.documents-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.document-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--white);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.document-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.doc-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-100);
+  border-radius: var(--radius);
+}
+
+.doc-info {
+  flex: 1;
+}
+
+.doc-info h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.doc-info p {
+  color: var(--gray-500);
+  font-size: 0.9rem;
+}
+
+.doc-date {
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+.doc-status {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.doc-status.completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.doc-status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.doc-status.draft {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.generate-document-form {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  max-width: 700px;
+}
+
+.generate-document-form h3 {
+  margin-bottom: 1.5rem;
+}
+
+/* Document Viewer Modal */
+.document-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.document-viewer-header h2 {
+  font-size: 1.5rem;
+}
+
+.document-meta {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.doc-type-badge {
+  background: var(--primary);
+  color: var(--white);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.doc-status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.doc-status-badge.completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.doc-status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.doc-status-badge.draft {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.doc-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.doc-info-item label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  margin-bottom: 0.25rem;
+}
+
+.doc-info-item span {
+  font-weight: 500;
+}
+
+.signatures-section {
+  margin-bottom: 2rem;
+}
+
+.signatures-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.signature-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+}
+
+.signature-item.signed {
+  background: #dcfce7;
+}
+
+.signature-item.pending {
+  background: #fef3c7;
+}
+
+.sig-role {
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.sig-status {
+  font-size: 0.9rem;
+  color: var(--gray-600);
+}
+
+.document-actions {
+  display: flex;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+/* Signature Pad */
+.signature-pad-container {
+  border: 2px dashed var(--gray-300);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  background: var(--white);
+}
+
+.signature-pad-container canvas {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: 150px;
+  cursor: crosshair;
+}
+
+.signature-pad-container .btn {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .documents-tabs {
+    flex-direction: column;
+  }
+
+  .doc-tab {
+    text-align: center;
+  }
+
+  .document-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .doc-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .document-actions {
+    flex-direction: column;
+  }
+}
