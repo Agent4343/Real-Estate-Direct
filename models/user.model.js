@@ -8,6 +8,10 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   // Admin access
   isAdmin: { type: Boolean, default: false },
+  phone: { type: String },
+  // Password reset fields
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
   // Checklist progress - stores which items are completed
   checklistProgress: {
     type: Map,
