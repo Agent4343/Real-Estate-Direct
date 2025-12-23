@@ -13,18 +13,26 @@ let favorites = [];
 let checklistProgress = {};
 
 // Initialize app
-document.addEventListener('DOMContentLoaded', async () => {
-  loadProvinces();
-  updateAuthUI();
-  searchProperties();
-  initImageUpload();
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    loadProvinces().catch(function(e) { console.error('loadProvinces error:', e); });
+    updateAuthUI();
+    searchProperties().catch(function(e) { console.error('searchProperties error:', e); });
+    initImageUpload();
 
-  // Load user preferences from API if logged in
-  if (authToken) {
-    await loadUserPreferences();
+    // Load user preferences from API if logged in
+    if (authToken) {
+      try {
+        await loadUserPreferences();
+      } catch (e) {
+        console.error('loadUserPreferences error:', e);
+      }
+    }
+
+    initChecklists();
+  } catch (error) {
+    console.error('App initialization error:', error);
   }
-
-  initChecklists();
 });
 
 // ==========================================
@@ -748,20 +756,37 @@ function clearAllImages() {
 // ==========================================
 
 function showSection(sectionId) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(sectionId).classList.add('active');
+  try {
+    document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+    var section = document.getElementById(sectionId);
+    if (section) {
+      section.classList.add('active');
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
-  if (sectionId === 'dashboard' && authToken) {
-    loadDashboard();
+    if (sectionId === 'dashboard' && authToken) {
+      loadDashboard();
+    }
+  } catch (error) {
+    console.error('showSection error:', error);
   }
 }
 
-function showTab(tabId) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+function showTab(tabId, event) {
+  try {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
 
-  event.target.classList.add('active');
-  document.getElementById(tabId).classList.add('active');
+    if (event && event.target) {
+      event.target.classList.add('active');
+    }
+    var tab = document.getElementById(tabId);
+    if (tab) {
+      tab.classList.add('active');
+    }
+  } catch (error) {
+    console.error('showTab error:', error);
+  }
 }
 
 // ==========================================
@@ -769,11 +794,25 @@ function showTab(tabId) {
 // ==========================================
 
 function showModal(modalId) {
-  document.getElementById(modalId).classList.add('active');
+  try {
+    var modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('active');
+    }
+  } catch (error) {
+    console.error('showModal error:', error);
+  }
 }
 
 function closeModal(modalId) {
-  document.getElementById(modalId).classList.remove('active');
+  try {
+    var modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('active');
+    }
+  } catch (error) {
+    console.error('closeModal error:', error);
+  }
 }
 
 // Close modal on outside click
