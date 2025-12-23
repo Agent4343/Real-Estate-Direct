@@ -1027,6 +1027,168 @@ header {
   color: white;
 }
 
+/* Calculator Tabs */
+.calculator-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--gray-200);
+  padding-bottom: 0.5rem;
+}
+
+.calc-tab-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--gray-600);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius) var(--radius) 0 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calc-tab-btn:hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.calc-tab-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.calc-tab-content {
+  display: none;
+}
+
+.calc-tab-content.active {
+  display: block;
+}
+
+/* Mortgage Calculator Styles */
+.mortgage-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.calc-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.calc-item:last-child {
+  border-bottom: none;
+}
+
+.calc-item.highlight {
+  background: var(--primary-50);
+  padding: 1rem;
+  border-radius: var(--radius);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.calc-item.highlight span:last-child {
+  color: var(--primary);
+}
+
+.calc-item.calc-total {
+  background: var(--gray-900);
+  color: white;
+  padding: 1rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.cmhc-warning {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  border-radius: var(--radius);
+}
+
+.cmhc-warning .warning-icon {
+  font-size: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.form-hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  margin-top: 0.25rem;
+}
+
+/* Affordability Calculator Styles */
+.afford-summary {
+  text-align: center;
+}
+
+.afford-main {
+  background: linear-gradient(135deg, var(--primary), var(--primary-700));
+  color: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+}
+
+.afford-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.afford-amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.afford-details {
+  background: var(--gray-50);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+.afford-note {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  background: var(--gray-50);
+  padding: 1rem;
+  border-radius: var(--radius);
+  text-align: left;
+}
+
+.afford-note p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .calculator-tabs {
+    flex-wrap: wrap;
+  }
+
+  .calc-tab-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .afford-amount {
+    font-size: 2rem;
+  }
+}
+
 .checkbox-group {
   margin-top: 1rem;
 }

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const User = require('./models/user.model');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -7,11 +8,52 @@ const { body, validationResult } = require('express-validator');
 const emailService = require('./services/email.service');
 const authMiddleware = require('./auth.middleware');
 
+// Strict rate limiting for login attempts (prevents brute force)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per 15 minutes
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true // Don't count successful logins
+});
+
+// Rate limiting for registration (prevents mass account creation)
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // 3 registrations per hour per IP
+  message: { error: 'Too many accounts created. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Rate limiting for password reset (prevents abuse)
+const passwordResetLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // 3 reset attempts per hour
+  message: { error: 'Too many password reset attempts. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Password complexity regex - requires:
+// - At least 8 characters
+// - At least one uppercase letter
+// - At least one lowercase letter
+// - At least one number
+// - At least one special character
+const passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 // Validation middleware for registration
 const registerValidation = [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+  body('password')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+    .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+    .matches(/\d/).withMessage('Password must contain at least one number')
+    .matches(/[@$!%*?&]/).withMessage('Password must contain at least one special character (@$!%*?&)')
 ];
 
 // Validation middleware for login
@@ -21,7 +63,7 @@ const loginValidation = [
 ];
 
 // Register
-router.post('/register', registerValidation, async (req, res) => {
+router.post('/register', registerLimiter, registerValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -46,7 +88,7 @@ router.post('/register', registerValidation, async (req, res) => {
 });
 
 // Login
-router.post('/login', loginValidation, async (req, res) => {
+router.post('/login', loginLimiter, loginValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -76,7 +118,7 @@ router.post('/login', loginValidation, async (req, res) => {
 });
 
 // Forgot Password - Request reset link
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
@@ -110,6 +152,17 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
+// Helper function to validate password complexity
+function validatePasswordComplexity(password) {
+  const errors = [];
+  if (password.length < 8) errors.push('at least 8 characters');
+  if (!/[a-z]/.test(password)) errors.push('one lowercase letter');
+  if (!/[A-Z]/.test(password)) errors.push('one uppercase letter');
+  if (!/\d/.test(password)) errors.push('one number');
+  if (!/[@$!%*?&]/.test(password)) errors.push('one special character (@$!%*?&)');
+  return errors;
+}
+
 // Reset Password - Set new password with token
 router.post('/reset-password', async (req, res) => {
   try {
@@ -119,8 +172,11 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ error: 'Token and password are required' });
     }
 
-    if (password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    const passwordErrors = validatePasswordComplexity(password);
+    if (passwordErrors.length > 0) {
+      return res.status(400).json({
+        error: `Password must contain: ${passwordErrors.join(', ')}`
+      });
     }
 
     // Hash the token to compare with stored hash
@@ -157,8 +213,11 @@ router.post('/change-password', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Current and new password are required' });
     }
 
-    if (newPassword.length < 8) {
-      return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    const passwordErrors = validatePasswordComplexity(newPassword);
+    if (passwordErrors.length > 0) {
+      return res.status(400).json({
+        error: `New password must contain: ${passwordErrors.join(', ')}`
+      });
     }
 
     const user = await User.findById(req.user.userId);

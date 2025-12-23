@@ -208,26 +208,26 @@ function loadSavedProperties() {
       <div class="saved-property-card">
         <div class="saved-property-image">
           ${p.image
-            ? `<img src="${p.image}" alt="${p.address?.street}">`
+            ? `<img src="${sanitizeUrl(p.image)}" alt="${escapeHtml(p.address?.street)}">`
             : '<div class="property-image-placeholder">🏠</div>'
           }
         </div>
         <div class="saved-property-info">
-          <div class="saved-property-price">$${p.askingPrice?.toLocaleString() || 'N/A'}</div>
-          <div class="saved-property-address">${p.address?.street || ''}, ${p.address?.city || ''}</div>
+          <div class="saved-property-price">${formatCurrency(p.askingPrice)}</div>
+          <div class="saved-property-address">${escapeHtml(p.address?.street || '')}, ${escapeHtml(p.address?.city || '')}</div>
           <div class="saved-property-details">
-            <span>${p.bedrooms || 0} beds</span>
-            <span>${p.bathrooms || 0} baths</span>
-            <span>${p.squareFeet || 'N/A'} sqft</span>
+            <span>${escapeHtml(p.bedrooms || 0)} beds</span>
+            <span>${escapeHtml(p.bathrooms || 0)} baths</span>
+            <span>${escapeHtml(p.squareFeet || 'N/A')} sqft</span>
           </div>
           <div class="saved-property-meta">
-            <span class="property-type-badge">${p.propertyType || 'Property'}</span>
-            <span class="saved-date">Saved ${formatSavedDate(p.savedAt)}</span>
+            <span class="property-type-badge">${escapeHtml(p.propertyType || 'Property')}</span>
+            <span class="saved-date">Saved ${escapeHtml(formatSavedDate(p.savedAt))}</span>
           </div>
         </div>
         <div class="saved-property-actions">
-          <button class="btn btn-primary btn-sm" onclick="viewProperty('${p.id}')">View</button>
-          <button class="btn btn-outline btn-sm" onclick="removeFavorite('${p.id}')">Remove</button>
+          <button class="btn btn-primary btn-sm" onclick="viewProperty('${escapeHtml(p.id)}')">View</button>
+          <button class="btn btn-outline btn-sm" onclick="removeFavorite('${escapeHtml(p.id)}')">Remove</button>
         </div>
       </div>
     `).join('');
@@ -643,7 +643,10 @@ function showToast(message, type = 'info') {
   if (!container) return;
 
   const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
+  // Validate type to prevent class injection
+  const validTypes = ['success', 'error', 'info', 'warning'];
+  const safeType = validTypes.includes(type) ? type : 'info';
+  toast.className = `toast toast-${safeType}`;
 
   const icons = {
     success: '✓',
@@ -653,8 +656,8 @@ function showToast(message, type = 'info') {
   };
 
   toast.innerHTML = `
-    <span class="toast-icon">${icons[type] || icons.info}</span>
-    <span class="toast-message">${message}</span>
+    <span class="toast-icon">${icons[safeType]}</span>
+    <span class="toast-message">${escapeHtml(message)}</span>
   `;
 
   container.appendChild(toast);
@@ -1055,33 +1058,34 @@ async function searchProperties() {
 
     if (data.properties && data.properties.length > 0) {
       grid.innerHTML = data.properties.map(p => {
+        const safeId = escapeHtml(p._id);
         const mainImage = p.images && p.images.length > 0
-          ? `<img src="${p.images[0].url}" alt="${p.address?.street}" style="width:100%;height:100%;object-fit:cover;">`
+          ? `<img src="${sanitizeUrl(p.images[0].url)}" alt="${escapeHtml(p.address?.street)}" style="width:100%;height:100%;object-fit:cover;">`
           : '<div class="property-image-placeholder">🏠</div>';
 
         const isFav = isFavorite(p._id);
 
         return `
-          <div class="property-card" onclick="viewProperty('${p._id}')">
+          <div class="property-card" onclick="viewProperty('${safeId}')">
             <div class="property-image">
               ${mainImage}
               <button class="favorite-btn ${isFav ? 'favorited' : ''}"
-                      data-property-id="${p._id}"
-                      onclick="toggleFavorite('${p._id}', event)"
+                      data-property-id="${safeId}"
+                      onclick="toggleFavorite('${safeId}', event)"
                       title="${isFav ? 'Remove from saved' : 'Save property'}">
                 ${isFav ? '❤️' : '🤍'}
               </button>
             </div>
-            ${p.images && p.images.length > 1 ? `<span class="image-count">📷 ${p.images.length}</span>` : ''}
+            ${p.images && p.images.length > 1 ? `<span class="image-count">📷 ${escapeHtml(p.images.length)}</span>` : ''}
             <div class="property-info">
-              <div class="property-price">$${p.askingPrice?.toLocaleString() || 'N/A'}</div>
-              <div class="property-address">${p.address?.street || ''}, ${p.address?.city || ''}</div>
+              <div class="property-price">${formatCurrency(p.askingPrice)}</div>
+              <div class="property-address">${escapeHtml(p.address?.street || '')}, ${escapeHtml(p.address?.city || '')}</div>
               <div class="property-details">
-                <span>${p.bedrooms || 0} beds</span>
-                <span>${p.bathrooms || 0} baths</span>
-                <span>${p.squareFeet || 'N/A'} sqft</span>
+                <span>${escapeHtml(p.bedrooms || 0)} beds</span>
+                <span>${escapeHtml(p.bathrooms || 0)} baths</span>
+                <span>${escapeHtml(p.squareFeet || 'N/A')} sqft</span>
               </div>
-              <div class="property-type-badge">${p.propertyType || 'Property'}</div>
+              <div class="property-type-badge">${escapeHtml(p.propertyType || 'Property')}</div>
             </div>
           </div>
         `;
@@ -1100,23 +1104,27 @@ async function viewProperty(propertyId) {
     const response = await fetch(`${API_BASE}/properties/${propertyId}`);
     const property = await response.json();
 
+    // Sanitize property data
+    const safeId = escapeHtml(property._id);
+    const safeStatus = escapeHtml(property.status);
+
     // Build image gallery HTML
     let galleryHtml = '';
     if (property.images && property.images.length > 0) {
       galleryHtml = `
         <div class="property-gallery">
           <div class="gallery-main">
-            <img id="galleryMainImage" src="${property.images[0].url}" alt="${property.address?.street}">
+            <img id="galleryMainImage" src="${sanitizeUrl(property.images[0].url)}" alt="${escapeHtml(property.address?.street)}">
             <div class="gallery-nav">
               <button class="gallery-nav-btn" onclick="prevGalleryImage()">‹</button>
-              <span class="gallery-counter"><span id="galleryIndex">1</span> / ${property.images.length}</span>
+              <span class="gallery-counter"><span id="galleryIndex">1</span> / ${escapeHtml(property.images.length)}</span>
               <button class="gallery-nav-btn" onclick="nextGalleryImage()">›</button>
             </div>
           </div>
           ${property.images.length > 1 ? `
             <div class="gallery-thumbnails">
               ${property.images.map((img, i) => `
-                <img src="${img.url}" alt="Photo ${i + 1}"
+                <img src="${sanitizeUrl(img.url)}" alt="Photo ${i + 1}"
                      class="gallery-thumb ${i === 0 ? 'active' : ''}"
                      onclick="selectGalleryImage(${i})"
                      data-index="${i}">
@@ -1137,47 +1145,47 @@ async function viewProperty(propertyId) {
       ${galleryHtml}
 
       <div class="property-detail-header">
-        <h2 class="property-detail-price">$${property.askingPrice?.toLocaleString()}</h2>
-        <span class="property-status-badge status-${property.status}">${property.status}</span>
+        <h2 class="property-detail-price">${formatCurrency(property.askingPrice)}</h2>
+        <span class="property-status-badge status-${safeStatus}">${safeStatus}</span>
       </div>
 
       <p class="property-detail-address">
-        <strong>${property.address?.street}${property.address?.unit ? ', Unit ' + property.address.unit : ''}</strong>
+        <strong>${escapeHtml(property.address?.street)}${property.address?.unit ? ', Unit ' + escapeHtml(property.address.unit) : ''}</strong>
       </p>
-      <p class="property-detail-location">${property.address?.city}, ${property.address?.province} ${property.address?.postalCode}</p>
+      <p class="property-detail-location">${escapeHtml(property.address?.city)}, ${escapeHtml(property.address?.province)} ${escapeHtml(property.address?.postalCode)}</p>
 
       <div class="property-stats">
         <div class="stat-item">
-          <span class="stat-value">${property.bedrooms || 0}</span>
+          <span class="stat-value">${escapeHtml(property.bedrooms || 0)}</span>
           <span class="stat-label">Bedrooms</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">${property.bathrooms || 0}</span>
+          <span class="stat-value">${escapeHtml(property.bathrooms || 0)}</span>
           <span class="stat-label">Bathrooms</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">${property.squareFeet?.toLocaleString() || 'N/A'}</span>
+          <span class="stat-value">${escapeHtml(property.squareFeet?.toLocaleString() || 'N/A')}</span>
           <span class="stat-label">Sq Ft</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">${property.yearBuilt || 'N/A'}</span>
+          <span class="stat-value">${escapeHtml(property.yearBuilt || 'N/A')}</span>
           <span class="stat-label">Year Built</span>
         </div>
       </div>
 
       <div class="property-description">
         <h3>Description</h3>
-        <p>${property.description || 'No description provided.'}</p>
+        <p>${escapeHtml(property.description || 'No description provided.')}</p>
       </div>
 
       <div class="property-features">
         <h3>Property Details</h3>
         <div class="features-grid">
-          <div class="feature-item"><span class="feature-label">Type:</span> ${property.propertyType || 'N/A'}</div>
-          <div class="feature-item"><span class="feature-label">Lot Size:</span> ${property.lotSize || 'N/A'} ${property.lotSizeUnit || 'sqft'}</div>
-          <div class="feature-item"><span class="feature-label">Parking:</span> ${property.parkingSpaces || 0} spaces</div>
-          <div class="feature-item"><span class="feature-label">Heating:</span> ${property.heatingType || 'N/A'}</div>
-          <div class="feature-item"><span class="feature-label">Cooling:</span> ${property.coolingType || 'N/A'}</div>
+          <div class="feature-item"><span class="feature-label">Type:</span> ${escapeHtml(property.propertyType || 'N/A')}</div>
+          <div class="feature-item"><span class="feature-label">Lot Size:</span> ${escapeHtml(property.lotSize || 'N/A')} ${escapeHtml(property.lotSizeUnit || 'sqft')}</div>
+          <div class="feature-item"><span class="feature-label">Parking:</span> ${escapeHtml(property.parkingSpaces || 0)} spaces</div>
+          <div class="feature-item"><span class="feature-label">Heating:</span> ${escapeHtml(property.heatingType || 'N/A')}</div>
+          <div class="feature-item"><span class="feature-label">Cooling:</span> ${escapeHtml(property.coolingType || 'N/A')}</div>
         </div>
       </div>
 
@@ -1185,13 +1193,13 @@ async function viewProperty(propertyId) {
         <div class="property-amenities">
           <h3>Features & Amenities</h3>
           <div class="amenities-list">
-            ${property.features.map(f => `<span class="amenity-tag">✓ ${f}</span>`).join('')}
+            ${property.features.map(f => `<span class="amenity-tag">✓ ${escapeHtml(f)}</span>`).join('')}
           </div>
         </div>
       ` : ''}
 
       ${authToken && property.status === 'active' ? `
-        <button onclick="prepareOffer('${property._id}')" class="btn btn-primary btn-lg" style="margin-top:1.5rem;width:100%;">
+        <button onclick="prepareOffer('${safeId}')" class="btn btn-primary btn-lg" style="margin-top:1.5rem;width:100%;">
           Make an Offer
         </button>
       ` : authToken ? '' : '<p style="margin-top:1rem;text-align:center;"><a href="#" onclick="showModal(\'loginModal\')">Login</a> to make an offer</p>'}
@@ -1477,41 +1485,219 @@ async function calculateTax() {
       <h3>Tax Breakdown</h3>
       <div class="calc-item">
         <span>Purchase Price:</span>
-        <span>$${data.purchasePrice?.toLocaleString()}</span>
+        <span>${formatCurrency(data.purchasePrice)}</span>
       </div>
       ${data.provincial ? `
         <div class="calc-item">
           <span>Provincial Tax:</span>
-          <span>$${data.provincial?.toLocaleString()}</span>
+          <span>${formatCurrency(data.provincial)}</span>
         </div>
       ` : ''}
       ${data.municipal ? `
         <div class="calc-item">
           <span>Municipal Tax:</span>
-          <span>$${data.municipal?.toLocaleString()}</span>
+          <span>${formatCurrency(data.municipal)}</span>
         </div>
       ` : ''}
       ${data.registrationFee ? `
         <div class="calc-item">
           <span>Registration Fee:</span>
-          <span>$${data.registrationFee?.toLocaleString()}</span>
+          <span>${formatCurrency(data.registrationFee)}</span>
         </div>
       ` : ''}
       ${data.rebate ? `
         <div class="calc-item" style="color:#10b981;">
           <span>First-Time Buyer Rebate:</span>
-          <span>-$${data.rebate?.toLocaleString()}</span>
+          <span>-${formatCurrency(data.rebate)}</span>
         </div>
       ` : ''}
       <div class="calc-item calc-total">
         <span>Total Tax/Fees:</span>
-        <span>$${data.total?.toLocaleString()}</span>
+        <span>${formatCurrency(data.total)}</span>
       </div>
-      ${data.note ? `<p style="margin-top:1rem;color:#666;font-size:0.875rem;">${data.note}</p>` : ''}
+      ${data.note ? `<p style="margin-top:1rem;color:#666;font-size:0.875rem;">${escapeHtml(data.note)}</p>` : ''}
     `;
   } catch (error) {
     alert('Calculation failed: ' + error.message);
   }
+}
+
+// ==========================================
+// Calculator Tabs
+// ==========================================
+
+function showCalcTab(tabName, event) {
+  // Hide all tab contents
+  document.querySelectorAll('.calc-tab-content').forEach(function(content) {
+    content.style.display = 'none';
+    content.classList.remove('active');
+  });
+
+  // Deactivate all tab buttons
+  document.querySelectorAll('.calc-tab-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+
+  // Show selected tab
+  var tabContent = document.getElementById(tabName + 'Calc');
+  if (tabContent) {
+    tabContent.style.display = 'block';
+    tabContent.classList.add('active');
+  }
+
+  // Activate clicked button
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+
+  // Run calculator for the selected tab
+  if (tabName === 'mortgage') {
+    calculateMortgage();
+  } else if (tabName === 'affordability') {
+    calculateAffordability();
+  }
+}
+
+// ==========================================
+// Mortgage Calculator
+// ==========================================
+
+function calculateMortgage() {
+  var homePrice = parseFloat(document.getElementById('mortgagePrice')?.value) || 0;
+  var downPayment = parseFloat(document.getElementById('mortgageDown')?.value) || 0;
+  var interestRate = parseFloat(document.getElementById('mortgageRate')?.value) || 5;
+  var amortization = parseInt(document.getElementById('mortgageAmortization')?.value) || 25;
+  var frequency = document.getElementById('mortgageFrequency')?.value || 'monthly';
+
+  // Calculate mortgage amount
+  var mortgageAmount = homePrice - downPayment;
+  if (mortgageAmount < 0) mortgageAmount = 0;
+
+  // Update down payment percentage hint
+  var downPaymentPercent = homePrice > 0 ? ((downPayment / homePrice) * 100).toFixed(1) : 0;
+  var percentHint = document.getElementById('downPaymentPercent');
+  if (percentHint) {
+    percentHint.textContent = downPaymentPercent + '% of purchase price';
+  }
+
+  // Calculate CMHC insurance if down payment < 20%
+  var cmhcPremium = 0;
+  var cmhcWarning = document.getElementById('cmhcWarning');
+  if (downPaymentPercent < 20 && homePrice > 0) {
+    // CMHC premium rates based on loan-to-value ratio
+    var ltv = (mortgageAmount / homePrice) * 100;
+    var premiumRate = 0;
+    if (ltv <= 65) premiumRate = 0.006;
+    else if (ltv <= 75) premiumRate = 0.017;
+    else if (ltv <= 80) premiumRate = 0.024;
+    else if (ltv <= 85) premiumRate = 0.028;
+    else if (ltv <= 90) premiumRate = 0.031;
+    else if (ltv <= 95) premiumRate = 0.04;
+
+    cmhcPremium = mortgageAmount * premiumRate;
+    mortgageAmount += cmhcPremium; // CMHC premium is added to mortgage
+
+    if (cmhcWarning) {
+      cmhcWarning.style.display = 'block';
+      document.getElementById('cmhcPremium').textContent = formatCurrency(cmhcPremium);
+    }
+  } else {
+    if (cmhcWarning) cmhcWarning.style.display = 'none';
+  }
+
+  // Calculate monthly payment using mortgage formula
+  var monthlyRate = interestRate / 100 / 12;
+  var numPayments = amortization * 12;
+  var monthlyPayment = 0;
+
+  if (monthlyRate > 0 && mortgageAmount > 0) {
+    monthlyPayment = mortgageAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
+      (Math.pow(1 + monthlyRate, numPayments) - 1);
+  }
+
+  // Adjust for payment frequency
+  var paymentAmount = monthlyPayment;
+  var paymentsPerYear = 12;
+  if (frequency === 'biweekly') {
+    paymentAmount = monthlyPayment / 2;
+    paymentsPerYear = 26;
+  } else if (frequency === 'weekly') {
+    paymentAmount = monthlyPayment / 4;
+    paymentsPerYear = 52;
+  }
+
+  // Calculate total interest
+  var totalPayments = monthlyPayment * numPayments;
+  var totalInterest = totalPayments - mortgageAmount;
+  var totalCost = homePrice + totalInterest;
+
+  // Update display
+  document.getElementById('mortgageAmount').textContent = formatCurrency(mortgageAmount);
+  document.getElementById('mortgagePayment').textContent = formatCurrency(paymentAmount) +
+    (frequency === 'monthly' ? '/mo' : frequency === 'biweekly' ? '/bi-wk' : '/wk');
+  document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+  document.getElementById('totalCost').textContent = formatCurrency(totalCost);
+}
+
+// ==========================================
+// Affordability Calculator
+// ==========================================
+
+function calculateAffordability() {
+  var annualIncome = parseFloat(document.getElementById('annualIncome')?.value) || 0;
+  var monthlyDebt = parseFloat(document.getElementById('monthlyDebt')?.value) || 0;
+  var availableDown = parseFloat(document.getElementById('availableDown')?.value) || 0;
+  var interestRate = parseFloat(document.getElementById('affordRate')?.value) || 5;
+  var propTaxRate = parseFloat(document.getElementById('propTaxRate')?.value) || 1;
+
+  var monthlyIncome = annualIncome / 12;
+
+  // GDS ratio (Gross Debt Service) - max 32% for housing costs
+  // Housing costs = mortgage + property tax + heating (estimate $150/mo)
+  var maxGDS = monthlyIncome * 0.32;
+
+  // TDS ratio (Total Debt Service) - max 40% for all debt
+  var maxTDS = monthlyIncome * 0.40;
+  var availableForHousing = maxTDS - monthlyDebt;
+
+  // Use the lower of GDS and TDS-adjusted amounts
+  var maxMonthlyPayment = Math.min(maxGDS, availableForHousing);
+
+  // Subtract estimated property tax and heating from available payment
+  // We'll iterate to find the max home price
+  var heatingEstimate = 150; // Monthly heating cost estimate
+  var maxHomePrice = 0;
+
+  // Iterative calculation to find max home price
+  for (var price = 100000; price <= 3000000; price += 10000) {
+    var monthlyPropTax = (price * propTaxRate / 100) / 12;
+    var availableForMortgage = maxMonthlyPayment - monthlyPropTax - heatingEstimate;
+
+    if (availableForMortgage <= 0) continue;
+
+    // Calculate max mortgage that would result in this payment
+    var monthlyRate = interestRate / 100 / 12;
+    var numPayments = 25 * 12; // 25 year amortization
+
+    var maxMortgage = availableForMortgage *
+      (Math.pow(1 + monthlyRate, numPayments) - 1) /
+      (monthlyRate * Math.pow(1 + monthlyRate, numPayments));
+
+    var requiredDown = price - maxMortgage;
+
+    // Check if we have enough down payment
+    if (requiredDown <= availableDown) {
+      maxHomePrice = price;
+    } else {
+      break; // We've exceeded what we can afford
+    }
+  }
+
+  // Update display
+  document.getElementById('maxHomePrice').textContent = formatCurrency(maxHomePrice);
+  document.getElementById('maxMonthlyGDS').textContent = formatCurrency(maxGDS);
+  document.getElementById('maxMonthlyTDS').textContent = formatCurrency(availableForHousing);
+  document.getElementById('maxMortgage').textContent = formatCurrency(maxHomePrice - availableDown);
 }
 
 // ==========================================
@@ -1534,18 +1720,22 @@ async function loadDashboard() {
 
     const list = document.getElementById('propertiesList');
     if (properties.length > 0) {
-      list.innerHTML = properties.map(p => `
-        <div class="dashboard-item">
-          <div>
-            <strong>${p.address?.street}, ${p.address?.city}</strong>
-            <br><small>$${p.askingPrice?.toLocaleString()} - ${p.propertyType}</small>
+      list.innerHTML = properties.map(p => {
+        const safeId = escapeHtml(p._id);
+        const safeStatus = escapeHtml(p.status);
+        return `
+          <div class="dashboard-item">
+            <div>
+              <strong>${escapeHtml(p.address?.street)}, ${escapeHtml(p.address?.city)}</strong>
+              <br><small>${formatCurrency(p.askingPrice)} - ${escapeHtml(p.propertyType)}</small>
+            </div>
+            <div>
+              <span class="status-badge status-${safeStatus}">${safeStatus}</span>
+              ${p.status === 'draft' ? `<button class="btn btn-sm btn-primary" onclick="activateListing('${safeId}')">Activate</button>` : ''}
+            </div>
           </div>
-          <div>
-            <span class="status-badge status-${p.status}">${p.status}</span>
-            ${p.status === 'draft' ? `<button class="btn btn-sm btn-primary" onclick="activateListing('${p._id}')">Activate</button>` : ''}
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } else {
       list.innerHTML = '<p>No properties yet. <a href="#" onclick="showSection(\'sell\')">List one now!</a></p>';
     }
@@ -1562,15 +1752,18 @@ async function loadDashboard() {
 
     const list = document.getElementById('offersList');
     if (offers.length > 0) {
-      list.innerHTML = offers.map(o => `
-        <div class="dashboard-item">
-          <div>
-            <strong>${o.property?.address?.street || 'Property'}</strong>
-            <br><small>Offer: $${o.offerPrice?.toLocaleString()}</small>
+      list.innerHTML = offers.map(o => {
+        const safeStatus = escapeHtml(o.status);
+        return `
+          <div class="dashboard-item">
+            <div>
+              <strong>${escapeHtml(o.property?.address?.street || 'Property')}</strong>
+              <br><small>Offer: ${formatCurrency(o.offerPrice)}</small>
+            </div>
+            <span class="status-badge status-${safeStatus}">${safeStatus}</span>
           </div>
-          <span class="status-badge status-${o.status}">${o.status}</span>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } else {
       list.innerHTML = '<p>No offers yet. <a href="#" onclick="showSection(\'search\')">Find properties!</a></p>';
     }
@@ -1587,15 +1780,18 @@ async function loadDashboard() {
 
     const list = document.getElementById('transactionsList');
     if (transactions.length > 0) {
-      list.innerHTML = transactions.map(t => `
-        <div class="dashboard-item">
-          <div>
-            <strong>${t.property?.address?.street || 'Transaction'}</strong>
-            <br><small>$${t.purchasePrice?.toLocaleString()} - Closing: ${new Date(t.closingDate).toLocaleDateString()}</small>
+      list.innerHTML = transactions.map(t => {
+        const safeStatus = escapeHtml(t.status);
+        return `
+          <div class="dashboard-item">
+            <div>
+              <strong>${escapeHtml(t.property?.address?.street || 'Transaction')}</strong>
+              <br><small>${formatCurrency(t.purchasePrice)} - Closing: ${formatDate(t.closingDate)}</small>
+            </div>
+            <span class="status-badge status-${safeStatus}">${safeStatus}</span>
           </div>
-          <span class="status-badge status-${t.status}">${t.status}</span>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } else {
       list.innerHTML = '<p>No transactions yet.</p>';
     }
