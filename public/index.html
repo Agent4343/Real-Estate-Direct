@@ -27,6 +27,7 @@
         <a href="#" onclick="showSection('messages')" id="messagesLink" style="display:none;">Messages</a>
         <a href="#" onclick="showSection('transactions')" id="transactionsLink" style="display:none;">Transactions</a>
         <a href="#" onclick="showSection('documents')" id="documentsLink" style="display:none;">Documents</a>
+        <a href="#" onclick="showSection('notifications')" id="notificationsLink" style="display:none;">Notifications</a>
         <a href="#" onclick="showSection('profile')" id="profileLink" style="display:none;">Profile</a>
         <a href="#" onclick="showSection('admin')" id="adminLink" style="display:none;">Admin</a>
       </div>
@@ -35,8 +36,26 @@
         <button onclick="showModal('registerModal')" class="btn btn-primary">Get Started</button>
       </div>
       <div class="user-info" id="userInfo" style="display:none;">
+        <div class="notification-bell" id="notificationBell" onclick="toggleNotifications()">
+          <span class="bell-icon">🔔</span>
+          <span class="notification-count" id="notificationCount" style="display:none;">0</span>
+        </div>
         <span id="userName" class="user-name"></span>
         <button onclick="logout()" class="btn btn-outline">Logout</button>
+      </div>
+
+      <!-- Notification Panel -->
+      <div id="notificationPanel" class="notification-panel" style="display:none;">
+        <div class="notification-header">
+          <h3>Notifications</h3>
+          <button onclick="markAllNotificationsRead()" class="btn btn-sm btn-outline">Mark all read</button>
+        </div>
+        <div class="notification-list" id="notificationList">
+          <div class="empty-state">No notifications</div>
+        </div>
+        <div class="notification-footer">
+          <a href="#" onclick="showSection('notifications'); closeNotificationPanel();">View all notifications</a>
+        </div>
       </div>
     </nav>
   </header>
@@ -1777,6 +1796,31 @@
       </div>
     </div>
   </div>
+
+  <!-- Notifications Section -->
+  <section id="notifications" class="section">
+    <div class="notifications-container">
+      <div class="notifications-header">
+        <h1>Notifications</h1>
+        <div class="notifications-actions">
+          <button onclick="markAllNotificationsRead()" class="btn btn-outline">Mark all as read</button>
+          <button onclick="clearAllNotifications()" class="btn btn-outline">Clear all</button>
+        </div>
+      </div>
+
+      <div class="notifications-filters">
+        <button class="notif-filter active" onclick="filterNotifications('all')">All</button>
+        <button class="notif-filter" onclick="filterNotifications('offers')">Offers</button>
+        <button class="notif-filter" onclick="filterNotifications('messages')">Messages</button>
+        <button class="notif-filter" onclick="filterNotifications('transactions')">Transactions</button>
+        <button class="notif-filter" onclick="filterNotifications('documents')">Documents</button>
+      </div>
+
+      <div class="notifications-full-list" id="notificationsFullList">
+        <div class="empty-state">No notifications</div>
+      </div>
+    </div>
+  </section>
 
   <!-- Signature Modal -->
   <div id="signatureModal" class="modal">

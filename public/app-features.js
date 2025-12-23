@@ -894,4 +894,268 @@ window.onLoginSuccess = function() {
   if (prevOnLogin) prevOnLogin();
   var docsLink = document.getElementById('documentsLink');
   if (docsLink) docsLink.style.display = 'inline';
+  var notifsLink = document.getElementById('notificationsLink');
+  if (notifsLink) notifsLink.style.display = 'inline';
+  loadNotifications();
 };
+
+// ==========================================
+// Notification Center Functions
+// ==========================================
+
+var notificationsData = [];
+var notificationPanelOpen = false;
+
+function toggleNotifications() {
+  var panel = document.getElementById('notificationPanel');
+  notificationPanelOpen = !notificationPanelOpen;
+  panel.style.display = notificationPanelOpen ? 'block' : 'none';
+
+  if (notificationPanelOpen) {
+    loadNotifications();
+  }
+}
+
+function closeNotificationPanel() {
+  var panel = document.getElementById('notificationPanel');
+  panel.style.display = 'none';
+  notificationPanelOpen = false;
+}
+
+async function loadNotifications() {
+  if (!authToken) return;
+
+  try {
+    var response = await fetch(API_BASE + '/notifications', {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+
+    if (response.ok) {
+      notificationsData = await response.json();
+      renderNotifications();
+      updateNotificationCount();
+    }
+  } catch (err) {
+    console.error('Failed to load notifications:', err);
+    // Use mock data for demo
+    notificationsData = getMockNotifications();
+    renderNotifications();
+    updateNotificationCount();
+  }
+}
+
+function getMockNotifications() {
+  return [
+    { _id: '1', type: 'offer', title: 'New Offer Received', message: 'You received an offer of $550,000 on 123 Main St', createdAt: new Date(), read: false },
+    { _id: '2', type: 'message', title: 'New Message', message: 'John Smith sent you a message', createdAt: new Date(Date.now() - 3600000), read: false },
+    { _id: '3', type: 'transaction', title: 'Transaction Update', message: 'Financing condition has been fulfilled', createdAt: new Date(Date.now() - 86400000), read: true },
+    { _id: '4', type: 'document', title: 'Document Signed', message: 'Agreement of Purchase and Sale has been signed', createdAt: new Date(Date.now() - 172800000), read: true }
+  ];
+}
+
+function renderNotifications() {
+  var panelList = document.getElementById('notificationList');
+  var fullList = document.getElementById('notificationsFullList');
+
+  if (!notificationsData || notificationsData.length === 0) {
+    var emptyHtml = '<div class="empty-state">No notifications</div>';
+    if (panelList) panelList.innerHTML = emptyHtml;
+    if (fullList) fullList.innerHTML = emptyHtml;
+    return;
+  }
+
+  var recentNotifs = notificationsData.slice(0, 5);
+
+  if (panelList) {
+    panelList.innerHTML = recentNotifs.map(function(n) {
+      return renderNotificationItem(n, true);
+    }).join('');
+  }
+
+  if (fullList) {
+    fullList.innerHTML = notificationsData.map(function(n) {
+      return renderNotificationItem(n, false);
+    }).join('');
+  }
+}
+
+function renderNotificationItem(n, isCompact) {
+  var icon = getNotificationIcon(n.type);
+  var timeAgo = getTimeAgo(new Date(n.createdAt));
+  var readClass = n.read ? 'read' : 'unread';
+
+  if (isCompact) {
+    return '<div class="notification-item ' + readClass + '" onclick="handleNotificationClick(\'' + n._id + '\', \'' + n.type + '\')">' +
+      '<span class="notif-icon">' + icon + '</span>' +
+      '<div class="notif-content">' +
+      '<p class="notif-title">' + n.title + '</p>' +
+      '<span class="notif-time">' + timeAgo + '</span>' +
+      '</div>' +
+      '</div>';
+  } else {
+    return '<div class="notification-item-full ' + readClass + '" onclick="handleNotificationClick(\'' + n._id + '\', \'' + n.type + '\')">' +
+      '<span class="notif-icon">' + icon + '</span>' +
+      '<div class="notif-content">' +
+      '<p class="notif-title">' + n.title + '</p>' +
+      '<p class="notif-message">' + n.message + '</p>' +
+      '<span class="notif-time">' + timeAgo + '</span>' +
+      '</div>' +
+      '<button class="notif-dismiss" onclick="dismissNotification(event, \'' + n._id + '\')">×</button>' +
+      '</div>';
+  }
+}
+
+function getNotificationIcon(type) {
+  switch(type) {
+    case 'offer': return '📝';
+    case 'message': return '💬';
+    case 'transaction': return '🏠';
+    case 'document': return '📄';
+    case 'payment': return '💰';
+    default: return '🔔';
+  }
+}
+
+function getTimeAgo(date) {
+  var seconds = Math.floor((new Date() - date) / 1000);
+
+  if (seconds < 60) return 'Just now';
+  if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+  if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+  if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+  return date.toLocaleDateString();
+}
+
+function updateNotificationCount() {
+  var countEl = document.getElementById('notificationCount');
+  var unreadCount = notificationsData.filter(function(n) { return !n.read; }).length;
+
+  if (unreadCount > 0) {
+    countEl.textContent = unreadCount > 9 ? '9+' : unreadCount;
+    countEl.style.display = 'inline-block';
+  } else {
+    countEl.style.display = 'none';
+  }
+}
+
+function handleNotificationClick(notifId, type) {
+  markNotificationRead(notifId);
+  closeNotificationPanel();
+
+  switch(type) {
+    case 'offer':
+      showSection('dashboard');
+      break;
+    case 'message':
+      showSection('messages');
+      break;
+    case 'transaction':
+      showSection('transactions');
+      break;
+    case 'document':
+      showSection('documents');
+      break;
+    default:
+      break;
+  }
+}
+
+async function markNotificationRead(notifId) {
+  var notif = notificationsData.find(function(n) { return n._id === notifId; });
+  if (notif) notif.read = true;
+  updateNotificationCount();
+  renderNotifications();
+
+  try {
+    await fetch(API_BASE + '/notifications/' + notifId + '/read', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+  } catch (err) {
+    console.error('Failed to mark notification as read:', err);
+  }
+}
+
+async function markAllNotificationsRead() {
+  notificationsData.forEach(function(n) { n.read = true; });
+  updateNotificationCount();
+  renderNotifications();
+
+  try {
+    await fetch(API_BASE + '/notifications/read-all', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+    showToast('All notifications marked as read', 'success');
+  } catch (err) {
+    console.error('Failed to mark all notifications as read:', err);
+  }
+}
+
+async function dismissNotification(event, notifId) {
+  event.stopPropagation();
+
+  notificationsData = notificationsData.filter(function(n) { return n._id !== notifId; });
+  updateNotificationCount();
+  renderNotifications();
+
+  try {
+    await fetch(API_BASE + '/notifications/' + notifId, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+  } catch (err) {
+    console.error('Failed to dismiss notification:', err);
+  }
+}
+
+async function clearAllNotifications() {
+  notificationsData = [];
+  updateNotificationCount();
+  renderNotifications();
+
+  try {
+    await fetch(API_BASE + '/notifications/clear', {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+    showToast('All notifications cleared', 'success');
+  } catch (err) {
+    console.error('Failed to clear notifications:', err);
+  }
+}
+
+function filterNotifications(filter) {
+  document.querySelectorAll('.notif-filter').forEach(function(b) { b.classList.remove('active'); });
+  event.target.classList.add('active');
+
+  var filteredData = filter === 'all' ? notificationsData :
+    notificationsData.filter(function(n) { return n.type === filter.slice(0, -1); });
+
+  var fullList = document.getElementById('notificationsFullList');
+  if (filteredData.length === 0) {
+    fullList.innerHTML = '<div class="empty-state">No ' + filter + ' notifications</div>';
+  } else {
+    fullList.innerHTML = filteredData.map(function(n) {
+      return renderNotificationItem(n, false);
+    }).join('');
+  }
+}
+
+// Close notification panel when clicking outside
+document.addEventListener('click', function(event) {
+  var panel = document.getElementById('notificationPanel');
+  var bell = document.getElementById('notificationBell');
+
+  if (notificationPanelOpen && panel && bell &&
+      !panel.contains(event.target) && !bell.contains(event.target)) {
+    closeNotificationPanel();
+  }
+});
+
+// Poll for new notifications every 30 seconds
+setInterval(function() {
+  if (authToken) {
+    loadNotifications();
+  }
+}, 30000);
