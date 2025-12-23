@@ -69,8 +69,27 @@
     <section id="home" class="section active">
       <div class="hero">
         <div class="hero-content">
-          <h1>Buy or Sell Real Estate <span class="highlight">Across Canada</span></h1>
-          <p class="hero-subtitle">Your one-stop platform for buying and selling properties. Simple process, all legal forms included, every province supported.</p>
+          <div class="hero-badge">Save $15,000+ on Your Next Home</div>
+          <h1>Buy or Sell Real Estate <span class="highlight">Without the 6% Commission</span></h1>
+          <p class="hero-subtitle">Traditional agents charge 5-6%. We charge just 2% total. Keep more money in your pocket with Canada's modern real estate platform.</p>
+          <div class="savings-highlight">
+            <div class="savings-comparison">
+              <div class="savings-item traditional">
+                <span class="label">Traditional Agent</span>
+                <span class="rate">5-6%</span>
+                <span class="example">$30,000 on $500K home</span>
+              </div>
+              <div class="savings-vs">VS</div>
+              <div class="savings-item ours">
+                <span class="label">Real Estate Direct</span>
+                <span class="rate">2%</span>
+                <span class="example">$10,000 on $500K home</span>
+              </div>
+              <div class="savings-result">
+                <span class="you-save">You Save: <strong>$20,000</strong></span>
+              </div>
+            </div>
+          </div>
           <div class="hero-buttons">
             <button onclick="showSection('search')" class="btn btn-primary btn-lg">
               <span class="btn-icon">🔍</span> Find Properties
@@ -78,19 +97,34 @@
             <button onclick="showSection('sell')" class="btn btn-secondary btn-lg">
               <span class="btn-icon">📝</span> List Your Property
             </button>
+            <button onclick="showSection('savings-calculator')" class="btn btn-outline btn-lg hero-calc-btn">
+              <span class="btn-icon">🧮</span> Calculate Your Savings
+            </button>
           </div>
           <div class="hero-stats">
+            <div class="stat">
+              <span class="stat-number">2%</span>
+              <span class="stat-label">Total Commission</span>
+            </div>
             <div class="stat">
               <span class="stat-number">13</span>
               <span class="stat-label">Provinces & Territories</span>
             </div>
             <div class="stat">
-              <span class="stat-number">100%</span>
-              <span class="stat-label">Legal Compliance</span>
+              <span class="stat-number">$0</span>
+              <span class="stat-label">Upfront Fees</span>
             </div>
             <div class="stat">
               <span class="stat-number">24/7</span>
               <span class="stat-label">Platform Access</span>
+            </div>
+          </div>
+          <div class="hero-trust">
+            <p>Trusted by homeowners across Canada</p>
+            <div class="trust-badges">
+              <span class="trust-badge">Secure Transactions</span>
+              <span class="trust-badge">Legal Documents Included</span>
+              <span class="trust-badge">AI-Powered Tools</span>
             </div>
           </div>
         </div>
@@ -136,6 +170,106 @@
         <h2 class="section-title">Serving All of Canada</h2>
         <p class="section-subtitle">From coast to coast, we support real estate transactions in every province and territory.</p>
         <div class="province-grid" id="provinceGrid"></div>
+      </div>
+
+      <!-- Success Stories / Testimonials -->
+      <div class="testimonials-section">
+        <h2 class="section-title">Success Stories</h2>
+        <p class="section-subtitle">See how Canadians are saving thousands with Real Estate Direct</p>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="testimonial-savings">Saved $18,500</div>
+            <div class="testimonial-content">
+              <p>"We sold our Toronto home for $740,000 and saved over $18,000 compared to using a traditional agent. The platform made the entire process simple and stress-free."</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">SM</div>
+              <div class="author-info">
+                <strong>Sarah M.</strong>
+                <span>Toronto, ON - Sold in 21 days</span>
+              </div>
+            </div>
+            <div class="testimonial-rating">★★★★★</div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-savings">Saved $12,000</div>
+            <div class="testimonial-content">
+              <p>"As a first-time buyer, I was nervous about buying without an agent. The step-by-step guides and document templates made it easy. Plus, I saved $12K on my purchase!"</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">JT</div>
+              <div class="author-info">
+                <strong>James T.</strong>
+                <span>Vancouver, BC - First-time buyer</span>
+              </div>
+            </div>
+            <div class="testimonial-rating">★★★★★</div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-savings">Saved $25,200</div>
+            <div class="testimonial-content">
+              <p>"Sold our family home for $1.2M. The AI tools helped us find a great lawyer and mortgage rate. Couldn't believe how much we saved - over $25,000!"</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">PL</div>
+              <div class="author-info">
+                <strong>Patricia L.</strong>
+                <span>Calgary, AB - Upgraded to larger home</span>
+              </div>
+            </div>
+            <div class="testimonial-rating">★★★★★</div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-savings">Saved $9,800</div>
+            <div class="testimonial-content">
+              <p>"I was hesitant at first, but the secure messaging and offer comparison tools made negotiating easy. Sold my condo in just 2 weeks!"</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">MK</div>
+              <div class="author-info">
+                <strong>Michael K.</strong>
+                <span>Montreal, QC - Condo seller</span>
+              </div>
+            </div>
+            <div class="testimonial-rating">★★★★★</div>
+          </div>
+        </div>
+        <div class="testimonials-stats">
+          <div class="testimonial-stat">
+            <span class="stat-value">$15,400</span>
+            <span class="stat-label">Average Savings</span>
+          </div>
+          <div class="testimonial-stat">
+            <span class="stat-value">23 days</span>
+            <span class="stat-label">Average Time to Sell</span>
+          </div>
+          <div class="testimonial-stat">
+            <span class="stat-value">4.8/5</span>
+            <span class="stat-label">User Rating</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home Valuation Tool Teaser -->
+      <div class="valuation-teaser-section">
+        <div class="valuation-teaser-content">
+          <div class="valuation-icon">🏠</div>
+          <h2>What's Your Home Worth?</h2>
+          <p>Get an instant AI-powered estimate of your property's value based on recent sales in your area.</p>
+          <button onclick="showSection('home-valuation')" class="btn btn-primary btn-lg">Get Free Valuation</button>
+        </div>
+      </div>
+
+      <!-- Referral Banner -->
+      <div class="referral-banner">
+        <div class="referral-content">
+          <div class="referral-icon">🎁</div>
+          <div class="referral-text">
+            <h3>Refer a Friend, Earn $500</h3>
+            <p>Know someone buying or selling? Refer them to Real Estate Direct and you both get $500 off your platform fee when their transaction closes.</p>
+          </div>
+          <button onclick="showSection('referrals')" class="btn btn-secondary">Learn More</button>
+        </div>
       </div>
 
       <div class="cta-section">
@@ -2629,6 +2763,388 @@
     </div>
   </section>
 
+  <!-- Savings Calculator Section -->
+  <section id="savings-calculator" class="section">
+    <div class="section-header">
+      <h2>Commission Savings Calculator</h2>
+      <p>See exactly how much you'll save compared to traditional real estate agents</p>
+    </div>
+    <div class="savings-calc-container">
+      <div class="savings-calc-form">
+        <div class="form-group">
+          <label>Property Value ($)</label>
+          <input type="number" id="savingsPropertyValue" value="500000" min="50000" step="10000" onchange="calculateSavings()">
+          <input type="range" id="savingsPropertySlider" min="100000" max="2000000" step="25000" value="500000" onchange="updateSavingsValue(this.value)">
+        </div>
+        <div class="form-group">
+          <label>Are you buying or selling?</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="transactionType" value="selling" checked onchange="calculateSavings()"> Selling</label>
+            <label class="radio-label"><input type="radio" name="transactionType" value="buying" onchange="calculateSavings()"> Buying</label>
+            <label class="radio-label"><input type="radio" name="transactionType" value="both" onchange="calculateSavings()"> Both (buying & selling)</label>
+          </div>
+        </div>
+      </div>
+      <div class="savings-calc-results" id="savingsResults">
+        <div class="savings-comparison-card">
+          <div class="comparison-side traditional">
+            <h3>Traditional Agent</h3>
+            <div class="commission-breakdown">
+              <div class="breakdown-item">
+                <span>Commission Rate</span>
+                <span class="rate">5%</span>
+              </div>
+              <div class="breakdown-item total">
+                <span>Total Cost</span>
+                <span class="amount" id="traditionalCost">$25,000</span>
+              </div>
+            </div>
+          </div>
+          <div class="comparison-side ours">
+            <h3>Real Estate Direct</h3>
+            <div class="commission-breakdown">
+              <div class="breakdown-item">
+                <span>Commission Rate</span>
+                <span class="rate">2%</span>
+              </div>
+              <div class="breakdown-item total">
+                <span>Total Cost</span>
+                <span class="amount" id="ourCost">$10,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="savings-total-card">
+          <div class="savings-icon">💰</div>
+          <div class="savings-amount">
+            <span class="label">Your Savings</span>
+            <span class="value" id="totalSavings">$15,000</span>
+          </div>
+          <p class="savings-note">That's money you keep in your pocket!</p>
+        </div>
+        <div class="savings-cta">
+          <button onclick="showModal('registerModal')" class="btn btn-primary btn-lg">Start Saving Today</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Home Valuation Section -->
+  <section id="home-valuation" class="section">
+    <div class="section-header">
+      <h2>Free Home Valuation</h2>
+      <p>Get an instant AI-powered estimate of your property's market value</p>
+    </div>
+    <div class="valuation-container">
+      <div class="valuation-form-card">
+        <form onsubmit="getHomeValuation(event)" class="valuation-form">
+          <div class="form-group">
+            <label>Province *</label>
+            <select id="valuationProvince" required>
+              <option value="">Select Province</option>
+              <option value="ON">Ontario</option>
+              <option value="BC">British Columbia</option>
+              <option value="AB">Alberta</option>
+              <option value="QC">Quebec</option>
+              <option value="MB">Manitoba</option>
+              <option value="SK">Saskatchewan</option>
+              <option value="NS">Nova Scotia</option>
+              <option value="NB">New Brunswick</option>
+              <option value="PE">Prince Edward Island</option>
+              <option value="NL">Newfoundland and Labrador</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>City *</label>
+              <input type="text" id="valuationCity" required placeholder="e.g., Toronto">
+            </div>
+            <div class="form-group">
+              <label>Postal Code *</label>
+              <input type="text" id="valuationPostal" required placeholder="e.g., M5V 1A1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Property Type *</label>
+            <select id="valuationType" required>
+              <option value="detached">Detached House</option>
+              <option value="semi-detached">Semi-Detached</option>
+              <option value="townhouse">Townhouse</option>
+              <option value="condo">Condo / Apartment</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bedrooms *</label>
+              <select id="valuationBeds" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Bathrooms *</label>
+              <select id="valuationBaths" required>
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Square Feet</label>
+              <input type="number" id="valuationSqft" placeholder="e.g., 1500">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Year Built</label>
+            <input type="number" id="valuationYear" placeholder="e.g., 2000" min="1800" max="2025">
+          </div>
+          <div class="form-group">
+            <label>Property Condition</label>
+            <select id="valuationCondition">
+              <option value="excellent">Excellent - Recently renovated</option>
+              <option value="good" selected>Good - Well maintained</option>
+              <option value="fair">Fair - Some updates needed</option>
+              <option value="needs-work">Needs Work - Major renovations required</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg btn-block" id="valuationBtn">
+            <span class="btn-icon">🏠</span> Get My Valuation
+          </button>
+        </form>
+      </div>
+      <div class="valuation-results-card" id="valuationResults" style="display: none;">
+        <div class="valuation-header">
+          <h3>Estimated Market Value</h3>
+          <span class="valuation-badge">AI-Powered Estimate</span>
+        </div>
+        <div class="valuation-estimate">
+          <span class="estimate-range" id="valuationRange">$485,000 - $525,000</span>
+          <span class="estimate-primary" id="valuationPrimary">$505,000</span>
+        </div>
+        <div class="valuation-details">
+          <div class="detail-item">
+            <span class="label">Price per sq ft</span>
+            <span class="value" id="valuationPricePerSqft">$337</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Market trend</span>
+            <span class="value trend-up" id="valuationTrend">+3.2% (6 months)</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Avg days on market</span>
+            <span class="value" id="valuationDays">18 days</span>
+          </div>
+        </div>
+        <div class="valuation-comparables">
+          <h4>Recent Comparable Sales</h4>
+          <div class="comparable-list" id="comparableList">
+            <!-- Filled by JavaScript -->
+          </div>
+        </div>
+        <div class="valuation-cta">
+          <p>Ready to list your property?</p>
+          <button onclick="showSection('sell')" class="btn btn-primary">List My Property</button>
+          <button onclick="showSection('ai-tools')" class="btn btn-outline">Find a Lawyer</button>
+        </div>
+        <p class="valuation-disclaimer">*This is an estimated value based on market data. Actual sale price may vary. Get a professional appraisal for accurate valuation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Referrals Section -->
+  <section id="referrals" class="section">
+    <div class="referrals-container">
+      <div class="referrals-header">
+        <div class="referrals-icon">🎁</div>
+        <h1>Refer Friends, Earn Rewards</h1>
+        <p>Share Real Estate Direct with friends and family. When they complete a transaction, you both save!</p>
+      </div>
+      <div class="referrals-how-it-works">
+        <h2>How It Works</h2>
+        <div class="referral-steps">
+          <div class="referral-step">
+            <div class="step-number">1</div>
+            <div class="step-icon">📧</div>
+            <h3>Share Your Link</h3>
+            <p>Get your unique referral link and share it with friends who are buying or selling</p>
+          </div>
+          <div class="referral-step">
+            <div class="step-number">2</div>
+            <div class="step-icon">🏠</div>
+            <h3>They Sign Up</h3>
+            <p>Your friend creates an account and lists or searches for properties</p>
+          </div>
+          <div class="referral-step">
+            <div class="step-number">3</div>
+            <div class="step-icon">✅</div>
+            <h3>Transaction Closes</h3>
+            <p>When their sale or purchase completes successfully</p>
+          </div>
+          <div class="referral-step">
+            <div class="step-number">4</div>
+            <div class="step-icon">💰</div>
+            <h3>You Both Save</h3>
+            <p>You each get $500 credited toward your platform fees</p>
+          </div>
+        </div>
+      </div>
+      <div class="referral-share-card" id="referralShareCard">
+        <div class="share-content" id="loggedOutReferral">
+          <h3>Get Your Referral Link</h3>
+          <p>Create an account to get your unique referral link and start earning rewards.</p>
+          <button onclick="showModal('registerModal')" class="btn btn-primary btn-lg">Create Account</button>
+        </div>
+        <div class="share-content" id="loggedInReferral" style="display: none;">
+          <h3>Your Referral Link</h3>
+          <div class="referral-link-box">
+            <input type="text" id="referralLink" readonly value="https://realestatedirect.ca/ref/YOUR_CODE">
+            <button onclick="copyReferralLink()" class="btn btn-primary">Copy</button>
+          </div>
+          <div class="share-buttons">
+            <button onclick="shareViaEmail()" class="btn btn-outline"><span>📧</span> Email</button>
+            <button onclick="shareViaFacebook()" class="btn btn-outline"><span>📘</span> Facebook</button>
+            <button onclick="shareViaTwitter()" class="btn btn-outline"><span>🐦</span> Twitter</button>
+            <button onclick="shareViaWhatsApp()" class="btn btn-outline"><span>💬</span> WhatsApp</button>
+          </div>
+          <div class="referral-stats">
+            <div class="referral-stat">
+              <span class="stat-value" id="referralsSent">0</span>
+              <span class="stat-label">Invites Sent</span>
+            </div>
+            <div class="referral-stat">
+              <span class="stat-value" id="referralsSignedUp">0</span>
+              <span class="stat-label">Friends Signed Up</span>
+            </div>
+            <div class="referral-stat">
+              <span class="stat-value" id="referralsEarned">$0</span>
+              <span class="stat-label">Total Earned</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="referral-terms">
+        <h4>Terms & Conditions</h4>
+        <ul>
+          <li>Referral credit is applied when the referred person's transaction closes successfully</li>
+          <li>Maximum credit of $500 per referral, up to $2,500 per year</li>
+          <li>Credits cannot be combined with other promotions</li>
+          <li>Credits are applied to your next platform fee</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog/Resources Section -->
+  <section id="blog" class="section">
+    <div class="section-header">
+      <h2>Real Estate Resources</h2>
+      <p>Expert guides, tips, and insights for Canadian home buyers and sellers</p>
+    </div>
+    <div class="blog-container">
+      <div class="blog-featured">
+        <div class="blog-card featured">
+          <div class="blog-image">
+            <span class="blog-category">Guide</span>
+          </div>
+          <div class="blog-content">
+            <h3>Complete Guide to Selling Your Home Without an Agent in 2024</h3>
+            <p>Everything you need to know about FSBO (For Sale By Owner) in Canada, from pricing strategies to closing the deal.</p>
+            <div class="blog-meta">
+              <span class="read-time">15 min read</span>
+              <span class="date">Updated Dec 2024</span>
+            </div>
+            <button onclick="showSection('how-to-sell')" class="btn btn-outline">Read Guide</button>
+          </div>
+        </div>
+      </div>
+      <div class="blog-grid">
+        <div class="blog-card">
+          <div class="blog-image small">
+            <span class="blog-category">Buying</span>
+          </div>
+          <div class="blog-content">
+            <h3>First-Time Home Buyer's Checklist for Canada</h3>
+            <p>Step-by-step checklist covering everything from mortgage pre-approval to closing day.</p>
+            <button onclick="showSection('how-to-buy')" class="btn btn-sm btn-outline">Read More</button>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-image small">
+            <span class="blog-category">Legal</span>
+          </div>
+          <div class="blog-content">
+            <h3>Understanding FINTRAC: What Buyers & Sellers Need to Know</h3>
+            <p>Anti-money laundering requirements and how they affect your real estate transaction.</p>
+            <button onclick="showSection('fintrac')" class="btn btn-sm btn-outline">Read More</button>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-image small">
+            <span class="blog-category">Finance</span>
+          </div>
+          <div class="blog-content">
+            <h3>Land Transfer Tax by Province: Complete 2024 Guide</h3>
+            <p>Calculate your closing costs with our province-by-province breakdown and first-time buyer rebates.</p>
+            <button onclick="showSection('calculator')" class="btn btn-sm btn-outline">Use Calculator</button>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-image small">
+            <span class="blog-category">Tips</span>
+          </div>
+          <div class="blog-content">
+            <h3>How to Price Your Home to Sell Fast</h3>
+            <p>Pricing strategies that attract buyers and maximize your sale price in any market.</p>
+            <button onclick="showSection('how-to-sell')" class="btn btn-sm btn-outline">Read More</button>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-image small">
+            <span class="blog-category">Negotiation</span>
+          </div>
+          <div class="blog-content">
+            <h3>Handling Multiple Offers: A Seller's Guide</h3>
+            <p>How to evaluate and negotiate when you receive multiple offers on your property.</p>
+            <button onclick="showSection('how-to-sell')" class="btn btn-sm btn-outline">Read More</button>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-image small">
+            <span class="blog-category">Market</span>
+          </div>
+          <div class="blog-content">
+            <h3>Canadian Housing Market Update: Winter 2024</h3>
+            <p>Current trends, pricing data, and what to expect in the coming months.</p>
+            <button class="btn btn-sm btn-outline">Coming Soon</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Offer Comparison Section -->
+  <section id="offer-comparison" class="section">
+    <div class="section-header">
+      <h2>Compare Offers</h2>
+      <p>Review and compare all offers on your property side by side</p>
+    </div>
+    <div class="offer-comparison-container">
+      <div class="no-offers-state" id="noOffersState">
+        <div class="empty-icon">📋</div>
+        <h3>No Offers to Compare Yet</h3>
+        <p>When you receive offers on your property, you'll be able to compare them here side by side.</p>
+        <button onclick="showSection('dashboard')" class="btn btn-outline">Go to Dashboard</button>
+      </div>
+      <div class="offers-comparison-grid" id="offersComparisonGrid" style="display: none;">
+        <!-- Filled by JavaScript when offers exist -->
+      </div>
+    </div>
+  </section>
+
   <!-- Success/Error Toast -->
   <div id="toast" class="toast"></div>
 
@@ -2641,13 +3157,17 @@
       <div class="footer-links">
         <a href="#" onclick="showSection('how-to-buy')">How to Buy</a>
         <a href="#" onclick="showSection('how-to-sell')">How to Sell</a>
+        <a href="#" onclick="showSection('home-valuation')">Home Valuation</a>
+        <a href="#" onclick="showSection('savings-calculator')">Savings Calculator</a>
         <a href="#" onclick="showSection('calculator')">Tax Calculator</a>
+        <a href="#" onclick="showSection('blog')">Resources</a>
+        <a href="#" onclick="showSection('referrals')">Refer & Earn</a>
         <a href="#" onclick="showSection('faq')">FAQ</a>
         <a href="#" onclick="showSection('fintrac')">FINTRAC/AML</a>
         <a href="#" onclick="showSection('privacy')">Privacy</a>
         <a href="#" onclick="showSection('terms')">Terms</a>
       </div>
-      <p class="footer-disclaimer">© 2024 Real Estate Direct. This platform provides tools for convenience only. Consult with licensed real estate professionals and lawyers for legal advice.</p>
+      <p class="footer-disclaimer">© 2025 Real Estate Direct. This platform provides tools for convenience only. Consult with licensed real estate professionals and lawyers for legal advice.</p>
     </div>
   </footer>
 

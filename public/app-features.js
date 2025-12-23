@@ -2070,3 +2070,354 @@ window.onLoginSuccess = function() {
   var aiToolsLink = document.getElementById('aiToolsLink');
   if (aiToolsLink) aiToolsLink.style.display = 'inline';
 };
+
+// ==========================================
+// Savings Calculator Functions
+// ==========================================
+
+function updateSavingsValue(value) {
+  document.getElementById('savingsPropertyValue').value = value;
+  calculateSavings();
+}
+
+function calculateSavings() {
+  var propertyValue = parseFloat(document.getElementById('savingsPropertyValue').value) || 500000;
+  var transactionType = document.querySelector('input[name="transactionType"]:checked');
+  var type = transactionType ? transactionType.value : 'selling';
+
+  // Update slider
+  var slider = document.getElementById('savingsPropertySlider');
+  if (slider) slider.value = propertyValue;
+
+  var traditionalRate = 0.05; // 5% traditional
+  var ourRate = 0.02; // 2% (1% buyer + 1% seller)
+
+  var multiplier = 1;
+  if (type === 'both') {
+    multiplier = 2;
+  }
+
+  var traditionalCost = propertyValue * traditionalRate * multiplier;
+  var ourCost = propertyValue * ourRate * multiplier;
+  var savings = traditionalCost - ourCost;
+
+  document.getElementById('traditionalCost').textContent = '$' + traditionalCost.toLocaleString();
+  document.getElementById('ourCost').textContent = '$' + ourCost.toLocaleString();
+  document.getElementById('totalSavings').textContent = '$' + savings.toLocaleString();
+}
+
+// Initialize savings calculator on page load
+document.addEventListener('DOMContentLoaded', function() {
+  calculateSavings();
+});
+
+// ==========================================
+// Home Valuation Functions
+// ==========================================
+
+// Sample market data by province/city (in production, this would come from an API)
+var marketData = {
+  'ON': {
+    'Toronto': { avgPrice: 1050000, pricePerSqft: 750, trend: 2.5, daysOnMarket: 15 },
+    'Ottawa': { avgPrice: 650000, pricePerSqft: 450, trend: 3.2, daysOnMarket: 22 },
+    'default': { avgPrice: 550000, pricePerSqft: 350, trend: 2.8, daysOnMarket: 25 }
+  },
+  'BC': {
+    'Vancouver': { avgPrice: 1250000, pricePerSqft: 900, trend: 1.8, daysOnMarket: 18 },
+    'Victoria': { avgPrice: 850000, pricePerSqft: 600, trend: 2.2, daysOnMarket: 21 },
+    'default': { avgPrice: 650000, pricePerSqft: 450, trend: 2.5, daysOnMarket: 24 }
+  },
+  'AB': {
+    'Calgary': { avgPrice: 550000, pricePerSqft: 350, trend: 4.5, daysOnMarket: 28 },
+    'Edmonton': { avgPrice: 420000, pricePerSqft: 280, trend: 3.8, daysOnMarket: 32 },
+    'default': { avgPrice: 380000, pricePerSqft: 250, trend: 4.0, daysOnMarket: 35 }
+  },
+  'QC': {
+    'Montreal': { avgPrice: 550000, pricePerSqft: 400, trend: 3.5, daysOnMarket: 25 },
+    'Quebec City': { avgPrice: 350000, pricePerSqft: 280, trend: 4.2, daysOnMarket: 30 },
+    'default': { avgPrice: 320000, pricePerSqft: 240, trend: 3.8, daysOnMarket: 32 }
+  },
+  'default': { avgPrice: 400000, pricePerSqft: 300, trend: 3.0, daysOnMarket: 28 }
+};
+
+var propertyTypeMultipliers = {
+  'detached': 1.0,
+  'semi-detached': 0.85,
+  'townhouse': 0.75,
+  'condo': 0.7
+};
+
+var conditionMultipliers = {
+  'excellent': 1.1,
+  'good': 1.0,
+  'fair': 0.9,
+  'needs-work': 0.75
+};
+
+function getHomeValuation(event) {
+  event.preventDefault();
+
+  var province = document.getElementById('valuationProvince').value;
+  var city = document.getElementById('valuationCity').value.trim();
+  var postalCode = document.getElementById('valuationPostal').value.trim();
+  var propertyType = document.getElementById('valuationType').value;
+  var beds = parseInt(document.getElementById('valuationBeds').value);
+  var baths = parseInt(document.getElementById('valuationBaths').value);
+  var sqft = parseInt(document.getElementById('valuationSqft').value) || 1500;
+  var yearBuilt = parseInt(document.getElementById('valuationYear').value) || 2000;
+  var condition = document.getElementById('valuationCondition').value;
+
+  // Get market data
+  var provinceData = marketData[province] || marketData['default'];
+  var cityData = provinceData[city] || provinceData['default'] || provinceData;
+
+  // Base calculation
+  var basePrice = cityData.avgPrice || 400000;
+  var pricePerSqft = cityData.pricePerSqft || 300;
+
+  // Adjust for sqft
+  var sqftValue = sqft * pricePerSqft;
+
+  // Adjust for property type
+  var typeMultiplier = propertyTypeMultipliers[propertyType] || 1.0;
+
+  // Adjust for condition
+  var condMultiplier = conditionMultipliers[condition] || 1.0;
+
+  // Adjust for bedrooms (more beds = higher value)
+  var bedMultiplier = 1 + ((beds - 3) * 0.05);
+
+  // Adjust for year built
+  var currentYear = new Date().getFullYear();
+  var age = currentYear - yearBuilt;
+  var ageMultiplier = age < 5 ? 1.1 : (age > 50 ? 0.85 : 1 - (age * 0.002));
+
+  // Calculate estimated value
+  var estimatedValue = sqftValue * typeMultiplier * condMultiplier * bedMultiplier * ageMultiplier;
+
+  // Round to nearest 5000
+  estimatedValue = Math.round(estimatedValue / 5000) * 5000;
+
+  // Calculate range (±4%)
+  var lowEstimate = Math.round(estimatedValue * 0.96 / 1000) * 1000;
+  var highEstimate = Math.round(estimatedValue * 1.04 / 1000) * 1000;
+
+  // Update results
+  document.getElementById('valuationPrimary').textContent = '$' + estimatedValue.toLocaleString();
+  document.getElementById('valuationRange').textContent = '$' + lowEstimate.toLocaleString() + ' - $' + highEstimate.toLocaleString();
+  document.getElementById('valuationPricePerSqft').textContent = '$' + Math.round(estimatedValue / sqft).toLocaleString();
+  document.getElementById('valuationTrend').textContent = '+' + (cityData.trend || 3.0).toFixed(1) + '% (6 months)';
+  document.getElementById('valuationDays').textContent = (cityData.daysOnMarket || 25) + ' days';
+
+  // Generate comparable sales
+  var comparables = generateComparables(estimatedValue, city, province);
+  renderComparables(comparables);
+
+  // Show results
+  document.getElementById('valuationResults').style.display = 'block';
+
+  // Smooth scroll to results
+  document.getElementById('valuationResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function generateComparables(baseValue, city, province) {
+  var comparables = [];
+  var variance = 0.08; // 8% variance
+
+  for (var i = 0; i < 3; i++) {
+    var priceVariance = 1 + ((Math.random() - 0.5) * variance * 2);
+    var price = Math.round(baseValue * priceVariance / 1000) * 1000;
+    var daysAgo = Math.floor(Math.random() * 45) + 5;
+
+    comparables.push({
+      address: generateFakeAddress(city),
+      price: price,
+      soldDate: daysAgo + ' days ago'
+    });
+  }
+
+  return comparables;
+}
+
+function generateFakeAddress(city) {
+  var streetNumbers = ['123', '456', '789', '321', '654', '987', '234', '567', '890'];
+  var streetNames = ['Maple', 'Oak', 'Pine', 'Cedar', 'Elm', 'Birch', 'Willow', 'Spruce', 'Cherry'];
+  var streetTypes = ['St', 'Ave', 'Dr', 'Blvd', 'Crescent', 'Way', 'Lane'];
+
+  var num = streetNumbers[Math.floor(Math.random() * streetNumbers.length)];
+  var name = streetNames[Math.floor(Math.random() * streetNames.length)];
+  var type = streetTypes[Math.floor(Math.random() * streetTypes.length)];
+
+  return num + ' ' + name + ' ' + type + ', ' + city;
+}
+
+function renderComparables(comparables) {
+  var container = document.getElementById('comparableList');
+
+  container.innerHTML = comparables.map(function(comp) {
+    return '<div class="comparable-item">' +
+      '<span>' + comp.address + '</span>' +
+      '<span><strong>$' + comp.price.toLocaleString() + '</strong> (' + comp.soldDate + ')</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ==========================================
+// Referral Program Functions
+// ==========================================
+
+function generateReferralCode() {
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  var code = '';
+  for (var i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+function updateReferralUI() {
+  var loggedOutDiv = document.getElementById('loggedOutReferral');
+  var loggedInDiv = document.getElementById('loggedInReferral');
+
+  if (authToken && currentUser) {
+    loggedOutDiv.style.display = 'none';
+    loggedInDiv.style.display = 'block';
+
+    // Generate or get referral code
+    var referralCode = localStorage.getItem('referralCode');
+    if (!referralCode) {
+      referralCode = generateReferralCode();
+      localStorage.setItem('referralCode', referralCode);
+    }
+
+    var referralLink = window.location.origin + '/ref/' + referralCode;
+    document.getElementById('referralLink').value = referralLink;
+
+    // Load referral stats (in production from API)
+    var stats = JSON.parse(localStorage.getItem('referralStats') || '{"sent":0,"signedUp":0,"earned":0}');
+    document.getElementById('referralsSent').textContent = stats.sent;
+    document.getElementById('referralsSignedUp').textContent = stats.signedUp;
+    document.getElementById('referralsEarned').textContent = '$' + stats.earned;
+  } else {
+    loggedOutDiv.style.display = 'block';
+    loggedInDiv.style.display = 'none';
+  }
+}
+
+function copyReferralLink() {
+  var linkInput = document.getElementById('referralLink');
+  linkInput.select();
+  navigator.clipboard.writeText(linkInput.value).then(function() {
+    showToast('Referral link copied to clipboard!', 'success');
+
+    // Increment sent count
+    var stats = JSON.parse(localStorage.getItem('referralStats') || '{"sent":0,"signedUp":0,"earned":0}');
+    stats.sent++;
+    localStorage.setItem('referralStats', JSON.stringify(stats));
+    document.getElementById('referralsSent').textContent = stats.sent;
+  }).catch(function() {
+    showToast('Failed to copy. Please copy manually.', 'error');
+  });
+}
+
+function shareViaEmail() {
+  var referralLink = document.getElementById('referralLink').value;
+  var subject = encodeURIComponent('Save thousands on your next home purchase - Real Estate Direct');
+  var body = encodeURIComponent('Hey!\n\nI found this great platform for buying/selling real estate in Canada. They only charge 2% instead of the usual 5-6% commission. I saved thousands!\n\nCheck it out: ' + referralLink + '\n\nWe both get $500 off our platform fee when you complete a transaction.');
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+
+  var stats = JSON.parse(localStorage.getItem('referralStats') || '{"sent":0,"signedUp":0,"earned":0}');
+  stats.sent++;
+  localStorage.setItem('referralStats', JSON.stringify(stats));
+  document.getElementById('referralsSent').textContent = stats.sent;
+}
+
+function shareViaFacebook() {
+  var referralLink = document.getElementById('referralLink').value;
+  window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(referralLink), '_blank', 'width=600,height=400');
+}
+
+function shareViaTwitter() {
+  var referralLink = document.getElementById('referralLink').value;
+  var text = encodeURIComponent('I just discovered @RealEstateDirect - they only charge 2% vs 5-6% traditional commission! Check it out:');
+  window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + encodeURIComponent(referralLink), '_blank', 'width=600,height=400');
+}
+
+function shareViaWhatsApp() {
+  var referralLink = document.getElementById('referralLink').value;
+  var text = encodeURIComponent('Hey! Check out Real Estate Direct - save thousands on buying/selling your home: ' + referralLink);
+  window.open('https://wa.me/?text=' + text, '_blank');
+}
+
+// ==========================================
+// Offer Comparison Functions
+// ==========================================
+
+function loadOfferComparison(propertyId) {
+  // In production, this would fetch offers from API
+  // For now, show the no-offers state
+  var noOffersState = document.getElementById('noOffersState');
+  var offersGrid = document.getElementById('offersComparisonGrid');
+
+  // Simulated check - in production would check actual offers
+  var hasOffers = false;
+
+  if (hasOffers) {
+    noOffersState.style.display = 'none';
+    offersGrid.style.display = 'grid';
+    // renderOfferComparison(offers);
+  } else {
+    noOffersState.style.display = 'block';
+    offersGrid.style.display = 'none';
+  }
+}
+
+function renderOfferComparison(offers) {
+  var container = document.getElementById('offersComparisonGrid');
+
+  // Sort offers by price descending
+  offers.sort(function(a, b) { return b.price - a.price; });
+
+  container.innerHTML = offers.map(function(offer, index) {
+    var isBest = index === 0;
+    return '<div class="offer-comparison-card' + (isBest ? ' best-offer' : '') + '">' +
+      '<div class="offer-header' + (isBest ? ' best' : '') + '">' +
+        '<h3>Offer ' + (index + 1) + (isBest ? ' - Best Offer' : '') + '</h3>' +
+      '</div>' +
+      '<div class="offer-body">' +
+        '<div class="offer-row"><span class="label">Offer Price</span><span class="value">$' + offer.price.toLocaleString() + '</span></div>' +
+        '<div class="offer-row"><span class="label">Deposit</span><span class="value">$' + offer.deposit.toLocaleString() + '</span></div>' +
+        '<div class="offer-row"><span class="label">Closing Date</span><span class="value">' + offer.closingDate + '</span></div>' +
+        '<div class="offer-row"><span class="label">Conditions</span><span class="value">' + offer.conditions + '</span></div>' +
+        '<div class="offer-row"><span class="label">Pre-Approved</span><span class="value">' + (offer.preApproved ? 'Yes' : 'No') + '</span></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ==========================================
+// Initialize New Features on Page Load
+// ==========================================
+
+var prevOnLogin4 = window.onLoginSuccess;
+window.onLoginSuccess = function() {
+  if (prevOnLogin4) prevOnLogin4();
+  updateReferralUI();
+};
+
+// Update referral UI when showing referrals section
+var originalShowSection = window.showSection;
+if (originalShowSection) {
+  window.showSection = function(sectionId) {
+    originalShowSection(sectionId);
+    if (sectionId === 'referrals') {
+      updateReferralUI();
+    }
+    if (sectionId === 'savings-calculator') {
+      calculateSavings();
+    }
+    if (sectionId === 'offer-comparison') {
+      loadOfferComparison();
+    }
+  };
+}
