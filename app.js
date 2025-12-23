@@ -239,21 +239,19 @@ app.use((err, req, res, next) => {
 // Database Connection & Server Start
 // ==========================================
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('Database connection error:', err));
-
+// Start server first to pass health checks
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`
-╔═══════════════════════════════════════════════════════╗
-║           Real Estate Direct API Server               ║
-╠═══════════════════════════════════════════════════════╣
-║  Server running on port ${PORT}                          ║
-║  API Base URL: http://localhost:${PORT}/api              ║
-║  Health Check: http://localhost:${PORT}/health           ║
-╚═══════════════════════════════════════════════════════╝
-  `);
+  console.log(`Server running on port ${PORT}`);
+
+  // Connect to database after server starts
+  if (process.env.MONGO_URI) {
+    mongoose.connect(process.env.MONGO_URI)
+      .then(() => console.log('Connected to MongoDB'))
+      .catch((err) => console.error('Database connection error:', err));
+  } else {
+    console.warn('MONGO_URI not set - database features disabled');
+  }
 });
 
 module.exports = app;
