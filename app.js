@@ -4,6 +4,7 @@ const path = require('path');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('mongo-sanitize');
 require('dotenv').config();
 
 // Import routes
@@ -34,7 +35,20 @@ const app = express();
 app.use(helmet({
   contentSecurityPolicy: false
 }));
-app.use(cors());
+
+// CORS configuration - restrict to allowed origins in production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? [
+        process.env.APP_URL || 'https://real-estate-direct-production.up.railway.app',
+        /\.railway\.app$/  // Allow Railway subdomains
+      ]
+    : true, // Allow all origins in development
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -54,6 +68,14 @@ app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// NoSQL injection prevention - sanitize request body, params, and query
+app.use((req, res, next) => {
+  if (req.body) req.body = mongoSanitize(req.body);
+  if (req.params) req.params = mongoSanitize(req.params);
+  if (req.query) req.query = mongoSanitize(req.query);
+  next();
+});
 
 // ==========================================
 // API Routes

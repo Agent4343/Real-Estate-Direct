@@ -143,15 +143,22 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+  // SECURITY: Always require webhook signature verification in production
+  if (!webhookSecret) {
+    console.error('STRIPE_WEBHOOK_SECRET is not configured - rejecting webhook');
+    return res.status(500).json({ error: 'Webhook secret not configured' });
+  }
+
+  if (!sig) {
+    console.error('Missing stripe-signature header');
+    return res.status(400).json({ error: 'Missing signature header' });
+  }
+
   let event;
 
   try {
-    if (webhookSecret) {
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-    } else {
-      // For testing without signature verification
-      event = JSON.parse(req.body);
-    }
+    // Always verify the webhook signature
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });

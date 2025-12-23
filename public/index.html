@@ -3,7 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Real Estate Direct - Buy & Sell Real Estate in Canada</title>
+  <title>Real Estate Direct - Buy & Sell Real Estate in Canada | Save Thousands on Commission</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Buy or sell real estate in Canada with just 2% total commission. Save $15,000+ compared to traditional 5-6% agent fees. Free property listings, mortgage calculator, and land transfer tax calculator.">
+  <meta name="keywords" content="real estate Canada, buy house Canada, sell house Canada, FSBO Canada, for sale by owner, low commission real estate, Toronto real estate, Vancouver real estate, mortgage calculator, land transfer tax">
+  <meta name="author" content="Real Estate Direct">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://real-estate-direct-production.up.railway.app/">
+  <meta property="og:title" content="Real Estate Direct - Save Thousands on Real Estate Commission">
+  <meta property="og:description" content="Buy or sell real estate in Canada with just 2% total commission. Save $15,000+ compared to traditional agents.">
+  <meta property="og:image" content="https://real-estate-direct-production.up.railway.app/og-image.png">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://real-estate-direct-production.up.railway.app/">
+  <meta name="twitter:title" content="Real Estate Direct - Save Thousands on Real Estate Commission">
+  <meta name="twitter:description" content="Buy or sell real estate in Canada with just 2% total commission.">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://real-estate-direct-production.up.railway.app/">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#2563eb">
+  <meta name="msapplication-TileColor" content="#2563eb">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Real Estate Direct",
+    "description": "Canadian real estate platform with 2% commission",
+    "url": "https://real-estate-direct-production.up.railway.app",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Canada"
+    },
+    "priceRange": "$$",
+    "openingHours": "Mo-Su 00:00-24:00",
+    "sameAs": []
+  }
+  </script>
+
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -266,7 +315,7 @@
           <div class="referral-icon">🎁</div>
           <div class="referral-text">
             <h3>Refer a Friend, Earn $500</h3>
-            <p>Know someone buying or selling? Refer them to Real Estate Direct and you both get $500 off your platform fee when their transaction closes.</p>
+            <p>Know someone buying or selling? Refer them to Real Estate Direct and you both get $500 cash back when their transaction closes.</p>
           </div>
           <button onclick="showSection('referrals')" class="btn btn-secondary">Learn More</button>
         </div>
@@ -784,37 +833,178 @@
     <!-- Tax Calculator Section -->
     <section id="calculator" class="section">
       <div class="section-header">
-        <h2>Land Transfer Tax Calculator</h2>
-        <p>Calculate your closing costs in seconds</p>
+        <h2>Financial Calculators</h2>
+        <p>Plan your home purchase with our free calculators</p>
       </div>
-      <div class="calculator-container">
-        <div class="calc-form">
-          <div class="form-group">
-            <label>Province</label>
-            <select id="calcProvince" onchange="updateCalcOptions()"></select>
+
+      <!-- Calculator Tabs -->
+      <div class="calculator-tabs">
+        <button class="calc-tab-btn active" onclick="showCalcTab('landTransfer', event)">
+          <span class="tab-icon">📊</span> Land Transfer Tax
+        </button>
+        <button class="calc-tab-btn" onclick="showCalcTab('mortgage', event)">
+          <span class="tab-icon">🏦</span> Mortgage Calculator
+        </button>
+        <button class="calc-tab-btn" onclick="showCalcTab('affordability', event)">
+          <span class="tab-icon">💰</span> Affordability
+        </button>
+      </div>
+
+      <!-- Land Transfer Tax Calculator -->
+      <div class="calc-tab-content active" id="landTransferCalc">
+        <div class="calculator-container">
+          <div class="calc-form">
+            <div class="form-group">
+              <label>Province</label>
+              <select id="calcProvince" onchange="updateCalcOptions()"></select>
+            </div>
+            <div class="form-group">
+              <label>Purchase Price ($)</label>
+              <input type="number" id="calcPrice" value="500000" min="0">
+            </div>
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="calcFirstTime">
+                <span>First-Time Home Buyer</span>
+              </label>
+            </div>
+            <div class="form-group checkbox-group" id="torontoOption" style="display:none;">
+              <label class="checkbox-label">
+                <input type="checkbox" id="calcToronto">
+                <span>Property in Toronto</span>
+              </label>
+            </div>
+            <button onclick="calculateTax()" class="btn btn-primary btn-block">Calculate Tax</button>
           </div>
-          <div class="form-group">
-            <label>Purchase Price ($)</label>
-            <input type="number" id="calcPrice" value="500000" min="0">
+          <div class="calc-results" id="calcResults">
+            <div class="results-placeholder">
+              <div class="placeholder-icon">🧮</div>
+              <p>Enter details and click Calculate to see your estimated land transfer tax.</p>
+            </div>
           </div>
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="calcFirstTime">
-              <span>First-Time Home Buyer</span>
-            </label>
-          </div>
-          <div class="form-group checkbox-group" id="torontoOption" style="display:none;">
-            <label class="checkbox-label">
-              <input type="checkbox" id="calcToronto">
-              <span>Property in Toronto</span>
-            </label>
-          </div>
-          <button onclick="calculateTax()" class="btn btn-primary btn-block">Calculate Tax</button>
         </div>
-        <div class="calc-results" id="calcResults">
-          <div class="results-placeholder">
-            <div class="placeholder-icon">🧮</div>
-            <p>Enter details and click Calculate to see your estimated land transfer tax.</p>
+      </div>
+
+      <!-- Mortgage Calculator -->
+      <div class="calc-tab-content" id="mortgageCalc" style="display: none;">
+        <div class="calculator-container">
+          <div class="calc-form">
+            <div class="form-group">
+              <label>Home Price ($)</label>
+              <input type="number" id="mortgagePrice" value="500000" min="0" oninput="calculateMortgage()">
+            </div>
+            <div class="form-group">
+              <label>Down Payment ($)</label>
+              <input type="number" id="mortgageDown" value="100000" min="0" oninput="calculateMortgage()">
+              <span class="form-hint" id="downPaymentPercent">20% of purchase price</span>
+            </div>
+            <div class="form-group">
+              <label>Interest Rate (%)</label>
+              <input type="number" id="mortgageRate" value="5.0" min="0" max="20" step="0.01" oninput="calculateMortgage()">
+            </div>
+            <div class="form-group">
+              <label>Amortization Period</label>
+              <select id="mortgageAmortization" onchange="calculateMortgage()">
+                <option value="25" selected>25 years</option>
+                <option value="30">30 years</option>
+                <option value="20">20 years</option>
+                <option value="15">15 years</option>
+                <option value="10">10 years</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Payment Frequency</label>
+              <select id="mortgageFrequency" onchange="calculateMortgage()">
+                <option value="monthly" selected>Monthly</option>
+                <option value="biweekly">Bi-weekly</option>
+                <option value="weekly">Weekly</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-results" id="mortgageResults">
+            <h3>Your Mortgage</h3>
+            <div class="mortgage-summary">
+              <div class="calc-item">
+                <span>Mortgage Amount:</span>
+                <span id="mortgageAmount">$400,000</span>
+              </div>
+              <div class="calc-item highlight">
+                <span>Monthly Payment:</span>
+                <span id="mortgagePayment">$2,326</span>
+              </div>
+              <div class="calc-item">
+                <span>Total Interest Paid:</span>
+                <span id="totalInterest">$297,800</span>
+              </div>
+              <div class="calc-item">
+                <span>Total Cost of Home:</span>
+                <span id="totalCost">$697,800</span>
+              </div>
+            </div>
+            <div class="cmhc-warning" id="cmhcWarning" style="display: none;">
+              <span class="warning-icon">⚠️</span>
+              <p><strong>CMHC Insurance Required:</strong> Down payments less than 20% require mortgage default insurance.</p>
+              <div class="calc-item">
+                <span>CMHC Premium:</span>
+                <span id="cmhcPremium">$0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Affordability Calculator -->
+      <div class="calc-tab-content" id="affordabilityCalc" style="display: none;">
+        <div class="calculator-container">
+          <div class="calc-form">
+            <div class="form-group">
+              <label>Gross Annual Income ($)</label>
+              <input type="number" id="annualIncome" value="100000" min="0" oninput="calculateAffordability()">
+            </div>
+            <div class="form-group">
+              <label>Monthly Debt Payments ($)</label>
+              <input type="number" id="monthlyDebt" value="500" min="0" oninput="calculateAffordability()">
+              <span class="form-hint">Car loans, credit cards, student loans, etc.</span>
+            </div>
+            <div class="form-group">
+              <label>Down Payment Available ($)</label>
+              <input type="number" id="availableDown" value="100000" min="0" oninput="calculateAffordability()">
+            </div>
+            <div class="form-group">
+              <label>Interest Rate (%)</label>
+              <input type="number" id="affordRate" value="5.0" min="0" max="20" step="0.01" oninput="calculateAffordability()">
+            </div>
+            <div class="form-group">
+              <label>Property Tax Rate (%)</label>
+              <input type="number" id="propTaxRate" value="1.0" min="0" max="5" step="0.1" oninput="calculateAffordability()">
+              <span class="form-hint">Typically 0.5% - 1.5% of home value annually</span>
+            </div>
+          </div>
+          <div class="calc-results" id="affordResults">
+            <h3>What You Can Afford</h3>
+            <div class="afford-summary">
+              <div class="afford-main">
+                <div class="afford-label">Maximum Home Price</div>
+                <div class="afford-amount" id="maxHomePrice">$500,000</div>
+              </div>
+              <div class="afford-details">
+                <div class="calc-item">
+                  <span>Max Monthly Payment (GDS 32%):</span>
+                  <span id="maxMonthlyGDS">$2,667</span>
+                </div>
+                <div class="calc-item">
+                  <span>Max Monthly Payment (TDS 40%):</span>
+                  <span id="maxMonthlyTDS">$2,833</span>
+                </div>
+                <div class="calc-item">
+                  <span>Your Max Mortgage:</span>
+                  <span id="maxMortgage">$400,000</span>
+                </div>
+              </div>
+              <div class="afford-note">
+                <p><strong>Note:</strong> GDS (Gross Debt Service) should be ≤32% and TDS (Total Debt Service) should be ≤40% of your gross monthly income. Lenders use the lower of these two limits.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1680,12 +1870,12 @@
           <li>Notify us immediately of any unauthorized use</li>
         </ul>
 
-        <h2>4. Platform Fees and Commission</h2>
-        <p>Real Estate Direct charges a platform fee of 1% of the final sale price from each party (buyer and seller), for a total of 2%. This fee is significantly lower than traditional real estate agent commissions of 5-6%.</p>
+        <h2>4. Commission Structure</h2>
+        <p>Real Estate Direct charges a simple 1% commission from each party (buyer and seller), for a total of 2%. This is significantly lower than traditional real estate agent commissions of 5-6%.</p>
         <ul>
-          <li><strong>Seller Fee:</strong> 1% of the sale price, payable upon closing</li>
-          <li><strong>Buyer Fee:</strong> 1% of the purchase price, payable upon closing</li>
-          <li>Fees are invoiced upon transaction completion</li>
+          <li><strong>Seller Commission:</strong> 1% of the sale price, payable upon closing</li>
+          <li><strong>Buyer Commission:</strong> 1% of the purchase price, payable upon closing</li>
+          <li>Commissions are invoiced upon transaction completion</li>
           <li>Payment is due within 30 days of closing</li>
           <li>Accepted payment methods include credit card and bank transfer</li>
         </ul>
@@ -2948,21 +3138,21 @@
       <div id="faq-fees" class="faq-category">
         <div class="faq-item">
           <h3 class="faq-question" onclick="toggleFaq(this)">
-            What are the platform fees?
+            What are your fees?
             <span class="faq-toggle">+</span>
           </h3>
           <div class="faq-answer">
-            <p>Our platform charges a 1% fee to both the buyer and seller (2% total) upon successful closing. There are no upfront fees for listing your property or browsing listings. Both parties benefit from document generation, AI tools, and transaction support.</p>
+            <p>We charge a simple 1% commission to both the buyer and seller (2% total) upon successful closing. There are no upfront fees for listing your property or browsing listings. Both parties benefit from document generation, AI tools, and transaction support.</p>
           </div>
         </div>
 
         <div class="faq-item">
           <h3 class="faq-question" onclick="toggleFaq(this)">
-            When do I pay the platform fee?
+            When do I pay the commission?
             <span class="faq-toggle">+</span>
           </h3>
           <div class="faq-answer">
-            <p>The platform fee is invoiced after your transaction successfully closes. Payment is due within 30 days and can be made via credit card or bank transfer through our secure payment system.</p>
+            <p>The 1% commission is invoiced after your transaction successfully closes. Payment is due within 30 days and can be made via credit card or bank transfer through our secure payment system.</p>
           </div>
         </div>
 
@@ -2972,7 +3162,7 @@
             <span class="faq-toggle">+</span>
           </h3>
           <div class="faq-answer">
-            <p>No hidden fees. The 1% platform fee (charged to both buyer and seller) is the only fee we charge. You may have other standard closing costs (legal fees, title insurance, etc.) but these are not charged by us.</p>
+            <p>No hidden fees. The 1% commission (charged to both buyer and seller) is the only fee we charge. You may have other standard closing costs (legal fees, title insurance, etc.) but these are not charged by us.</p>
           </div>
         </div>
       </div>
@@ -3283,7 +3473,7 @@
             <div class="step-number">4</div>
             <div class="step-icon">💰</div>
             <h3>You Both Save</h3>
-            <p>You each get $500 credited toward your platform fees</p>
+            <p>You each get $500 cash back on your transaction</p>
           </div>
         </div>
       </div>
@@ -3324,10 +3514,10 @@
       <div class="referral-terms">
         <h4>Terms & Conditions</h4>
         <ul>
-          <li>Referral credit is applied when the referred person's transaction closes successfully</li>
-          <li>Maximum credit of $500 per referral, up to $2,500 per year</li>
-          <li>Credits cannot be combined with other promotions</li>
-          <li>Credits are applied to your next platform fee</li>
+          <li>$500 cash back is paid when the referred person's transaction closes successfully</li>
+          <li>Maximum of $500 per referral, up to $2,500 per year</li>
+          <li>Cannot be combined with other promotions</li>
+          <li>Payment issued within 30 days of transaction closing</li>
         </ul>
       </div>
     </div>
@@ -3468,6 +3658,8 @@
 
   <!-- Leaflet Maps JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- Security: HTML sanitization utilities -->
+  <script src="sanitize.js"></script>
   <script src="app.js"></script>
   <script src="app-features.js"></script>
 </body>
