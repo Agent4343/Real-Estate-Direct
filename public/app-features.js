@@ -2057,6 +2057,348 @@ function copyToClipboard(text) {
   });
 }
 
+// ==========================================
+// AI Property Description Generator
+// ==========================================
+
+async function generateDescription(event) {
+  event.preventDefault();
+
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  var canUse = await canUseAITools();
+  if (!canUse) {
+    showToast('You have reached your monthly AI limit. Please upgrade for more uses.', 'error');
+    return;
+  }
+
+  var propertyType = document.getElementById('descPropertyType').value;
+  var bedrooms = document.getElementById('descBedrooms').value;
+  var bathrooms = document.getElementById('descBathrooms').value;
+  var sqft = document.getElementById('descSqft').value;
+  var features = document.getElementById('descFeatures').value;
+  var location = document.getElementById('descLocation').value;
+  var style = document.getElementById('descStyle').value;
+
+  var btn = event.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+  try {
+    var response = await fetch(API_BASE + '/ai/generate-description', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + authToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        propertyType: propertyType,
+        bedrooms: bedrooms,
+        bathrooms: bathrooms,
+        squareFeet: sqft,
+        features: features,
+        location: location,
+        style: style
+      })
+    });
+
+    var data = await response.json();
+
+    if (response.ok) {
+      document.getElementById('generatedDescription').textContent = data.description;
+      document.getElementById('descriptionResult').style.display = 'block';
+      updateAIUsageDisplay(data.usage);
+      showToast('Description generated successfully!', 'success');
+    } else {
+      showToast(data.error || 'Failed to generate description', 'error');
+    }
+  } catch (err) {
+    console.error('Description generation error:', err);
+    showToast('Network error. Please try again.', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="btn-icon">✨</span> Generate Description';
+}
+
+function copyDescription() {
+  var text = document.getElementById('generatedDescription').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('Description copied to clipboard!', 'success');
+  }).catch(function() {
+    showToast('Failed to copy. Please select and copy manually.', 'error');
+  });
+}
+
+async function regenerateDescription() {
+  var form = document.getElementById('descriptionForm');
+  if (form) {
+    var event = new Event('submit', { cancelable: true });
+    form.dispatchEvent(event);
+  }
+}
+
+// ==========================================
+// AI Price Suggestion Tool
+// ==========================================
+
+async function suggestPrice(event) {
+  event.preventDefault();
+
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  var canUse = await canUseAITools();
+  if (!canUse) {
+    showToast('You have reached your monthly AI limit. Please upgrade for more uses.', 'error');
+    return;
+  }
+
+  var propertyType = document.getElementById('pricePropertyType').value;
+  var bedrooms = document.getElementById('priceBedrooms').value;
+  var bathrooms = document.getElementById('priceBathrooms').value;
+  var sqft = document.getElementById('priceSqft').value;
+  var province = document.getElementById('priceProvince').value;
+  var city = document.getElementById('priceCity').value;
+  var condition = document.getElementById('priceCondition').value;
+  var yearBuilt = document.getElementById('priceYearBuilt').value;
+
+  var btn = event.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+  try {
+    var response = await fetch(API_BASE + '/ai/suggest-price', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + authToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        propertyType: propertyType,
+        bedrooms: parseInt(bedrooms),
+        bathrooms: parseFloat(bathrooms),
+        squareFeet: parseInt(sqft),
+        province: province,
+        city: city,
+        condition: condition,
+        yearBuilt: parseInt(yearBuilt)
+      })
+    });
+
+    var data = await response.json();
+
+    if (response.ok) {
+      document.getElementById('suggestedPrice').textContent = '$' + data.suggestedPrice.toLocaleString();
+      document.getElementById('priceRangeLow').textContent = '$' + data.priceRange.low.toLocaleString();
+      document.getElementById('priceRangeHigh').textContent = '$' + data.priceRange.high.toLocaleString();
+      document.getElementById('pricePerSqftResult').textContent = '$' + data.pricePerSqft.toLocaleString();
+      document.getElementById('marketTrendResult').textContent = data.marketTrend;
+      document.getElementById('confidenceLevel').textContent = data.confidence;
+
+      // Display comparables
+      var compHtml = data.comparables.map(function(c) {
+        return '<div class="comparable-item">' +
+          '<div class="comp-address">' + c.address + '</div>' +
+          '<div class="comp-details">' + c.bedrooms + ' bed, ' + c.bathrooms + ' bath, ' + c.squareFeet.toLocaleString() + ' sqft</div>' +
+          '<div class="comp-price">Sold: $' + c.soldPrice.toLocaleString() + ' (' + c.daysAgo + ' days ago)</div>' +
+        '</div>';
+      }).join('');
+      document.getElementById('priceComparables').innerHTML = compHtml;
+
+      document.getElementById('priceResult').style.display = 'block';
+      updateAIUsageDisplay(data.usage);
+      showToast('Price analysis complete!', 'success');
+    } else {
+      showToast(data.error || 'Failed to analyze price', 'error');
+    }
+  } catch (err) {
+    console.error('Price suggestion error:', err);
+    showToast('Network error. Please try again.', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="btn-icon">💰</span> Get Price Suggestion';
+}
+
+// ==========================================
+// AI Listing Title Generator
+// ==========================================
+
+async function generateTitles(event) {
+  event.preventDefault();
+
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  var canUse = await canUseAITools();
+  if (!canUse) {
+    showToast('You have reached your monthly AI limit. Please upgrade for more uses.', 'error');
+    return;
+  }
+
+  var propertyType = document.getElementById('titlePropertyType').value;
+  var keyFeatures = document.getElementById('titleKeyFeatures').value;
+  var location = document.getElementById('titleLocation').value;
+  var targetBuyer = document.getElementById('titleTargetBuyer').value;
+
+  var btn = event.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+  try {
+    var response = await fetch(API_BASE + '/ai/generate-title', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + authToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        propertyType: propertyType,
+        keyFeatures: keyFeatures,
+        location: location,
+        targetBuyer: targetBuyer
+      })
+    });
+
+    var data = await response.json();
+
+    if (response.ok) {
+      var titlesHtml = data.titles.map(function(title, idx) {
+        return '<div class="title-option">' +
+          '<span class="title-number">' + (idx + 1) + '</span>' +
+          '<span class="title-text">' + title + '</span>' +
+          '<button class="btn btn-sm btn-outline" onclick="copyTitleText(\'' + title.replace(/'/g, "\\'") + '\')">Copy</button>' +
+        '</div>';
+      }).join('');
+
+      document.getElementById('generatedTitles').innerHTML = titlesHtml;
+      document.getElementById('titlesResult').style.display = 'block';
+      updateAIUsageDisplay(data.usage);
+      showToast('Titles generated successfully!', 'success');
+    } else {
+      showToast(data.error || 'Failed to generate titles', 'error');
+    }
+  } catch (err) {
+    console.error('Title generation error:', err);
+    showToast('Network error. Please try again.', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="btn-icon">📝</span> Generate Titles';
+}
+
+function copyTitleText(title) {
+  navigator.clipboard.writeText(title).then(function() {
+    showToast('Title copied to clipboard!', 'success');
+  }).catch(function() {
+    showToast('Failed to copy. Please select and copy manually.', 'error');
+  });
+}
+
+// ==========================================
+// AI Neighbourhood Insights
+// ==========================================
+
+async function getNeighbourhoodInsights(event) {
+  event.preventDefault();
+
+  if (!isLoggedInForAI()) {
+    showToast('Please log in to use AI tools', 'error');
+    showModal('loginModal');
+    return;
+  }
+
+  var canUse = await canUseAITools();
+  if (!canUse) {
+    showToast('You have reached your monthly AI limit. Please upgrade for more uses.', 'error');
+    return;
+  }
+
+  var province = document.getElementById('insightsProvince').value;
+  var city = document.getElementById('insightsCity').value;
+  var neighbourhood = document.getElementById('insightsNeighbourhood').value;
+
+  var btn = event.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+  try {
+    var response = await fetch(API_BASE + '/ai/neighbourhood-insights', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + authToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        province: province,
+        city: city,
+        neighbourhood: neighbourhood
+      })
+    });
+
+    var data = await response.json();
+
+    if (response.ok) {
+      var insights = data.insights;
+
+      // Update the insights display
+      document.getElementById('insightsOverview').textContent = insights.overview;
+      document.getElementById('insightsAvgPrice').textContent = '$' + insights.demographics.averageHomePrice.toLocaleString();
+      document.getElementById('insightsPopulation').textContent = insights.demographics.population.toLocaleString();
+      document.getElementById('insightsMedianIncome').textContent = '$' + insights.demographics.medianIncome.toLocaleString();
+
+      // Amenities
+      var amenitiesHtml = insights.amenities.map(function(a) {
+        return '<span class="amenity-tag">' + a + '</span>';
+      }).join('');
+      document.getElementById('insightsAmenities').innerHTML = amenitiesHtml;
+
+      // Schools
+      var schoolsHtml = insights.schools.map(function(s) {
+        return '<div class="school-item">' +
+          '<span class="school-name">' + s.name + '</span>' +
+          '<span class="school-rating">Rating: ' + s.rating + '/10</span>' +
+        '</div>';
+      }).join('');
+      document.getElementById('insightsSchools').innerHTML = schoolsHtml;
+
+      // Transportation
+      var transitHtml = insights.transportation.map(function(t) {
+        return '<span class="transit-tag">' + t + '</span>';
+      }).join('');
+      document.getElementById('insightsTransit').innerHTML = transitHtml;
+
+      // Scores
+      document.getElementById('walkScore').textContent = insights.scores.walkScore;
+      document.getElementById('transitScore').textContent = insights.scores.transitScore;
+      document.getElementById('bikeScore').textContent = insights.scores.bikeScore;
+
+      document.getElementById('insightsResult').style.display = 'block';
+      updateAIUsageDisplay(data.usage);
+      showToast('Neighbourhood analysis complete!', 'success');
+    } else {
+      showToast(data.error || 'Failed to get insights', 'error');
+    }
+  } catch (err) {
+    console.error('Neighbourhood insights error:', err);
+    showToast('Network error. Please try again.', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="btn-icon">🏘️</span> Get Insights';
+}
+
 function showUpgradeModal() {
   showToast('Premium upgrade coming soon! Contact support for early access.', 'info');
 }
@@ -2159,21 +2501,42 @@ function getHomeValuation(event) {
   var city = document.getElementById('valuationCity').value.trim();
   var postalCode = document.getElementById('valuationPostal').value.trim();
   var propertyType = document.getElementById('valuationType').value;
-  var beds = parseInt(document.getElementById('valuationBeds').value);
-  var baths = parseInt(document.getElementById('valuationBaths').value);
-  var sqft = parseInt(document.getElementById('valuationSqft').value) || 1500;
+  var beds = parseInt(document.getElementById('valuationBeds').value) || 3;
+  var baths = parseInt(document.getElementById('valuationBaths').value) || 2;
+  var sqft = parseInt(document.getElementById('valuationSqft').value) || 0;
   var yearBuilt = parseInt(document.getElementById('valuationYear').value) || 2000;
   var condition = document.getElementById('valuationCondition').value;
+
+  // Validate required fields
+  var missingFields = [];
+  if (!province) missingFields.push('province');
+  if (!city) missingFields.push('city');
+  if (!sqft || sqft < 100) missingFields.push('square footage');
+  if (!propertyType) missingFields.push('property type');
+
+  // If critical data is missing, show helpful message instead of $0
+  if (missingFields.length > 0) {
+    document.getElementById('valuationPrimary').innerHTML = '<span style="color: #dc2626;">Estimate Unavailable</span>';
+    document.getElementById('valuationRange').textContent = 'Missing: ' + missingFields.join(', ');
+    document.getElementById('valuationPricePerSqft').textContent = 'N/A';
+    document.getElementById('valuationTrend').textContent = 'N/A';
+    document.getElementById('valuationDays').textContent = 'N/A';
+    document.getElementById('comparablesList').innerHTML = '<p style="color: #6b7280; text-align: center;">Please complete all required fields for comparable sales data.</p>';
+    document.getElementById('valuationResults').style.display = 'block';
+    document.getElementById('valuationResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
 
   // Get market data
   var provinceData = marketData[province] || marketData['default'];
   var cityData = provinceData[city] || provinceData['default'] || provinceData;
 
-  // Base calculation
+  // Base calculation - ensure we have valid data
   var basePrice = cityData.avgPrice || 400000;
   var pricePerSqft = cityData.pricePerSqft || 300;
 
-  // Adjust for sqft
+  // Adjust for sqft (ensure minimum value)
+  sqft = Math.max(sqft, 500);
   var sqftValue = sqft * pricePerSqft;
 
   // Adjust for property type
@@ -2183,15 +2546,33 @@ function getHomeValuation(event) {
   var condMultiplier = conditionMultipliers[condition] || 1.0;
 
   // Adjust for bedrooms (more beds = higher value)
+  beds = Math.max(1, Math.min(beds, 10)); // Clamp between 1-10
   var bedMultiplier = 1 + ((beds - 3) * 0.05);
+  bedMultiplier = Math.max(0.8, Math.min(bedMultiplier, 1.4)); // Clamp multiplier
 
   // Adjust for year built
   var currentYear = new Date().getFullYear();
+  yearBuilt = Math.max(1900, Math.min(yearBuilt, currentYear));
   var age = currentYear - yearBuilt;
   var ageMultiplier = age < 5 ? 1.1 : (age > 50 ? 0.85 : 1 - (age * 0.002));
+  ageMultiplier = Math.max(0.7, Math.min(ageMultiplier, 1.2)); // Clamp multiplier
 
   // Calculate estimated value
   var estimatedValue = sqftValue * typeMultiplier * condMultiplier * bedMultiplier * ageMultiplier;
+
+  // Ensure minimum value (never show $0 or unreasonably low values)
+  var minimumValue = 50000;
+  if (!estimatedValue || isNaN(estimatedValue) || estimatedValue < minimumValue) {
+    document.getElementById('valuationPrimary').innerHTML = '<span style="color: #f59e0b;">Estimate Unavailable</span>';
+    document.getElementById('valuationRange').textContent = 'Insufficient comparable data for this area';
+    document.getElementById('valuationPricePerSqft').textContent = 'N/A';
+    document.getElementById('valuationTrend').textContent = '+' + (cityData.trend || 3.0).toFixed(1) + '% (6 months)';
+    document.getElementById('valuationDays').textContent = (cityData.daysOnMarket || 25) + ' days';
+    document.getElementById('comparablesList').innerHTML = '<p style="color: #6b7280; text-align: center;">We don\'t have enough comparable sales data for this location yet. <a href="javascript:void(0)" onclick="showSection(\'professionals\')">Contact a local professional</a> for an accurate valuation.</p>';
+    document.getElementById('valuationResults').style.display = 'block';
+    document.getElementById('valuationResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
 
   // Round to nearest 5000
   estimatedValue = Math.round(estimatedValue / 5000) * 5000;

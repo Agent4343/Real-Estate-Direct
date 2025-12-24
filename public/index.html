@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Real Estate Direct - Buy & Sell Real Estate in Canada | Save Thousands on Commission</title>
+  <title>Real Estate Direct - Buy & Sell Real Estate in Canada | Flat Fee Platform</title>
 
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Buy or sell real estate in Canada with just 2% total commission. Save $15,000+ compared to traditional 5-6% agent fees. Free property listings, mortgage calculator, and land transfer tax calculator.">
-  <meta name="keywords" content="real estate Canada, buy house Canada, sell house Canada, FSBO Canada, for sale by owner, low commission real estate, Toronto real estate, Vancouver real estate, mortgage calculator, land transfer tax">
+  <meta name="description" content="Buy or sell real estate in Canada with flat platform fees. Self-service listing tools, mortgage calculator, and document generation. Currently in early access.">
+  <meta name="keywords" content="real estate Canada, buy house Canada, sell house Canada, FSBO Canada, for sale by owner, flat fee real estate, Toronto real estate, Vancouver real estate, mortgage calculator, land transfer tax">
   <meta name="author" content="Real Estate Direct">
   <meta name="robots" content="index, follow">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://real-estate-direct-production.up.railway.app/">
-  <meta property="og:title" content="Real Estate Direct - Save Thousands on Real Estate Commission">
-  <meta property="og:description" content="Buy or sell real estate in Canada with just 2% total commission. Save $15,000+ compared to traditional agents.">
+  <meta property="og:title" content="Real Estate Direct - Flat Fee Real Estate Platform">
+  <meta property="og:description" content="Buy or sell real estate in Canada with flat platform fees. Self-service tools for modern buyers and sellers.">
   <meta property="og:image" content="https://real-estate-direct-production.up.railway.app/og-image.png">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://real-estate-direct-production.up.railway.app/">
-  <meta name="twitter:title" content="Real Estate Direct - Save Thousands on Real Estate Commission">
-  <meta name="twitter:description" content="Buy or sell real estate in Canada with just 2% total commission.">
+  <meta name="twitter:title" content="Real Estate Direct - Flat Fee Real Estate Platform">
+  <meta name="twitter:description" content="Buy or sell real estate in Canada with flat platform fees.">
 
   <!-- Canonical URL -->
   <link rel="canonical" href="https://real-estate-direct-production.up.railway.app/">
@@ -41,7 +41,7 @@
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
     "name": "Real Estate Direct",
-    "description": "Canadian real estate platform with 2% commission",
+    "description": "Canadian real estate platform with flat fees - early access",
     "url": "https://real-estate-direct-production.up.railway.app",
     "areaServed": {
       "@type": "Country",
@@ -120,24 +120,18 @@
     <section id="home" class="section active">
       <div class="hero">
         <div class="hero-content">
-          <div class="hero-badge">Save $15,000+ on Your Next Home</div>
-          <h1>Buy or Sell Real Estate <span class="highlight">Without the 6% Commission</span></h1>
-          <p class="hero-subtitle">Traditional agents charge 5-6%. We charge just 2% total. Keep more money in your pocket with Canada's modern real estate platform.</p>
+          <div class="hero-badge">Early Access - Flat Fee Platform</div>
+          <h1>Buy or Sell Real Estate <span class="highlight">With Flat Platform Fees</span></h1>
+          <p class="hero-subtitle">Self-service tools for modern Canadian real estate. List properties, generate documents, and manage transactions with transparent flat fees.</p>
           <div class="savings-highlight">
             <div class="savings-comparison">
-              <div class="savings-item traditional">
-                <span class="label">Traditional Agent</span>
-                <span class="rate">5-6%</span>
-                <span class="example">$30,000 on $500K home</span>
-              </div>
-              <div class="savings-vs">VS</div>
-              <div class="savings-item ours">
-                <span class="label">Real Estate Direct</span>
-                <span class="rate">2%</span>
-                <span class="example">$10,000 on $500K home</span>
-              </div>
-              <div class="savings-result">
-                <span class="you-save">You Save: <strong>$20,000</strong></span>
+              <div class="savings-item ours" style="flex: 1; text-align: center;">
+                <span class="label">Simple Flat Fees</span>
+                <div style="margin: 1rem 0;">
+                  <div style="margin-bottom: 0.5rem;"><strong>Sellers:</strong> $2,500 listing fee</div>
+                  <div><strong>Buyers:</strong> $1,000 platform fee</div>
+                </div>
+                <span class="example">No percentage-based commissions</span>
               </div>
             </div>
           </div>
@@ -148,14 +142,14 @@
             <button onclick="showSection('sell')" class="btn btn-secondary btn-lg">
               <span class="btn-icon">📝</span> List Your Property
             </button>
-            <button onclick="showSection('savings-calculator')" class="btn btn-outline btn-lg hero-calc-btn">
-              <span class="btn-icon">🧮</span> Calculate Your Savings
+            <button onclick="showSection('how-it-works')" class="btn btn-outline btn-lg hero-calc-btn">
+              <span class="btn-icon">📋</span> How It Works
             </button>
           </div>
           <div class="hero-stats">
             <div class="stat">
-              <span class="stat-number">2%</span>
-              <span class="stat-label">Total Commission</span>
+              <span class="stat-number">$2,500</span>
+              <span class="stat-label">Seller Listing Fee</span>
             </div>
             <div class="stat">
               <span class="stat-number">13</span>
@@ -223,80 +217,76 @@
         <div class="province-grid" id="provinceGrid"></div>
       </div>
 
-      <!-- Success Stories / Testimonials -->
+      <!-- Platform Features -->
       <div class="testimonials-section">
-        <h2 class="section-title">Success Stories</h2>
-        <p class="section-subtitle">See how Canadians are saving thousands with Real Estate Direct</p>
+        <h2 class="section-title">Why Choose Our Platform</h2>
+        <p class="section-subtitle">Early access to Canada's self-service real estate platform</p>
         <div class="testimonials-grid">
           <div class="testimonial-card">
-            <div class="testimonial-savings">Saved $18,500</div>
+            <div class="testimonial-savings">Flat Fees</div>
             <div class="testimonial-content">
-              <p>"We sold our Toronto home for $740,000 and saved over $18,000 compared to using a traditional agent. The platform made the entire process simple and stress-free."</p>
+              <p>No percentage-based commissions. Pay a simple flat fee: $2,500 for sellers, $1,000 for buyers. Know your costs upfront.</p>
             </div>
             <div class="testimonial-author">
-              <div class="author-avatar">SM</div>
+              <div class="author-avatar">💰</div>
               <div class="author-info">
-                <strong>Sarah M.</strong>
-                <span>Toronto, ON - Sold in 21 days</span>
+                <strong>Transparent Pricing</strong>
+                <span>No hidden costs</span>
               </div>
             </div>
-            <div class="testimonial-rating">★★★★★</div>
           </div>
           <div class="testimonial-card">
-            <div class="testimonial-savings">Saved $12,000</div>
+            <div class="testimonial-savings">Self-Service</div>
             <div class="testimonial-content">
-              <p>"As a first-time buyer, I was nervous about buying without an agent. The step-by-step guides and document templates made it easy. Plus, I saved $12K on my purchase!"</p>
+              <p>List your property, manage showings, and handle offers directly. Our tools guide you through each step of the process.</p>
             </div>
             <div class="testimonial-author">
-              <div class="author-avatar">JT</div>
+              <div class="author-avatar">🛠️</div>
               <div class="author-info">
-                <strong>James T.</strong>
-                <span>Vancouver, BC - First-time buyer</span>
+                <strong>Full Control</strong>
+                <span>Your transaction, your way</span>
               </div>
             </div>
-            <div class="testimonial-rating">★★★★★</div>
           </div>
           <div class="testimonial-card">
-            <div class="testimonial-savings">Saved $25,200</div>
+            <div class="testimonial-savings">AI-Powered</div>
             <div class="testimonial-content">
-              <p>"Sold our family home for $1.2M. The AI tools helped us find a great lawyer and mortgage rate. Couldn't believe how much we saved - over $25,000!"</p>
+              <p>Get AI-generated property descriptions, price suggestions, and neighborhood insights. Smart tools to help you make informed decisions.</p>
             </div>
             <div class="testimonial-author">
-              <div class="author-avatar">PL</div>
+              <div class="author-avatar">🤖</div>
               <div class="author-info">
-                <strong>Patricia L.</strong>
-                <span>Calgary, AB - Upgraded to larger home</span>
+                <strong>Intelligent Tools</strong>
+                <span>AI assistance included</span>
               </div>
             </div>
-            <div class="testimonial-rating">★★★★★</div>
           </div>
           <div class="testimonial-card">
-            <div class="testimonial-savings">Saved $9,800</div>
+            <div class="testimonial-savings">Documents</div>
             <div class="testimonial-content">
-              <p>"I was hesitant at first, but the secure messaging and offer comparison tools made negotiating easy. Sold my condo in just 2 weeks!"</p>
+              <p>Generate legal documents, disclosure forms, and offers. Province-specific templates ensure compliance with local requirements.</p>
             </div>
             <div class="testimonial-author">
-              <div class="author-avatar">MK</div>
+              <div class="author-avatar">📄</div>
               <div class="author-info">
-                <strong>Michael K.</strong>
-                <span>Montreal, QC - Condo seller</span>
+                <strong>Document Generation</strong>
+                <span>Province-specific forms</span>
               </div>
             </div>
-            <div class="testimonial-rating">★★★★★</div>
           </div>
         </div>
         <div class="testimonials-stats">
           <div class="testimonial-stat">
-            <span class="stat-value">$15,400</span>
-            <span class="stat-label">Average Savings</span>
+            <span class="stat-value">Early Access</span>
+            <span class="stat-label">Platform Status</span>
           </div>
           <div class="testimonial-stat">
-            <span class="stat-value">23 days</span>
-            <span class="stat-label">Average Time to Sell</span>
+            <span class="stat-value">13</span>
+            <span class="stat-label">Provinces & Territories</span>
           </div>
           <div class="testimonial-stat">
-            <span class="stat-value">4.8/5</span>
-            <span class="stat-label">User Rating</span>
+            <span class="stat-value">24/7</span>
+            <span class="stat-label">Platform Access</span>
           </div>
         </div>
       </div>
@@ -325,8 +315,14 @@
 
       <div class="cta-section">
         <h2>Ready to Get Started?</h2>
-        <p>Join thousands of Canadians buying and selling real estate the smart way.</p>
+        <p>Join our early access platform and take control of your real estate transaction.</p>
         <button onclick="showModal('registerModal')" class="btn btn-primary btn-lg">Create Free Account</button>
+      </div>
+
+      <!-- Platform vs Representation Disclaimer -->
+      <div class="platform-disclaimer" style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 1.5rem; margin: 2rem auto; max-width: 800px;">
+        <h3 style="color: #92400e; margin-bottom: 0.5rem;">Platform vs. Representation</h3>
+        <p style="color: #78350f; margin: 0;">Real Estate Direct provides tools and workflow assistance. We do not represent either party in a transaction. All negotiations are conducted directly between buyers and sellers, or through their chosen licensed professionals (lawyers, real estate agents, etc.).</p>
       </div>
     </section>
 
@@ -427,7 +423,7 @@
         <h3>Ready to Sell Your Property?</h3>
         <p>Sign in to create your listing and reach thousands of buyers. Our step-by-step wizard makes it easy.</p>
         <div class="sell-benefits">
-          <div class="benefit-item"><span>✓</span> Pay only 1% seller commission</div>
+          <div class="benefit-item"><span>✓</span> Flat $2,500 listing fee</div>
           <div class="benefit-item"><span>✓</span> Free AI-powered valuation</div>
           <div class="benefit-item"><span>✓</span> Professional listing tools</div>
           <div class="benefit-item"><span>✓</span> Reach thousands of buyers</div>
@@ -479,12 +475,12 @@
           <div class="wizard-step-header">
             <span class="wizard-step-icon">🔐</span>
             <h3>Identity Verification</h3>
-            <p>FINTRAC requires identity verification for all real estate transactions in Canada</p>
+            <p>Verify your identity to create a listing</p>
           </div>
           <div class="wizard-step-body">
             <div class="info-box warning">
-              <h4>Why Verification is Required</h4>
-              <p>Under Canadian anti-money laundering regulations (FINTRAC), we must verify the identity of all sellers. This protects you and ensures a secure transaction.</p>
+              <h4>About Verification</h4>
+              <p>Identity verification may be required depending on your role and service partners. Your lawyer will handle any regulatory compliance requirements as part of the closing process.</p>
             </div>
             <div class="verification-checklist">
               <div class="verify-item">
@@ -516,9 +512,13 @@
           <div class="wizard-step-body">
             <div class="form-group">
               <label>Province *</label>
-              <select id="propertyProvince" required>
+              <select id="propertyProvince" required onchange="updateProvinceDisclosures()">
                 <option value="">Select Province</option>
               </select>
+            </div>
+            <div id="provinceDisclosures" style="display: none; background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+              <h4 style="margin: 0 0 0.5rem 0; color: #1e40af; font-size: 0.875rem;">Province-Specific Requirements</h4>
+              <p id="provinceDisclosureText" style="margin: 0; color: #1e3a8a; font-size: 0.875rem;"></p>
             </div>
             <div class="form-row">
               <div class="form-group flex-2">
@@ -719,14 +719,14 @@
               </div>
             </div>
             <div class="commission-preview">
-              <h4>Commission Breakdown</h4>
+              <h4>Platform Fee Summary</h4>
               <div class="commission-row">
-                <span>Seller Commission (1%)</span>
-                <span id="sellerCommission">$0</span>
+                <span>Seller Listing Fee (flat)</span>
+                <span id="sellerCommission">$2,500</span>
               </div>
               <div class="commission-row">
-                <span>Buyer Commission (1%)</span>
-                <span id="buyerCommission">$0</span>
+                <span>Buyer Platform Fee (flat)</span>
+                <span id="buyerCommission">$1,000</span>
               </div>
               <div class="commission-row total">
                 <span>Your Net Proceeds (estimated)</span>
@@ -2271,14 +2271,20 @@
   <section id="terms" class="section">
     <div class="legal-container">
       <h1>Terms of Service</h1>
-      <p class="legal-date">Last Updated: December 2024</p>
+      <p class="legal-date">Last Updated: December 24, 2024</p>
 
       <div class="legal-content">
         <h2>1. Acceptance of Terms</h2>
         <p>By accessing or using Real Estate Direct ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our Platform.</p>
 
-        <h2>2. Platform Description</h2>
-        <p>Real Estate Direct is an online platform that facilitates the buying and selling of real estate properties in Canada. The Platform provides tools for property listings, offer management, document generation, and transaction coordination.</p>
+        <h2>2. Platform Description and Scope</h2>
+        <p>Real Estate Direct is a technology platform that provides tools and workflow assistance for real estate transactions across Canada. The Platform provides tools for property listings, offer management, document templates, and transaction coordination.</p>
+
+        <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+          <p style="margin: 0; color: #78350f;"><strong>Important:</strong> Real Estate Direct is a platform, not a brokerage. We do not represent buyers or sellers. All negotiations are conducted directly between the parties or through licensed professionals of their choosing. Real estate regulations vary by province; users are responsible for ensuring compliance with local requirements.</p>
+        </div>
+
+        <p><strong>Geographic Scope:</strong> The Platform is available across Canada. However, real estate laws, forms, and requirements vary significantly by province and territory. Users should consult with local real estate lawyers to ensure compliance with provincial regulations.</p>
 
         <h2>3. User Accounts</h2>
         <p>To use certain features of the Platform, you must register for an account. You agree to:</p>
@@ -2289,12 +2295,12 @@
           <li>Notify us immediately of any unauthorized use</li>
         </ul>
 
-        <h2>4. Commission Structure</h2>
-        <p>Real Estate Direct charges a simple 1% commission from each party (buyer and seller), for a total of 2%. This is significantly lower than traditional real estate agent commissions of 5-6%.</p>
+        <h2>4. Fee Structure</h2>
+        <p>Real Estate Direct charges flat platform fees that are not tied to the sale price of the property.</p>
         <ul>
-          <li><strong>Seller Commission:</strong> 1% of the sale price, payable upon closing</li>
-          <li><strong>Buyer Commission:</strong> 1% of the purchase price, payable upon closing</li>
-          <li>Commissions are invoiced upon transaction completion</li>
+          <li><strong>Seller Listing Fee:</strong> $2,500 flat fee, payable upon closing</li>
+          <li><strong>Buyer Platform Fee:</strong> $1,000 flat fee, payable upon closing</li>
+          <li>Fees are invoiced upon transaction completion</li>
           <li>Payment is due within 30 days of closing</li>
           <li>Accepted payment methods include credit card and bank transfer</li>
         </ul>
@@ -2392,11 +2398,13 @@
   <section id="privacy" class="section">
     <div class="legal-container">
       <h1>Privacy Policy</h1>
-      <p class="legal-date">Last Updated: December 2024</p>
+      <p class="legal-date">Last Updated: December 24, 2024</p>
 
       <div class="legal-content">
         <h2>1. Introduction</h2>
-        <p>Real Estate Direct ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Platform.</p>
+        <p>Real Estate Direct ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Platform across Canada.</p>
+
+        <p><strong>Scope:</strong> This policy applies to all users of the Real Estate Direct platform, regardless of province or territory. Additional privacy requirements may apply based on your location (e.g., Quebec's privacy laws).</p>
 
         <h2>2. Information We Collect</h2>
         <h3>Information You Provide</h3>
@@ -2780,6 +2788,31 @@
       <div id="doc-all" class="doc-tab-content active">
         <div class="documents-list" id="allDocumentsList">
           <div class="empty-state">Loading documents...</div>
+        </div>
+
+        <!-- Document Audit Trail Info -->
+        <div class="audit-trail-info" style="margin-top: 2rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem;">
+          <h3 style="margin: 0 0 1rem 0; font-size: 1rem; color: #334155;">Document Audit Trail</h3>
+          <p style="margin: 0 0 1rem 0; color: #64748b; font-size: 0.875rem;">Every document includes a complete audit trail for your records:</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">📅</span>
+              <span style="font-size: 0.875rem; color: #475569;">Created date & time</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">👤</span>
+              <span style="font-size: 0.875rem; color: #475569;">Uploaded/Created by</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">✍️</span>
+              <span style="font-size: 0.875rem; color: #475569;">Signed by & signature date</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">🔢</span>
+              <span style="font-size: 0.875rem; color: #475569;">Version history</span>
+            </div>
+          </div>
+          <p style="margin: 1rem 0 0 0; color: #94a3b8; font-size: 0.75rem;">All documents are timestamped and tracked for legal compliance. Click any document to view its full audit history.</p>
         </div>
       </div>
 
@@ -3257,6 +3290,232 @@
             <p class="results-disclaimer">Contact lawyers directly to verify availability, fees, and to confirm they can handle your specific transaction.</p>
           </div>
         </div>
+
+        <!-- Property Description Generator -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">✍️</span>
+            <h2>Property Description Generator</h2>
+          </div>
+          <p class="tool-description">Generate compelling property descriptions that attract buyers to your listing.</p>
+
+          <form id="descriptionForm" onsubmit="generateDescription(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Property Type</label>
+                <select id="descPropertyType" required>
+                  <option value="">Select Type</option>
+                  <option value="detached">Detached House</option>
+                  <option value="semi-detached">Semi-Detached</option>
+                  <option value="townhouse">Townhouse</option>
+                  <option value="condo">Condo/Apartment</option>
+                  <option value="bungalow">Bungalow</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="descCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bedrooms</label>
+                <input type="number" id="descBedrooms" min="0" max="20" placeholder="3" required>
+              </div>
+              <div class="form-group">
+                <label>Bathrooms</label>
+                <input type="number" id="descBathrooms" min="0" max="10" step="0.5" placeholder="2" required>
+              </div>
+              <div class="form-group">
+                <label>Square Feet</label>
+                <input type="number" id="descSqft" placeholder="1500">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Key Features (comma separated)</label>
+              <input type="text" id="descFeatures" placeholder="hardwood floors, updated kitchen, large backyard">
+            </div>
+            <div class="form-group">
+              <label>Highlights</label>
+              <textarea id="descHighlights" rows="2" placeholder="Any special selling points..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">✨</span> Generate Description
+            </button>
+          </form>
+
+          <div id="descriptionResults" class="ai-results" style="display:none;">
+            <h3>Generated Description</h3>
+            <div id="generatedDescription" class="generated-text"></div>
+            <div class="result-actions">
+              <button onclick="copyToClipboard('generatedDescription')" class="btn btn-outline btn-sm">Copy to Clipboard</button>
+              <button onclick="regenerateDescription()" class="btn btn-outline btn-sm">Regenerate</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Price Suggestion -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">💰</span>
+            <h2>AI Price Suggestion</h2>
+          </div>
+          <p class="tool-description">Get an AI-powered price estimate based on comparable properties and market data.</p>
+
+          <form id="priceSuggestionForm" onsubmit="suggestPrice(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="priceProvince" required>
+                  <option value="">Select Province</option>
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="priceCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Property Type</label>
+                <select id="pricePropertyType" required>
+                  <option value="detached">Detached House</option>
+                  <option value="semi-detached">Semi-Detached</option>
+                  <option value="townhouse">Townhouse</option>
+                  <option value="condo">Condo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Bedrooms</label>
+                <input type="number" id="priceBedrooms" min="0" max="20" placeholder="3" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bathrooms</label>
+                <input type="number" id="priceBathrooms" min="0" max="10" step="0.5" placeholder="2" required>
+              </div>
+              <div class="form-group">
+                <label>Square Feet</label>
+                <input type="number" id="priceSqft" placeholder="1500" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">📊</span> Get Price Estimate
+            </button>
+          </form>
+
+          <div id="priceResults" class="ai-results" style="display:none;">
+            <h3>Price Estimate</h3>
+            <div class="price-estimate">
+              <div class="suggested-price" id="suggestedPrice">$0</div>
+              <div class="price-range">Range: <span id="priceLow">$0</span> - <span id="priceHigh">$0</span></div>
+            </div>
+            <p class="price-methodology" id="priceMethodology"></p>
+            <p class="results-disclaimer">This is an AI-generated estimate. Consult a professional appraiser for accurate valuation.</p>
+          </div>
+        </div>
+
+        <!-- Listing Title Generator -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">📝</span>
+            <h2>Listing Title Generator</h2>
+          </div>
+          <p class="tool-description">Generate eye-catching listing titles that stand out in search results.</p>
+
+          <form id="titleForm" onsubmit="generateTitles(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Property Type</label>
+                <select id="titlePropertyType" required>
+                  <option value="detached">Detached House</option>
+                  <option value="semi-detached">Semi-Detached</option>
+                  <option value="townhouse">Townhouse</option>
+                  <option value="condo">Condo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="titleCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bedrooms</label>
+                <input type="number" id="titleBedrooms" min="0" placeholder="3" required>
+              </div>
+              <div class="form-group">
+                <label>Bathrooms</label>
+                <input type="number" id="titleBathrooms" min="0" step="0.5" placeholder="2" required>
+              </div>
+              <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" id="titlePrice" placeholder="500000">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">✨</span> Generate Titles
+            </button>
+          </form>
+
+          <div id="titleResults" class="ai-results" style="display:none;">
+            <h3>Suggested Titles</h3>
+            <div class="title-options" id="titleOptions"></div>
+          </div>
+        </div>
+
+        <!-- Neighbourhood Insights -->
+        <div class="ai-tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">🏘️</span>
+            <h2>Neighbourhood Insights</h2>
+          </div>
+          <p class="tool-description">Get AI-powered insights about any neighbourhood including schools, transit, and lifestyle.</p>
+
+          <form id="neighbourhoodForm" onsubmit="getNeighbourhoodInsights(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="insightProvince" required>
+                  <option value="">Select Province</option>
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="insightCity" placeholder="e.g., Toronto" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Postal Code (optional)</label>
+              <input type="text" id="insightPostalCode" placeholder="e.g., M5V 1J2">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">🔍</span> Get Insights
+            </button>
+          </form>
+
+          <div id="insightResults" class="ai-results" style="display:none;">
+            <h3>Neighbourhood Insights</h3>
+            <div id="neighbourhoodInsights" class="generated-text"></div>
+          </div>
+        </div>
       </div>
 
       <div class="ai-tools-info">
@@ -3332,52 +3591,52 @@
     </div>
   </div>
 
-  <!-- FINTRAC/AML Compliance Notice Section -->
+  <!-- Compliance Information Section -->
   <section id="fintrac" class="section">
     <div class="fintrac-container">
-      <h1>Anti-Money Laundering Compliance</h1>
-      <p class="fintrac-subtitle">Important information about FINTRAC requirements and identity verification in Canadian real estate</p>
+      <h1>Compliance & Legal Information</h1>
+      <p class="fintrac-subtitle">Understanding identity verification and legal requirements in Canadian real estate</p>
 
       <div class="fintrac-notice">
         <div class="fintrac-icon">🛡️</div>
         <div class="fintrac-content">
-          <h3>What is FINTRAC?</h3>
-          <p>The <strong>Financial Transactions and Reports Analysis Centre of Canada (FINTRAC)</strong> is Canada's financial intelligence unit. Real estate transactions are subject to anti-money laundering (AML) regulations under the <em>Proceeds of Crime (Money Laundering) and Terrorist Financing Act (PCMLTFA)</em>.</p>
+          <h3>About Regulatory Compliance</h3>
+          <p>Real estate transactions in Canada may be subject to various federal and provincial regulations. <strong>FINTRAC reporting requirements primarily apply to licensed real estate professionals, lawyers, and mortgage brokers.</strong> As a self-service platform, we provide tools and workflow assistance while your lawyer handles regulatory compliance at closing.</p>
         </div>
       </div>
 
       <div class="fintrac-requirements">
-        <h3>Identity Verification Requirements</h3>
-        <p>When buying or selling real estate in Canada, identity verification is required. Here's what you need to know:</p>
+        <h3>What to Expect During Your Transaction</h3>
+        <p>Your lawyer or notary will guide you through compliance requirements. Here's what's typically needed:</p>
 
         <div class="requirement-cards">
           <div class="requirement-card">
-            <h4>For Buyers</h4>
+            <h4>Identity Verification</h4>
             <ul>
-              <li>Valid government-issued photo ID (passport, driver's license)</li>
-              <li>Proof of address (utility bill, bank statement)</li>
-              <li>Source of funds documentation</li>
-              <li>Verification by lawyer or notary at closing</li>
+              <li>Government-issued photo ID (passport, driver's license)</li>
+              <li>Your lawyer will verify identity at closing</li>
+              <li>Corporate entities may require additional documentation</li>
+              <li>Requirements vary by province</li>
             </ul>
           </div>
 
           <div class="requirement-card">
-            <h4>For Sellers</h4>
+            <h4>Our Platform Role</h4>
             <ul>
-              <li>Valid government-issued photo ID</li>
-              <li>Proof of property ownership (title deed)</li>
-              <li>Verification by lawyer at closing</li>
-              <li>Banking information for proceeds</li>
+              <li>We provide listing and transaction tools</li>
+              <li>We do not provide legal representation</li>
+              <li>Your lawyer handles FINTRAC compliance</li>
+              <li>We recommend using licensed professionals</li>
             </ul>
           </div>
 
           <div class="requirement-card">
-            <h4>Third Party Involvement</h4>
+            <h4>Important Reminders</h4>
             <ul>
-              <li>Disclose if acting on behalf of another party</li>
-              <li>Beneficial owner information required</li>
-              <li>Corporate buyers must provide director info</li>
-              <li>Trust arrangements require beneficiary disclosure</li>
+              <li>Always hire a real estate lawyer</li>
+              <li>Foreign buyer restrictions may apply (consult lawyer)</li>
+              <li>Provincial disclosure requirements vary</li>
+              <li>Get professional advice for complex transactions</li>
             </ul>
           </div>
         </div>
@@ -3386,18 +3645,15 @@
       <div class="fintrac-warning">
         <h3>Important Notices</h3>
         <div class="warning-box">
-          <p><strong>Suspicious Transactions:</strong> Real estate professionals are required to report suspicious transactions to FINTRAC. Large cash transactions (over $10,000) and suspicious activity may be reported.</p>
+          <p><strong>Platform Role:</strong> Real Estate Direct is a technology platform, not a brokerage. We provide tools and workflow assistance but do not represent buyers or sellers. All negotiations are between the parties directly.</p>
         </div>
         <div class="warning-box">
-          <p><strong>Foreign Buyers:</strong> Non-Canadian buyers are subject to the <em>Prohibition on the Purchase of Residential Property by Non-Canadians Act</em> which restricts certain foreign purchases until 2027.</p>
-        </div>
-        <div class="warning-box">
-          <p><strong>Record Keeping:</strong> Transaction records must be kept for at least 5 years. This includes identification documents, transaction records, and correspondence.</p>
+          <p><strong>Legal Advice:</strong> This platform does not provide legal, tax, or financial advice. Consult with qualified professionals (lawyer, accountant, mortgage broker) for your specific situation.</p>
         </div>
       </div>
 
       <div class="fintrac-disclaimer">
-        <p><strong>Disclaimer:</strong> This information is provided for educational purposes only and does not constitute legal advice. For specific questions about FINTRAC compliance, consult with a qualified lawyer or visit <a href="https://fintrac-canafe.canada.ca" target="_blank" rel="noopener">fintrac-canafe.canada.ca</a>.</p>
+        <p><strong>Disclaimer:</strong> This information is provided for educational purposes only and does not constitute legal advice. FINTRAC compliance is typically handled by your lawyer or licensed real estate professional. For specific questions, consult with a qualified lawyer or visit <a href="https://fintrac-canafe.canada.ca" target="_blank" rel="noopener">fintrac-canafe.canada.ca</a>.</p>
       </div>
     </div>
   </section>
@@ -3517,11 +3773,11 @@
 
         <div class="faq-item">
           <h3 class="faq-question" onclick="toggleFaq(this)">
-            How much can I save compared to using an agent?
+            How do your fees compare to using an agent?
             <span class="faq-toggle">+</span>
           </h3>
           <div class="faq-answer">
-            <p>Traditional real estate commissions are typically 5-6% of the sale price, split between buyer's and seller's agents. Our platform fee is only 2% total (1% from buyer, 1% from seller), meaning you save 3-4% compared to traditional agents. On a $500,000 home, that's a savings of $15,000-$20,000!</p>
+            <p>Our flat fees ($2,500 for sellers, $1,000 for buyers) are fixed regardless of property value. Traditional agent commissions are typically percentage-based. Our platform is designed for buyers and sellers who want to manage their own transactions with our tools and workflow assistance. If you prefer full-service representation, you may want to work with a licensed real estate agent.</p>
           </div>
         </div>
 
@@ -3561,17 +3817,17 @@
             <span class="faq-toggle">+</span>
           </h3>
           <div class="faq-answer">
-            <p>We charge a simple 1% commission to both the buyer and seller (2% total) upon successful closing. There are no upfront fees for listing your property or browsing listings. Both parties benefit from document generation, AI tools, and transaction support.</p>
+            <p>We charge flat platform fees: $2,500 for sellers (listing fee) and $1,000 for buyers (platform fee). These are fixed amounts regardless of property value. There are no upfront fees for listing your property or browsing listings. Both parties benefit from document generation, AI tools, and transaction support.</p>
           </div>
         </div>
 
         <div class="faq-item">
           <h3 class="faq-question" onclick="toggleFaq(this)">
-            When do I pay the commission?
+            When do I pay the platform fee?
             <span class="faq-toggle">+</span>
           </h3>
           <div class="faq-answer">
-            <p>The 1% commission is invoiced after your transaction successfully closes. Payment is due within 30 days and can be made via credit card or bank transfer through our secure payment system.</p>
+            <p>Platform fees are invoiced after your transaction successfully closes. Payment is due within 30 days and can be made via credit card or bank transfer through our secure payment system.</p>
           </div>
         </div>
 
@@ -3581,7 +3837,7 @@
             <span class="faq-toggle">+</span>
           </h3>
           <div class="faq-answer">
-            <p>No hidden fees. The 1% commission (charged to both buyer and seller) is the only fee we charge. You may have other standard closing costs (legal fees, title insurance, etc.) but these are not charged by us.</p>
+            <p>No hidden fees. The flat platform fees ($2,500 seller, $1,000 buyer) are the only fees we charge. You may have other standard closing costs (legal fees, title insurance, etc.) but these are not charged by us.</p>
           </div>
         </div>
       </div>
@@ -3667,68 +3923,110 @@
     </div>
   </section>
 
-  <!-- Savings Calculator Section -->
-  <section id="savings-calculator" class="section">
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="section">
     <div class="section-header">
-      <h2>Commission Savings Calculator</h2>
-      <p>See exactly how much you'll save compared to traditional real estate agents</p>
+      <h2>How It Works</h2>
+      <p>Simple steps to buy or sell real estate with flat platform fees</p>
     </div>
     <div class="savings-calc-container">
-      <div class="savings-calc-form">
-        <div class="form-group">
-          <label>Property Value ($)</label>
-          <input type="number" id="savingsPropertyValue" value="500000" min="50000" step="10000" onchange="calculateSavings()">
-          <input type="range" id="savingsPropertySlider" min="100000" max="2000000" step="25000" value="500000" onchange="updateSavingsValue(this.value)">
+      <div class="savings-calc-form" style="max-width: 100%;">
+        <h3 style="margin-bottom: 1.5rem;">For Sellers (5 Steps)</h3>
+        <div class="how-it-works-steps">
+          <div class="step-item"><span class="step-num">1</span> <strong>List:</strong> Create your property listing with photos, details, and AI-generated description</div>
+          <div class="step-item"><span class="step-num">2</span> <strong>Verify:</strong> Confirm your identity and property ownership</div>
+          <div class="step-item"><span class="step-num">3</span> <strong>Schedule:</strong> Manage showing requests from interested buyers</div>
+          <div class="step-item"><span class="step-num">4</span> <strong>Offers:</strong> Receive, compare, and respond to offers directly</div>
+          <div class="step-item"><span class="step-num">5</span> <strong>Close:</strong> Work with your lawyer to complete the transaction</div>
         </div>
-        <div class="form-group">
-          <label>Are you buying or selling?</label>
-          <div class="radio-group">
-            <label class="radio-label"><input type="radio" name="transactionType" value="selling" checked onchange="calculateSavings()"> Selling</label>
-            <label class="radio-label"><input type="radio" name="transactionType" value="buying" onchange="calculateSavings()"> Buying</label>
-            <label class="radio-label"><input type="radio" name="transactionType" value="both" onchange="calculateSavings()"> Both (buying & selling)</label>
-          </div>
+        <h3 style="margin: 2rem 0 1.5rem;">For Buyers (4 Steps)</h3>
+        <div class="how-it-works-steps">
+          <div class="step-item"><span class="step-num">1</span> <strong>Search:</strong> Browse listings and save your favorites</div>
+          <div class="step-item"><span class="step-num">2</span> <strong>Tour:</strong> Request showings directly with sellers</div>
+          <div class="step-item"><span class="step-num">3</span> <strong>Offer:</strong> Submit offers with our document templates</div>
+          <div class="step-item"><span class="step-num">4</span> <strong>Close:</strong> Work with your lawyer to complete the purchase</div>
         </div>
       </div>
       <div class="savings-calc-results" id="savingsResults">
         <div class="savings-comparison-card">
-          <div class="comparison-side traditional">
-            <h3>Traditional Agent</h3>
+          <div class="comparison-side ours" style="flex: 1;">
+            <h3>Flat Platform Fees</h3>
             <div class="commission-breakdown">
               <div class="breakdown-item">
-                <span>Commission Rate</span>
-                <span class="rate">5%</span>
+                <span>Seller Listing Fee</span>
+                <span class="rate">$2,500</span>
               </div>
-              <div class="breakdown-item total">
-                <span>Total Cost</span>
-                <span class="amount" id="traditionalCost">$25,000</span>
-              </div>
-            </div>
-          </div>
-          <div class="comparison-side ours">
-            <h3>Real Estate Direct</h3>
-            <div class="commission-breakdown">
               <div class="breakdown-item">
-                <span>Commission Rate</span>
-                <span class="rate">2%</span>
+                <span>Buyer Platform Fee</span>
+                <span class="rate">$1,000</span>
               </div>
               <div class="breakdown-item total">
-                <span>Total Cost</span>
-                <span class="amount" id="ourCost">$10,000</span>
+                <span>Combined Total</span>
+                <span class="amount">$3,500</span>
               </div>
             </div>
           </div>
         </div>
         <div class="savings-total-card">
-          <div class="savings-icon">💰</div>
+          <div class="savings-icon">✨</div>
           <div class="savings-amount">
-            <span class="label">Your Savings</span>
-            <span class="value" id="totalSavings">$15,000</span>
+            <span class="label">Fixed Costs</span>
+            <span class="value">No Surprises</span>
           </div>
-          <p class="savings-note">That's money you keep in your pocket!</p>
+          <p class="savings-note">Same fee regardless of property value</p>
         </div>
         <div class="savings-cta">
-          <button onclick="showModal('registerModal')" class="btn btn-primary btn-lg">Start Saving Today</button>
+          <button onclick="showModal('registerModal')" class="btn btn-primary btn-lg">Get Started Today</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Who Does What Table -->
+    <div style="margin-top: 3rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+      <h3 style="text-align: center; margin-bottom: 1.5rem;">Who Does What in a Transaction</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <thead>
+            <tr style="background: #2563eb; color: white;">
+              <th style="padding: 12px; text-align: left;">Role</th>
+              <th style="padding: 12px; text-align: left;">Responsibilities</th>
+              <th style="padding: 12px; text-align: center;">Required?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 12px; font-weight: 600;">Buyer</td>
+              <td style="padding: 12px;">Search, schedule viewings, submit offers, arrange financing</td>
+              <td style="padding: 12px; text-align: center;">Yes</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Seller</td>
+              <td style="padding: 12px;">List property, respond to showings, review and accept offers</td>
+              <td style="padding: 12px; text-align: center;">Yes</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 12px; font-weight: 600;">Real Estate Lawyer</td>
+              <td style="padding: 12px;">Title search, document review, closing, fund transfer</td>
+              <td style="padding: 12px; text-align: center;">Yes*</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Mortgage Lender</td>
+              <td style="padding: 12px;">Pre-approval, financing, mortgage registration</td>
+              <td style="padding: 12px; text-align: center;">If financing</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 12px; font-weight: 600;">Home Inspector</td>
+              <td style="padding: 12px;">Property condition assessment, identify issues</td>
+              <td style="padding: 12px; text-align: center;">Recommended</td>
+            </tr>
+            <tr style="background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Licensed Agent</td>
+              <td style="padding: 12px;">Representation, negotiation, market expertise</td>
+              <td style="padding: 12px; text-align: center;">Optional</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem; text-align: center;">*In most provinces. In Quebec, a notary handles closings.</p>
       </div>
     </div>
   </section>
