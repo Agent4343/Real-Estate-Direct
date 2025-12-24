@@ -7468,3 +7468,36 @@ footer {
     justify-content: flex-start;
   }
 }
+
+/* Roles Table */
+.roles-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.roles-table thead tr {
+  background: var(--primary);
+  color: white;
+}
+
+.roles-table th,
+.roles-table td {
+  padding: 12px;
+  text-align: left;
+}
+
+.roles-table tbody tr {
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.roles-table tbody tr:nth-child(even) {
+  background: var(--gray-50);
+}
+
+.roles-table tbody tr:last-child {
+  border-bottom: none;
+}
