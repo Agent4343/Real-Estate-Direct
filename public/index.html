@@ -512,9 +512,13 @@
           <div class="wizard-step-body">
             <div class="form-group">
               <label>Province *</label>
-              <select id="propertyProvince" required>
+              <select id="propertyProvince" required onchange="updateProvinceDisclosures()">
                 <option value="">Select Province</option>
               </select>
+            </div>
+            <div id="provinceDisclosures" style="display: none; background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+              <h4 style="margin: 0 0 0.5rem 0; color: #1e40af; font-size: 0.875rem;">Province-Specific Requirements</h4>
+              <p id="provinceDisclosureText" style="margin: 0; color: #1e3a8a; font-size: 0.875rem;"></p>
             </div>
             <div class="form-row">
               <div class="form-group flex-2">
@@ -2267,14 +2271,20 @@
   <section id="terms" class="section">
     <div class="legal-container">
       <h1>Terms of Service</h1>
-      <p class="legal-date">Last Updated: December 2024</p>
+      <p class="legal-date">Last Updated: December 24, 2024</p>
 
       <div class="legal-content">
         <h2>1. Acceptance of Terms</h2>
         <p>By accessing or using Real Estate Direct ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our Platform.</p>
 
-        <h2>2. Platform Description</h2>
-        <p>Real Estate Direct is an online platform that facilitates the buying and selling of real estate properties in Canada. The Platform provides tools for property listings, offer management, document generation, and transaction coordination.</p>
+        <h2>2. Platform Description and Scope</h2>
+        <p>Real Estate Direct is a technology platform that provides tools and workflow assistance for real estate transactions across Canada. The Platform provides tools for property listings, offer management, document templates, and transaction coordination.</p>
+
+        <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+          <p style="margin: 0; color: #78350f;"><strong>Important:</strong> Real Estate Direct is a platform, not a brokerage. We do not represent buyers or sellers. All negotiations are conducted directly between the parties or through licensed professionals of their choosing. Real estate regulations vary by province; users are responsible for ensuring compliance with local requirements.</p>
+        </div>
+
+        <p><strong>Geographic Scope:</strong> The Platform is available across Canada. However, real estate laws, forms, and requirements vary significantly by province and territory. Users should consult with local real estate lawyers to ensure compliance with provincial regulations.</p>
 
         <h2>3. User Accounts</h2>
         <p>To use certain features of the Platform, you must register for an account. You agree to:</p>
@@ -2388,11 +2398,13 @@
   <section id="privacy" class="section">
     <div class="legal-container">
       <h1>Privacy Policy</h1>
-      <p class="legal-date">Last Updated: December 2024</p>
+      <p class="legal-date">Last Updated: December 24, 2024</p>
 
       <div class="legal-content">
         <h2>1. Introduction</h2>
-        <p>Real Estate Direct ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Platform.</p>
+        <p>Real Estate Direct ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Platform across Canada.</p>
+
+        <p><strong>Scope:</strong> This policy applies to all users of the Real Estate Direct platform, regardless of province or territory. Additional privacy requirements may apply based on your location (e.g., Quebec's privacy laws).</p>
 
         <h2>2. Information We Collect</h2>
         <h3>Information You Provide</h3>
@@ -2776,6 +2788,31 @@
       <div id="doc-all" class="doc-tab-content active">
         <div class="documents-list" id="allDocumentsList">
           <div class="empty-state">Loading documents...</div>
+        </div>
+
+        <!-- Document Audit Trail Info -->
+        <div class="audit-trail-info" style="margin-top: 2rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem;">
+          <h3 style="margin: 0 0 1rem 0; font-size: 1rem; color: #334155;">Document Audit Trail</h3>
+          <p style="margin: 0 0 1rem 0; color: #64748b; font-size: 0.875rem;">Every document includes a complete audit trail for your records:</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">📅</span>
+              <span style="font-size: 0.875rem; color: #475569;">Created date & time</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">👤</span>
+              <span style="font-size: 0.875rem; color: #475569;">Uploaded/Created by</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">✍️</span>
+              <span style="font-size: 0.875rem; color: #475569;">Signed by & signature date</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">🔢</span>
+              <span style="font-size: 0.875rem; color: #475569;">Version history</span>
+            </div>
+          </div>
+          <p style="margin: 1rem 0 0 0; color: #94a3b8; font-size: 0.75rem;">All documents are timestamped and tracked for legal compliance. Click any document to view its full audit history.</p>
         </div>
       </div>
 
@@ -3941,6 +3978,55 @@
         <div class="savings-cta">
           <button onclick="showModal('registerModal')" class="btn btn-primary btn-lg">Get Started Today</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Who Does What Table -->
+    <div style="margin-top: 3rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+      <h3 style="text-align: center; margin-bottom: 1.5rem;">Who Does What in a Transaction</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <thead>
+            <tr style="background: #2563eb; color: white;">
+              <th style="padding: 12px; text-align: left;">Role</th>
+              <th style="padding: 12px; text-align: left;">Responsibilities</th>
+              <th style="padding: 12px; text-align: center;">Required?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 12px; font-weight: 600;">Buyer</td>
+              <td style="padding: 12px;">Search, schedule viewings, submit offers, arrange financing</td>
+              <td style="padding: 12px; text-align: center;">Yes</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Seller</td>
+              <td style="padding: 12px;">List property, respond to showings, review and accept offers</td>
+              <td style="padding: 12px; text-align: center;">Yes</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 12px; font-weight: 600;">Real Estate Lawyer</td>
+              <td style="padding: 12px;">Title search, document review, closing, fund transfer</td>
+              <td style="padding: 12px; text-align: center;">Yes*</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Mortgage Lender</td>
+              <td style="padding: 12px;">Pre-approval, financing, mortgage registration</td>
+              <td style="padding: 12px; text-align: center;">If financing</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 12px; font-weight: 600;">Home Inspector</td>
+              <td style="padding: 12px;">Property condition assessment, identify issues</td>
+              <td style="padding: 12px; text-align: center;">Recommended</td>
+            </tr>
+            <tr style="background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Licensed Agent</td>
+              <td style="padding: 12px;">Representation, negotiation, market expertise</td>
+              <td style="padding: 12px; text-align: center;">Optional</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem; text-align: center;">*In most provinces. In Quebec, a notary handles closings.</p>
       </div>
     </div>
   </section>

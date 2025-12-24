@@ -1041,6 +1041,38 @@ async function loadProvinces() {
   }
 }
 
+// Province-specific disclosures for listing workflow
+function updateProvinceDisclosures() {
+  const province = document.getElementById('propertyProvince')?.value;
+  const disclosuresDiv = document.getElementById('provinceDisclosures');
+  const disclosureText = document.getElementById('provinceDisclosureText');
+
+  if (!disclosuresDiv || !disclosureText) return;
+
+  const disclosures = {
+    'ON': 'Ontario requires mandatory property disclosure statements (SPIS recommended but not required). Title insurance is standard. Land Transfer Tax applies at closing.',
+    'BC': 'British Columbia has a Property Transfer Tax and Foreign Buyer Tax in certain areas. Property Disclosure Statement is recommended. Strata properties require Form B Information Certificate.',
+    'AB': 'Alberta has no land transfer tax. Real Property Report (RPR) is typically required. Property Condition Disclosure Statement is recommended.',
+    'QC': 'Quebec uses the Civil Code rather than common law. Notaries handle closings instead of lawyers. French language requirements may apply for documents.',
+    'MB': 'Manitoba has Land Transfer Tax. Property disclosure is recommended. Title insurance is available but not mandatory.',
+    'SK': 'Saskatchewan has no land transfer tax on residential property. Property Condition Disclosure Statement is commonly used.',
+    'NS': 'Nova Scotia has Deed Transfer Tax. Property Disclosure Statement is recommended. Title insurance is available.',
+    'NB': 'New Brunswick has Land Transfer Tax. Property Condition Disclosure is recommended.',
+    'PE': 'Prince Edward Island has Real Property Transfer Tax. Non-residents require Cabinet approval for land purchases over 5 acres or 165 feet of shore frontage.',
+    'NL': 'Newfoundland and Labrador has Registration of Deeds Tax. Property Condition Disclosure is recommended.',
+    'NT': 'Northwest Territories has no land transfer tax. Remote areas may have unique documentation requirements.',
+    'YT': 'Yukon has no land transfer tax. Property transactions follow similar processes to other territories.',
+    'NU': 'Nunavut has unique land ownership systems including Inuit Owned Lands. Consult local authorities for specific requirements.'
+  };
+
+  if (province && disclosures[province]) {
+    disclosureText.textContent = disclosures[province];
+    disclosuresDiv.style.display = 'block';
+  } else {
+    disclosuresDiv.style.display = 'none';
+  }
+}
+
 // ==========================================
 // Properties
 // ==========================================
@@ -1100,12 +1132,92 @@ async function searchProperties() {
         `;
       }).join('');
     } else {
-      grid.innerHTML = '<p class="loading">No properties found. Try adjusting your search.</p>';
+      // Show demo listings with CTA when no real listings found
+      grid.innerHTML = `
+        <div class="no-listings-banner" style="grid-column: 1/-1; text-align: center; padding: 2rem; background: #fef3c7; border-radius: 12px; margin-bottom: 2rem;">
+          <h3 style="margin: 0 0 0.5rem 0; color: #92400e;">No Active Listings Yet</h3>
+          <p style="margin: 0 0 1rem 0; color: #78350f;">Be the first to list in this area! It only takes 2 minutes.</p>
+          <button onclick="showSection('sell')" class="btn btn-primary">Post Your Listing</button>
+        </div>
+        <div style="grid-column: 1/-1; margin-bottom: 1rem;">
+          <p style="color: #6b7280; font-size: 0.875rem; text-align: center;">Sample listings to show how properties appear:</p>
+        </div>
+        ${getDemoListings()}
+      `;
     }
   } catch (error) {
     document.getElementById('propertyGrid').innerHTML =
-      '<p class="error">Failed to load properties</p>';
+      '<p class="error">Failed to load properties. Please try again.</p>';
   }
+}
+
+// Demo listings to show when no real listings exist
+function getDemoListings() {
+  const demoProperties = [
+    {
+      id: 'demo-1',
+      price: 549000,
+      street: '123 Maple Street',
+      city: 'Toronto',
+      province: 'ON',
+      beds: 3,
+      baths: 2,
+      sqft: 1850,
+      type: 'Detached'
+    },
+    {
+      id: 'demo-2',
+      price: 425000,
+      street: '456 Oak Avenue',
+      city: 'Ottawa',
+      province: 'ON',
+      beds: 2,
+      baths: 1,
+      sqft: 1200,
+      type: 'Condo'
+    },
+    {
+      id: 'demo-3',
+      price: 799000,
+      street: '789 Pine Crescent',
+      city: 'Vancouver',
+      province: 'BC',
+      beds: 4,
+      baths: 3,
+      sqft: 2400,
+      type: 'Townhouse'
+    },
+    {
+      id: 'demo-4',
+      price: 375000,
+      street: '321 Cedar Lane',
+      city: 'Calgary',
+      province: 'AB',
+      beds: 3,
+      baths: 2,
+      sqft: 1650,
+      type: 'Semi-Detached'
+    }
+  ];
+
+  return demoProperties.map(p => `
+    <div class="property-card demo-listing" style="opacity: 0.7; position: relative;">
+      <div class="demo-badge" style="position: absolute; top: 10px; left: 10px; background: #6366f1; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; z-index: 1;">Sample</div>
+      <div class="property-image">
+        <div class="property-image-placeholder">🏠</div>
+      </div>
+      <div class="property-info">
+        <div class="property-price">${formatCurrency(p.price)}</div>
+        <div class="property-address">${escapeHtml(p.street)}, ${escapeHtml(p.city)}</div>
+        <div class="property-details">
+          <span>${p.beds} beds</span>
+          <span>${p.baths} baths</span>
+          <span>${p.sqft.toLocaleString()} sqft</span>
+        </div>
+        <div class="property-type-badge">${escapeHtml(p.type)}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
 async function viewProperty(propertyId) {

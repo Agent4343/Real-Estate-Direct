@@ -2501,21 +2501,42 @@ function getHomeValuation(event) {
   var city = document.getElementById('valuationCity').value.trim();
   var postalCode = document.getElementById('valuationPostal').value.trim();
   var propertyType = document.getElementById('valuationType').value;
-  var beds = parseInt(document.getElementById('valuationBeds').value);
-  var baths = parseInt(document.getElementById('valuationBaths').value);
-  var sqft = parseInt(document.getElementById('valuationSqft').value) || 1500;
+  var beds = parseInt(document.getElementById('valuationBeds').value) || 3;
+  var baths = parseInt(document.getElementById('valuationBaths').value) || 2;
+  var sqft = parseInt(document.getElementById('valuationSqft').value) || 0;
   var yearBuilt = parseInt(document.getElementById('valuationYear').value) || 2000;
   var condition = document.getElementById('valuationCondition').value;
+
+  // Validate required fields
+  var missingFields = [];
+  if (!province) missingFields.push('province');
+  if (!city) missingFields.push('city');
+  if (!sqft || sqft < 100) missingFields.push('square footage');
+  if (!propertyType) missingFields.push('property type');
+
+  // If critical data is missing, show helpful message instead of $0
+  if (missingFields.length > 0) {
+    document.getElementById('valuationPrimary').innerHTML = '<span style="color: #dc2626;">Estimate Unavailable</span>';
+    document.getElementById('valuationRange').textContent = 'Missing: ' + missingFields.join(', ');
+    document.getElementById('valuationPricePerSqft').textContent = 'N/A';
+    document.getElementById('valuationTrend').textContent = 'N/A';
+    document.getElementById('valuationDays').textContent = 'N/A';
+    document.getElementById('comparablesList').innerHTML = '<p style="color: #6b7280; text-align: center;">Please complete all required fields for comparable sales data.</p>';
+    document.getElementById('valuationResults').style.display = 'block';
+    document.getElementById('valuationResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
 
   // Get market data
   var provinceData = marketData[province] || marketData['default'];
   var cityData = provinceData[city] || provinceData['default'] || provinceData;
 
-  // Base calculation
+  // Base calculation - ensure we have valid data
   var basePrice = cityData.avgPrice || 400000;
   var pricePerSqft = cityData.pricePerSqft || 300;
 
-  // Adjust for sqft
+  // Adjust for sqft (ensure minimum value)
+  sqft = Math.max(sqft, 500);
   var sqftValue = sqft * pricePerSqft;
 
   // Adjust for property type
@@ -2525,15 +2546,33 @@ function getHomeValuation(event) {
   var condMultiplier = conditionMultipliers[condition] || 1.0;
 
   // Adjust for bedrooms (more beds = higher value)
+  beds = Math.max(1, Math.min(beds, 10)); // Clamp between 1-10
   var bedMultiplier = 1 + ((beds - 3) * 0.05);
+  bedMultiplier = Math.max(0.8, Math.min(bedMultiplier, 1.4)); // Clamp multiplier
 
   // Adjust for year built
   var currentYear = new Date().getFullYear();
+  yearBuilt = Math.max(1900, Math.min(yearBuilt, currentYear));
   var age = currentYear - yearBuilt;
   var ageMultiplier = age < 5 ? 1.1 : (age > 50 ? 0.85 : 1 - (age * 0.002));
+  ageMultiplier = Math.max(0.7, Math.min(ageMultiplier, 1.2)); // Clamp multiplier
 
   // Calculate estimated value
   var estimatedValue = sqftValue * typeMultiplier * condMultiplier * bedMultiplier * ageMultiplier;
+
+  // Ensure minimum value (never show $0 or unreasonably low values)
+  var minimumValue = 50000;
+  if (!estimatedValue || isNaN(estimatedValue) || estimatedValue < minimumValue) {
+    document.getElementById('valuationPrimary').innerHTML = '<span style="color: #f59e0b;">Estimate Unavailable</span>';
+    document.getElementById('valuationRange').textContent = 'Insufficient comparable data for this area';
+    document.getElementById('valuationPricePerSqft').textContent = 'N/A';
+    document.getElementById('valuationTrend').textContent = '+' + (cityData.trend || 3.0).toFixed(1) + '% (6 months)';
+    document.getElementById('valuationDays').textContent = (cityData.daysOnMarket || 25) + ' days';
+    document.getElementById('comparablesList').innerHTML = '<p style="color: #6b7280; text-align: center;">We don\'t have enough comparable sales data for this location yet. <a href="javascript:void(0)" onclick="showSection(\'professionals\')">Contact a local professional</a> for an accurate valuation.</p>';
+    document.getElementById('valuationResults').style.display = 'block';
+    document.getElementById('valuationResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
 
   // Round to nearest 5000
   estimatedValue = Math.round(estimatedValue / 5000) * 5000;
