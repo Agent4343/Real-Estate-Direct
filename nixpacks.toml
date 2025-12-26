@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_20", "npm"]
 
 [phases.install]
-cmds = ["npm ci || npm install"]
+cmds = ["npm ci --legacy-peer-deps || npm install --legacy-peer-deps"]
 
 [phases.build]
-cmds = ["echo 'No build step required'"]
+cmds = ["echo 'Build complete'"]
 
 [start]
-cmd = "npm start"
+cmd = "node app.js"
